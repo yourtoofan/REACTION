@@ -530,3 +530,19 @@ async def broadcast_message(client, message):
 
         finally:
             IS_BROADCASTING = False
+
+
+    
+    
+import os
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+async def restart_nexichat():
+    os.system(f"kill -9 {os.getpid()} && python3 -m nexichat")
+
+scheduler = AsyncIOScheduler()
+scheduler.add_job(restart_nexichat, trigger="cron", hour=4, minute=0)
+scheduler.add_job(restart_nexichat, trigger="cron", hour=7, minute=0)
+scheduler.add_job(restart_nexichat, trigger="cron", hour=12, minute=0)
+scheduler.add_job(restart_nexichat, trigger="cron", hour=18, minute=0)
+scheduler.start()
