@@ -139,5 +139,15 @@ async def send_good_morning():
         except Exception as e:
             print(f"[bold red] Unable to send Good Morning message to Group {chat_id} - {e}")
 
-scheduler.add_job(send_good_morning, trigger="cron", hour=6, minute=1)
+
+async def restart_nexichat():
+    os.system(f"kill -9 {os.getpid()} && bash start")
+
+
+scheduler.add_job(send_good_morning, trigger="cron", hour=6, minute=0)
+scheduler.add_job(restart_nexichat, trigger="cron", hour=4, minute=30)
+scheduler.add_job(restart_nexichat, trigger="cron", hour=7, minute=0)
+scheduler.add_job(restart_nexichat, trigger="cron", hour=12, minute=0)
+scheduler.add_job(restart_nexichat, trigger="cron", hour=18, minute=0)
 scheduler.start()
+
