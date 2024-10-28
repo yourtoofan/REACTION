@@ -1,7 +1,7 @@
 import random
 from nexichat.database import get_served_chats
 from pyrogram import Client, filters
-
+import os
 from nexichat import nexichat
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pyrogram import filters
