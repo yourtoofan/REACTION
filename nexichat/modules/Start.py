@@ -471,9 +471,7 @@ async def broadcast_message(client, message):
                                 )
                                 pin_count += 1
                             except Exception as e:
-                                logger.error(
-                                    f"Failed to pin message in chat {chat_id}: {e}"
-                                )
+                                continue
 
                     except FloodWait as e:
                         flood_time = int(e.value)
@@ -487,7 +485,7 @@ async def broadcast_message(client, message):
                             continue
                         await asyncio.sleep(flood_time)
                     except Exception as e:
-                        logger.error(f"Error broadcasting to chat {chat_id}: {e}")
+                        
                         continue
 
                 await message.reply_text(
@@ -523,7 +521,7 @@ async def broadcast_message(client, message):
                             continue
                         await asyncio.sleep(flood_time)
                     except Exception as e:
-                        logger.error(f"Error broadcasting to user {user_id}: {e}")
+                        
                         continue
 
                 await message.reply_text(f"**Broadcasted to {susr} users.**")
