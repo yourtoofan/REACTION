@@ -60,7 +60,7 @@ async def chatbot_command(client: Client, message: Message):
         reply_markup=InlineKeyboardMarkup(CHATBOT_ON),
     )
 
-@app.on_message(filters.incoming)
+@nexichat.on_message(filters.incoming)
 async def chatbot_handler(client, message):
     chat_id = message.chat.id
     chat_status = await status_db.find_one({"chat_id": chat_id})
