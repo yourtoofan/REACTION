@@ -8,7 +8,6 @@ from pyrogram.types import BotCommand
 from config import OWNER_ID
 from nexichat import LOGGER, nexichat
 from nexichat.modules import ALL_MODULES
-from nexichat.modules.cleanup import main as cleanup
 
 
 
@@ -66,7 +65,6 @@ if __name__ == "__main__":
     # Start Flask server in a new thread
     flask_thread = threading.Thread(target=run_flask)
     flask_thread.start()
-    cleanup()
 
     # Start the bot asynchronously
     asyncio.get_event_loop().run_until_complete(anony_boot())
