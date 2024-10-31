@@ -18,7 +18,7 @@ from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
 import asyncio
 import config
 from nexichat import LOGGER, nexichat
-from nexichat.modules.helpers.chat_db import chatdb, get_current_mongo_uri
+from nexichat.modules.helpers.chat_db import chatdb, mongodb, get_current_mongo_uri
 from nexichat.modules.helpers import (
     ABOUT_BTN,
     ABOUT_READ,
@@ -362,6 +362,7 @@ async def chatbot_response(client: Client, message: Message):
         
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
+            await mongodb.close()
     except MessageEmpty as e:
         return await message.reply_text("🙄🙄")
     except Exception as e:
