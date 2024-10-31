@@ -18,7 +18,7 @@ from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
 import asyncio
 import config
 from nexichat import LOGGER, nexichat
-from nexichat.modules.helpers.chat_db import chatdb, mongodb, get_current_mongo_uri
+from nexichat.modules.helpers.chat_db import chatdb, mongodb, get_last_used_client_name
 from nexichat.modules.helpers import (
     ABOUT_BTN,
     ABOUT_READ,
@@ -46,7 +46,7 @@ status_db = db.chatbot_status_db.status
 
 @nexichat.on_message(filters.command("checkmongo"))
 async def check_mongo(client, message):
-    current_uri = get_current_mongo_uri()
+    current_uri = get_last_used_client_name()
     if current_uri:
         await message.reply_text(f"**Currently connected MongoDB URI For Chat:** `{current_uri}`")
     else:
@@ -362,8 +362,7 @@ async def chatbot_response(client: Client, message: Message):
         
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
-            await asyncio.sleep(5)
-            await mongodb.close()
+
     except MessageEmpty as e:
         return await message.reply_text("🙄🙄")
     except Exception as e:
