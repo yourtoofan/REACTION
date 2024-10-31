@@ -17,7 +17,7 @@ from nexichat.modules.helpers import (
     START,
     TOOLS_DATA_READ,
 )
-from nexichat import db
+from nexichat import db, nexichat
 
 status_db = db.chatbot_status_db.status
 
