@@ -1,7 +1,5 @@
 import random
-from pymongo import MongoClient
 from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
-
 
 CHAT_STORAGE = [
     "mongodb+srv://chutiyapa:bihar@cluster0.bph5t.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
@@ -21,11 +19,16 @@ CHAT_STORAGE = [
     "mongodb+srv://AbhiModszYT:AbhiModszYT@abhimodszyt.flmdtda.mongodb.net/?retryWrites=true&w=majority"
 ]
 
+selected_mongo_uri = None
+
 def get_mongo_client():
-    mongo_uri = random.choice(CHAT_STORAGE)
-    mongodb = MongoCli(mongo_uri)
+    global selected_mongo_uri
+    selected_mongo_uri = random.choice(CHAT_STORAGE)
+    mongodb = MongoCli(selected_mongo_uri)
     return mongodb
 
+def get_current_mongo_uri():
+    return selected_mongo_uri
 
 mongodb = get_mongo_client()
 chatdb = mongodb.Anonymous
