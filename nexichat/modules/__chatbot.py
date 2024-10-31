@@ -427,7 +427,7 @@ async def chatbot_response(client: Client, message: Message):
                 if not chat_lang or chat_lang == "nolang":
                     translated_text = response_text
                 else:
-                    translated_text = translator.translate(response_text, target=chat_lang)
+                    translated_text = GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
                 
                 if reply_data["check"] == "sticker":
                     await message.reply_sticker(reply_data["text"])
