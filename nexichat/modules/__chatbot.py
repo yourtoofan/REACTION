@@ -85,7 +85,7 @@ async def save_reply(original_message: Message, reply_message: Message):
 async def get_reply(word: str):
     global replies_cache
     if not replies_cache:
-        load_replies_cache()
+        await load_replies_cache()
         print("Reloaded Chats")
     relevant_replies = [reply for reply in replies_cache if reply['word'] == word]
     if not relevant_replies:
@@ -110,7 +110,7 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(chat_id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = get_reply(message.text)
+            reply_data = await get_reply(message.text)
 
             if reply_data:
                 response_text = reply_data["text"]
