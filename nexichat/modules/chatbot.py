@@ -1,4 +1,5 @@
 import random
+from TheApi import api
 from pymongo import MongoClient
 from pyrogram import Client, filters
 from pyrogram.errors import MessageEmpty
@@ -327,13 +328,14 @@ async def chatbot_response(client: Client, message: Message):
             reply_data = await get_reply(message.text)
 
             if reply_data:
-                response_text = reply_data["text"]
-                chat_lang = await get_chat_language(chat_id)
-
-                if not chat_lang or chat_lang == "nolang":
-                    translated_text = response_text
-                else:
-                    translated_text = GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
+                #response_text = reply_data["text"]
+                user_input = f"""
+                Sentences :- {message.text}
+                Ye sentence kon sa language me hai mujhe bas ush sentences ka chatbot jaisa chhota se chhota reply do jyada bada reply mat dena maximum 1 sentence ka hona chahiye reply aur agar chhota se chhota reply me bhi kam ho ja rha hai to chhota hi reply do aur jis lang me sentence hai usi lang me likh ke do, agar sentence me sirf emoji hoga to tum bhi reply me bas emoji do related emoji hi bhejna aur han ladki jaisa reply krna mtlb tum ek ladki ho ok.
+               
+                Bas reply likh ke do uske alava kuch nhi
+                """
+                results = api.chatgpt(user_input) 
                 
                 if reply_data["check"] == "sticker":
                     await message.reply_sticker(reply_data["text"])
@@ -346,7 +348,7 @@ async def chatbot_response(client: Client, message: Message):
                 elif reply_data["check"] == "gif":
                     await message.reply_animation(reply_data["text"]) 
                 else:
-                    await message.reply_text(translated_text)
+                    await message.reply_text(results)
             else:
                 await message.reply_text("**I don't understand. what are you saying??**")
         
