@@ -102,7 +102,7 @@ async def chatbot_response(client: Client, message: Message):
                 if x:
                     await message.reply_text(x, quote=True)
                 else:
-                    await message.reply_text("sᴏʀʀʏ
+                    await message.reply_text("🙄🙄")
         
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
