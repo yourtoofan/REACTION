@@ -8,7 +8,7 @@ from pyrogram.types import BotCommand
 from config import OWNER_ID
 from nexichat import LOGGER, nexichat
 from nexichat.modules import ALL_MODULES
-from nexichat.modules.chatbot import load_replies_cache
+from nexichat.modules import load_replies_cache
 
 async def anony_boot():
     try:
