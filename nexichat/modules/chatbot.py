@@ -8,7 +8,7 @@ from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
 from config import MONGO_URL
-from nexichat import nexichat, mongo, db
+from nexichat import nexichat, mongo
 from pyrogram.types import Message
 from nexichat.modules.helpers import CHATBOT_ON
 from pymongo import MongoClient
@@ -18,6 +18,7 @@ from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
 import asyncio
 import config
 from nexichat import LOGGER, nexichat
+from nexichat.modules.helpers.chat_db import db
 from nexichat.modules.helpers import (
     ABOUT_BTN,
     ABOUT_READ,
