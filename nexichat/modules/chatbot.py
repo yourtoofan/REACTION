@@ -1,6 +1,6 @@
 import random
 from pyrogram import Client, filters
-from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, 
+from pyrogram.types import CallbackQuery, InlineKeyboardMarkup 
 from pyrogram.errors import MessageEmpty
 from pyrogram.enums import ChatAction
 from pyrogram.types import Message
