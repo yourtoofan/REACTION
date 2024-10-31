@@ -10,7 +10,6 @@ from nexichat import LOGGER, nexichat
 from nexichat.modules import ALL_MODULES
 
 
-
 async def anony_boot():
     try:
         await nexichat.start()
@@ -29,6 +28,8 @@ async def anony_boot():
                 BotCommand("start", "Start the bot"),
                 BotCommand("help", "Get the help menu"),
                 BotCommand("ping", "Check if the bot is alive or dead"),
+                BotCommand("lang", "Select bot reply language"),
+                BotCommand("resetlang", "Reset to default bot reply lang"),
                 BotCommand("id", "Get users user_id"),
                 BotCommand("stats", "Check bot stats"),
                 BotCommand("gcast", "Broadcast any message to groups/users"),
