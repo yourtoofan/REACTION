@@ -1,6 +1,6 @@
 from .clean_logs import clean_logs
 from .clear_cache import clear_cache
-from .optimize_db import optimize_database
+from .optimize_database import optimize_database
 
 def main():
     print("Starting cleanup process...")
