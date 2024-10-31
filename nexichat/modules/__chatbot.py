@@ -2,19 +2,14 @@ import random
 from pymongo import MongoClient
 from pyrogram import Client, filters
 from pyrogram.errors import MessageEmpty
-from pyrogram.enums import ChatAction
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.enums import ChatAction, ChatMemberStatus as CMS
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
 from config import MONGO_URL
-from nexichat import nexichat, mongo
-from pyrogram.enums import ChatMemberStatus as CMS
-from pyrogram.types import CallbackQuery
-import asyncio
-import config
-from nexichat import LOGGER, nexichat
-from nexichat.modules.helpers import chatai
+from nexichat import nexichat, mongo, LOGGER, db
+from nexichat.modules.helpers import chatai, CHATBOT_ON
 from nexichat.modules.helpers import (
     ABOUT_BTN,
     ABOUT_READ,
@@ -30,9 +25,9 @@ from nexichat.modules.helpers import (
     START,
     TOOLS_DATA_READ,
 )
+import asyncio
 
 translator = GoogleTranslator()
-from nexichat import db
 
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
@@ -93,50 +88,6 @@ async def get_reply(word: str):
     return random.choice(relevant_replies) if relevant_replies else None
 
 
-
-
-import random
-from pymongo import MongoClient
-from pyrogram import Client, filters
-from pyrogram.errors import MessageEmpty
-from pyrogram.enums import ChatAction
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-from deep_translator import GoogleTranslator 
-from nexichat.database.chats import add_served_chat
-from nexichat.database.users import add_served_user
-from config import MONGO_URL
-from nexichat import nexichat, mongo
-from pyrogram.types import Message
-from nexichat.modules.helpers import CHATBOT_ON
-from pymongo import MongoClient
-from nexichat import mongo
-from pyrogram.enums import ChatMemberStatus as CMS
-from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
-import asyncio
-import config
-from nexichat import LOGGER, nexichat
-from nexichat.modules.helpers.chat_db import chatai
-from nexichat.modules.helpers import (
-    ABOUT_BTN,
-    ABOUT_READ,
-    ADMIN_READ,
-    BACK,
-    CHATBOT_BACK,
-    CHATBOT_READ,
-    DEV_OP,
-    HELP_BTN,
-    HELP_READ,
-    MUSIC_BACK_BTN,
-    SOURCE_READ,
-    START,
-    TOOLS_DATA_READ,
-)
-
-translator = GoogleTranslator()  
-from nexichat import db
-
-lang_db = db.ChatLangDb.LangCollection
-status_db = db.chatbot_status_db.status
 
 
 @nexichat.on_message(filters.command("status"))
