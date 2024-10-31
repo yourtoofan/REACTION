@@ -43,6 +43,17 @@ chatai = chatdb.Word.WordDb
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 
+from pyrogram import Client, filters
+from database import get_current_mongo_uri
+
+@nexichat.on_message(filters.command("checkmongo"))
+async def check_mongo(client, message):
+    current_uri = get_current_mongo_uri()
+    if current_uri:
+        await message.reply_text(f"**Currently connected MongoDB URI For Chat:** `{current_uri}`")
+    else:
+        await message.reply_text("**MongoDB URI is not set.**")
+
 @nexichat.on_message(filters.command("status"))
 async def status_command(client: Client, message: Message):
     chat_id = message.chat.id
