@@ -331,7 +331,7 @@ async def chatbot_response(client: Client, message: Message):
                 #response_text = reply_data["text"]
                 user_input = f"""
                 Sentences :- {message.text}
-                Ye sentence kon sa language me hai mujhe bas ush sentences ka chatbot jaisa chhota se chhota reply do jyada bada reply mat dena maximum 1 sentence ka hona chahiye reply aur agar chhota se chhota reply me bhi kam ho ja rha hai to chhota hi reply do aur jis lang me sentence hai usi lang me likh ke do, agar sentence me sirf emoji hoga to tum bhi reply me bas emoji do related emoji hi bhejna aur han ladki jaisa reply krna mtlb tum ek ladki ho ok.
+                Ye sentences ka chatbot jaisa chhota se chhota reply do jyada bada reply mat dena maximum 1 sentence ka hona chahiye reply aur agar chhota se chhota reply me bhi kam ho ja rha hai to chhota hi reply do aur jis lang me sentence hai usi lang me likh ke do, agar sentence me sirf emoji hoga to tum bhi reply me bas emoji do related emoji hi bhejna aur han ladki jaisa reply krna mtlb tum ek ladki ho ok.
                
                 Bas reply likh ke do uske alava kuch nhi
                 """
