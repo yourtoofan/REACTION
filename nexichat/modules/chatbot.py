@@ -69,6 +69,7 @@ async def chatbot_response(client: Client, message: Message):
         if chat_status and chat_status.get("status") == "disabled":
             return
 
+        # Ignore commands in groups or supergroups
         if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
             if message.chat.type == "group" or message.chat.type == "supergroup":
                 return await add_served_chat(message.chat.id)
@@ -76,17 +77,13 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(message.chat.id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            await client.send_chat_action(message.chat.id, ChatAction.TYPING)
+            await nexichat.send_chat_action(message.chat.id, ChatAction.TYPING)
+            
+            # Check database for non-text media (sticker, photo, video, audio, gif)
             reply_data = await get_reply(message.text)
 
             if reply_data:
-                user_input = f"""
-                text:- ({message.text})
-                text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
-                Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
-                """
-                results = api.chatgpt(user_input) 
-                
+                # Respond with the media found in the database
                 if reply_data["check"] == "sticker":
                     await message.reply_sticker(reply_data["text"])
                 elif reply_data["check"] == "photo":
@@ -96,18 +93,34 @@ async def chatbot_response(client: Client, message: Message):
                 elif reply_data["check"] == "audio":
                     await message.reply_audio(reply_data["text"])
                 elif reply_data["check"] == "gif":
-                    await message.reply_animation(reply_data["text"]) 
-                else:
-                    await message.reply_text(results)
+                    await message.reply_animation(reply_data["text"])
             else:
-                await message.reply_text("**I don't understand. what are you saying??**")
+                # Use api.chatgpt for text replies if no media found in the database
+                user_input = f"""
+                text:- ({message.text})
+                text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+                Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
+                """
+                results = api.chatgpt(user_input)
+                await message.reply_text(results)
         
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
     except MessageEmpty as e:
         return await message.reply_text("🙄🙄")
     except Exception as e:
+        print(f"Error in chatbot_response: {e}")
         return
+
+async def get_reply(word: str):
+    try:
+        # Only search for media responses (not text) in the database for the given word
+        reply_data = await chatai.find_one({"word": word, "check": {"$in": ["sticker", "photo", "video", "audio", "gif"]}})
+        
+        return reply_data if reply_data else None
+    except Exception as e:
+        print(f"Error in get_reply: {e}")
+        return None
 
 async def save_reply(original_message: Message, reply_message: Message):
     try:
@@ -180,7 +193,7 @@ async def save_reply(original_message: Message, reply_message: Message):
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
-
+"""
 async def get_reply(word: str):
     try:
         is_chat = await chatai.find({"word": word}).to_list(length=None)
@@ -190,3 +203,4 @@ async def get_reply(word: str):
     except Exception as e:
         print(f"Error in get_reply: {e}")
         return None
+"""
