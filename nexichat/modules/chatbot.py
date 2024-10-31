@@ -362,6 +362,7 @@ async def chatbot_response(client: Client, message: Message):
         
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
+            await asyncio.sleep(5)
             await mongodb.close()
     except MessageEmpty as e:
         return await message.reply_text("🙄🙄")
