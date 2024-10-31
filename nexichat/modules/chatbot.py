@@ -55,16 +55,9 @@ async def chatbot_response(client: Client, message: Message):
 
             if reply_data:
                 user_input = f"""
-                Input: {message.text}
-                
-                You are a friendly and concise chatbot designed to reply with short, context-aware responses. Please respond in the same language as the input text, keeping replies as short as possible (no longer than one sentence). If the input is in the form of a simple emoji, reply with a single related emoji.
-                Instructions:
-                1. Use a tone that feels casual and natural, like a female friend.
-                2. Keep responses direct, limited to the essential idea of the input, and only elaborate if necessary.
-                3. If a reply can be simplified, prioritize making it as short as possible.
-                4. If an input message has any gender-specific tone or phrasing, reply in a way that keeps the tone friendly and light-hearted.
-                
-                Now Reply concisely to the following text without adding anything extra. Just give the reply only.
+                Sentences:- {message.text}
+                jo sentences me message hai uske liye Ekdam chatty aur chhota reply do, purane jaise reply mat dena new reply lagna chahiye aur bas 1 sentence ka ya usse bhi kam, lekin reply mazedar aur simple ho. Jis language mein yeh sentence hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related ek emoji bhejo. Dhyaan rahe, tum ek ladki ho toh reply bhi ladki ke jaise masti bhara aur halka-phulka ho.
+                Bas reply hi likh ke do, kuch extra nahi!
                 """
                 results = api.chatgpt(user_input) 
                 
