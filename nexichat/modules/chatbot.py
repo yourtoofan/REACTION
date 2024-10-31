@@ -78,7 +78,7 @@ async def chatbot_handler(client, message):
                 Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
                 """
             response = api.gemini(user_input)
-            await app.send_chat_action(message.chat.id, ChatAction.TYPING)
+            await nexichat.send_chat_action(message.chat.id, ChatAction.TYPING)
             x = response["results"]
             if x:
                 await message.reply_text(x, quote=True)
