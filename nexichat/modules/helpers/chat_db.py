@@ -20,23 +20,18 @@ CHAT_STORAGE = [
 ]
 
 clients = {f"client_{i}": MongoCli(uri) for i, uri in enumerate(CHAT_STORAGE)}
-last_used_client = None
 
 def get_random_client():
-    global last_used_client
     client_name = random.choice(list(clients.keys()))
-    last_used_client = client_name
-    return clients[client_name]
+    return clients[client_name], client_name
 
-def get_random_chatdb():
-    client = get_random_client()
-    return client.Anonymous
+def get_chatai():
+    chatdb, client_name = get_random_client()
+    global last_used_client
+    last_used_client = client_name
+    return chatdb.Anonymous.Word.WordDb
 
 def get_last_used_client_name():
     return last_used_client
-
-def get_chatai():
-    chatdb = get_random_chatdb()
-    return chatdb.Word.WordDb
 
 chatai = get_chatai()
