@@ -18,7 +18,7 @@ from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
 import asyncio
 import config
 from nexichat import LOGGER, nexichat
-from nexichat.modules.helpers.chat_db import chatdb
+from nexichat.modules.helpers.chat_db import chatdb, get_current_mongo_uri
 from nexichat.modules.helpers import (
     ABOUT_BTN,
     ABOUT_READ,
@@ -43,8 +43,6 @@ chatai = chatdb.Word.WordDb
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 
-from pyrogram import Client, filters
-from database import get_current_mongo_uri
 
 @nexichat.on_message(filters.command("checkmongo"))
 async def check_mongo(client, message):
