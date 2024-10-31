@@ -38,3 +38,5 @@ def get_last_used_client_name():
 def get_chatai():
     chatdb = get_random_chatdb()
     return chatdb.Word.WordDb
+
+chatai = get_chatai()
