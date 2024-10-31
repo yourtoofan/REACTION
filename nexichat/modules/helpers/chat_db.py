@@ -28,4 +28,4 @@ def get_mongo_client():
 
 
 mongodb = get_mongo_client()
-db = mongodb.Anonymous
+chatdb = mongodb.Anonymous
