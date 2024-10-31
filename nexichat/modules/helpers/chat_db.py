@@ -21,7 +21,7 @@ CHAT_STORAGE = [
 
 
 def get_chatai():
-    chatdb = MongoCli(random.choice(CHAT_STORAGE))}
+    chatdb = MongoCli(random.choice(CHAT_STORAGE))
     return chatdb.Anonymous.Word.WordDb
 
 chatai = get_chatai()
