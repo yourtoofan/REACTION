@@ -8,7 +8,7 @@ from pyrogram.types import BotCommand
 from config import OWNER_ID
 from nexichat import LOGGER, nexichat
 from nexichat.modules import ALL_MODULES
-from modules.cleanup import main as cleanup
+from nexichat.modules.cleanup import main as cleanup
 
 
 
