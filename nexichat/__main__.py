@@ -8,7 +8,7 @@ from pyrogram.types import BotCommand
 from config import OWNER_ID
 from nexichat import LOGGER, nexichat
 from nexichat.modules import ALL_MODULES
-
+from nexichat.modules.chatbot import load_replies_cache
 
 async def anony_boot():
     try:
@@ -23,6 +23,8 @@ async def anony_boot():
 
     # Set bot commands
     try:
+        await load_replies_cache()
+        LOGGER.info("Chatbot Loaded")
         await nexichat.set_bot_commands(
             commands=[
                 BotCommand("start", "Start the bot"),
