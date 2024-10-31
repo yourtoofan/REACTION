@@ -77,13 +77,9 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(message.chat.id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            await nexichat.send_chat_action(message.chat.id, ChatAction.TYPING)
-            
-            # Check database for non-text media (sticker, photo, video, audio, gif)
             reply_data = await get_reply(message.text)
 
             if reply_data:
-                # Respond with the media found in the database
                 if reply_data["check"] == "sticker":
                     await message.reply_sticker(reply_data["text"])
                 elif reply_data["check"] == "photo":
@@ -95,14 +91,18 @@ async def chatbot_response(client: Client, message: Message):
                 elif reply_data["check"] == "gif":
                     await message.reply_animation(reply_data["text"])
             else:
-                # Use api.chatgpt for text replies if no media found in the database
                 user_input = f"""
                 text:- ({message.text})
                 text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
                 Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
                 """
-                results = api.chatgpt(user_input)
-                await message.reply_text(results)
+                response = api.gemini(user_input)
+                await nexichat.send_chat_action(message.chat.id, ChatAction.TYPING)
+                x = response["results"]
+                if x:
+                    await message.reply_text(x, quote=True)
+                else:
+                    await message.reply_text("sᴏʀʀʏ
         
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
