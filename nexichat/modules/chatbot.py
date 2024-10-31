@@ -32,7 +32,7 @@ from nexichat.modules.helpers import (
 )
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
-from TheApi import api
+from MukeshAPI import api
 from nexichat import db
 from nexichat import nexichat
 
