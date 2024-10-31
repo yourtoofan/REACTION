@@ -21,7 +21,7 @@ CHAT_STORAGE = [
     "mongodb+srv://AbhiModszYT:AbhiModszYT@abhimodszyt.flmdtda.mongodb.net/?retryWrites=true&w=majority"
 ]
 
-def get_mongo_client()
+def get_mongo_client():
     mongo_uri = random.choice(CHAT_STORAGE)
     mongodb = MongoCli(mongo_uri)
     return mongodb
