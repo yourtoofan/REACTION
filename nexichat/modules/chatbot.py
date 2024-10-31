@@ -112,15 +112,6 @@ async def chatbot_response(client: Client, message: Message):
         print(f"Error in chatbot_response: {e}")
         return
 
-async def get_reply(word: str):
-    try:
-        # Only search for media responses (not text) in the database for the given word
-        reply_data = await chatai.find_one({"word": word, "check": {"$in": ["sticker", "photo", "video", "audio", "gif"]}})
-        
-        return reply_data if reply_data else None
-    except Exception as e:
-        print(f"Error in get_reply: {e}")
-        return None
 
 async def save_reply(original_message: Message, reply_message: Message):
     try:
@@ -193,7 +184,7 @@ async def save_reply(original_message: Message, reply_message: Message):
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
-"""
+
 async def get_reply(word: str):
     try:
         is_chat = await chatai.find({"word": word}).to_list(length=None)
@@ -203,4 +194,4 @@ async def get_reply(word: str):
     except Exception as e:
         print(f"Error in get_reply: {e}")
         return None
-"""
+
