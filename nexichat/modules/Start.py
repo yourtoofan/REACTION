@@ -71,7 +71,6 @@ IMG = [
 from nexichat import db
 
 chatai = db.Word.WordDb
-lang_db = db.ChatLangDb.LangCollection
 status_db = db.ChatBotStatusDb.StatusCollection
 
 
@@ -106,8 +105,7 @@ async def welcomejej(client, message: Message):
         for member in message.new_chat_members:
             
             if member.id == nexichat.id:
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
-                await message.reply_photo(photo=random.choice(IMG), caption=START.format(nexichat.mention or "can't mention", users, chats), reply_markup=reply_markup)
+                await message.reply_photo(photo=random.choice(IMG), caption=START.format(nexichat.mention or "can't mention", users, chats))
                 chat = message.chat   
                 try:
                     invitelink = await nexichat.export_chat_invite_link(message.chat.id)
