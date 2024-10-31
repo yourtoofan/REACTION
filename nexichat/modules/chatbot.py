@@ -18,7 +18,7 @@ from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
 import asyncio
 import config
 from nexichat import LOGGER, nexichat
-from nexichat.modules.helpers.chat_db import db
+from nexichat.modules.helpers.chat_db import chatdb
 from nexichat.modules.helpers import (
     ABOUT_BTN,
     ABOUT_READ,
@@ -39,7 +39,7 @@ translator = GoogleTranslator()
 from nexichat import db
 
 # Simplified access to each collection in a consistent way
-chatai = db.Word.WordDb
+chatai = chatdb.Word.WordDb
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 
