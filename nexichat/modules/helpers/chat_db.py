@@ -19,16 +19,17 @@ CHAT_STORAGE = [
     "mongodb+srv://AbhiModszYT:AbhiModszYT@abhimodszyt.flmdtda.mongodb.net/?retryWrites=true&w=majority"
 ]
 
-selected_mongo_uri = None
+clients = {f"client_{i}": MongoCli(uri) for i, uri in enumerate(CHAT_STORAGE)}
+last_used_client = None
 
-def get_mongo_client():
-    global selected_mongo_uri
-    selected_mongo_uri = random.choice(CHAT_STORAGE)
-    mongodb = MongoCli(selected_mongo_uri)
-    return mongodb
+def get_random_client():
+    global last_used_client
+    client_name = random.choice(list(clients.keys()))
+    last_used_client = client_name
+    return clients[client_name]
 
-def get_current_mongo_uri():
-    return selected_mongo_uri
+def get_last_used_client_name():
+    return last_used_client
 
-mongodb = get_mongo_client()
+mongodb = get_random_client()
 chatdb = mongodb.Anonymous
