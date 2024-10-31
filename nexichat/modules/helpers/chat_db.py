@@ -1,5 +1,6 @@
 import random
 from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
 
 
 CHAT_STORAGE = [
@@ -20,16 +21,11 @@ CHAT_STORAGE = [
     "mongodb+srv://AbhiModszYT:AbhiModszYT@abhimodszyt.flmdtda.mongodb.net/?retryWrites=true&w=majority"
 ]
 
-def get_mongo_client():
-    
+def get_mongo_client()
     mongo_uri = random.choice(CHAT_STORAGE)
-    
-    # Create a MongoDB client using the random URI
-    client = MongoClient(mongo_uri)
-    
-    return client
+    mongodb = MongoCli(mongo_uri)
+    return mongodb
 
-# Create a single client and db object for external use
-client = get_mongo_client()
-db = client.get_database("Word")  # Replace "Word" with your actual database name
-WordDb = db.get_collection("WordDb")  # Replace "WordDb" with your actual collection name
+
+mongodb = get_mongo_client()
+db = mongodb.Anonymous
