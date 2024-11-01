@@ -33,14 +33,18 @@ translator = GoogleTranslator()
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 
-replies_cache = []
+from deep_translator import GoogleTranslator
+
+
+database_replies_cache = []
+ai_generated_replies_cache = []
 
 async def load_replies_cache():
-    global replies_cache
-    replies_cache = await chatai.find().to_list(length=None)
+    global database_replies_cache
+    database_replies_cache = await chatai.find().to_list(length=None)
 
 async def save_reply(original_message: Message, reply_message: Message):
-    global replies_cache
+    global database_replies_cache
     try:
         reply_data = {
             "word": original_message.text,
@@ -73,21 +77,22 @@ async def save_reply(original_message: Message, reply_message: Message):
         is_chat = await chatai.find_one(reply_data)
         if not is_chat:
             await chatai.insert_one(reply_data)
-            replies_cache.append(reply_data)
+            database_replies_cache.append(reply_data)
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
 
-async def get_reply(word: str):
-    global replies_cache
-    if not replies_cache:
-        await load_replies_cache()
-        print("Reloaded Chats")
-    relevant_replies = [reply for reply in replies_cache if reply['word'] == word]
-    if not relevant_replies:
-        relevant_replies = replies_cache
-    return random.choice(relevant_replies) if relevant_replies else None
 
+async def get_reply(word: str):
+    relevant_replies = [reply for reply in ai_generated_replies_cache if reply['word'] == word]
+    if relevant_replies:
+        return random.choice(relevant_replies)
+
+    relevant_replies = [reply for reply in database_replies_cache if reply['word'] == word]
+    if relevant_replies:
+        return random.choice(relevant_replies)
+
+    return random.choice(database_replies_cache) if database_replies_cache else None
 
 @nexichat.on_message(filters.command("status"))
 async def status_command(client: Client, message: Message):
@@ -267,37 +272,50 @@ async def chatbot_response(client: Client, message: Message):
 import asyncio
 import time
 AUTO_GCASTS = True
+
+
 async def refresh_replies_cache():
     while True:
-        for reply_data in replies_cache:
-            if reply_data["check"] == "none" and isinstance(reply_data["text"], str):  
-                user_input = f"""
-                    text:- ({reply_data['text']})
-                    text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
-                    Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
-                """
+        for reply_data in database_replies_cache:
+            if reply_data["check"] == "none" and isinstance(reply_data["text"], str):
                 try:
-                    response = api.chatgpt(user_input)
-                    
-                    if response:
-                        ai_reply = response
-                        reply_data["text"] = ai_reply if ai_reply else reply_data["text"]
+                    detected_language = GoogleTranslator().detect(reply_data["word"])
 
-                        await chatai.update_one(
-                            {"word": reply_data["word"], "check": "none"},
-                            {"$set": {"text": reply_data["text"]}}
-                        )
-                        print(f"New reply updated for {reply_data["word"]} == {reply_data["text"]}")
+                    existing_reply = next(
+                        (reply for reply in database_replies_cache if reply["word"] == reply_data["word"] and reply["text"] and GoogleTranslator().detect(reply["text"]) == detected_language),
+                        None
+                    )
+                    
+                    if existing_reply:
+                        ai_generated_replies_cache.append(existing_reply)
+                        database_replies_cache.remove(existing_reply)
                     else:
-                        print("Invalid API response format; using original text.")
+                        user_input = f"""
+                            text:- ({reply_data['text']})
+                            text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+                            Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
+                        """
+                        response = api.chatgpt(user_input)
+                        
+                        if response:
+                            ai_reply = response
+                            reply_data["text"] = ai_reply if ai_reply else reply_data["text"]
 
-                    
+                            ai_generated_replies_cache.append(reply_data)
+                            await chatai.update_one(
+                                {"word": reply_data["word"], "check": "none"},
+                                {"$set": {"text": reply_data["text"]}}
+                            )
+
+                            database_replies_cache.remove(reply_data)
+
                     await asyncio.sleep(1)
 
                 except Exception as e:
                     print(f"Error in refreshing replies cache: {e}")
 
-            await asyncio.sleep(1) 
+            await asyncio.sleep(1)
+
 
 async def continuous_update():
     await load_replies_cache()
@@ -306,10 +324,9 @@ async def continuous_update():
             try:
                 await refresh_replies_cache()
             except Exception as e:
-                pass
-
+                print(f"Error in continuous update: {e}")
         await asyncio.sleep(1)
-
 
 if AUTO_GCASTS:
     asyncio.create_task(continuous_update())
+
