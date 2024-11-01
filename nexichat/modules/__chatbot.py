@@ -140,35 +140,39 @@ async def generate_ai_reply(text):
         print(f"Error generating AI reply: {e}")
     return None
 
+import asyncio
+
 async def refresh_replies_cache():
     while True:
         for reply_data in chat_cache:
-            if reply_data["check"] == "none" and isinstance(reply_data["text"], str):  
+            if reply_data["check"] == "none" and isinstance(reply_data["text"], str):
                 user_input = f"""
                     sentence:- ({reply_data['text']})
-                    upar ek sentence use sentence ke liye ek chat vote Ki Tarah Chhota se Chhota reply do ladki banke jyada bada reply mat dena jitna chhota se chhota me kkam ho jaye aur Jis language mein sentence likha gaya Usi language mein reply likhkar ke do taki samjh aaye ki kya likha hua hai aur bas reply do uske alava extra kuch nhi"""
+                    upar ek sentence use sentence ke liye ek chat vote Ki Tarah Chhota se Chhota reply do ladki banke jyada bada reply mat dena jitna chhota se chhota me kkam ho jaye aur Jis language mein sentence likha gaya Usi language mein reply likhkar ke do taki samjh aaye ki kya likha hua hai aur bas reply do uske alava extra kuch nhi
+                """
                 try:
                     response = api.chatgpt(user_input)
                     
                     if response:
                         print(f"{reply_data['text']} == {response}")
-                        ai_reply = response
+                        ai_reply = response.strip()  # Trim whitespace from the response
                         reply_data["text"] = ai_reply if ai_reply else reply_data["text"]
 
+                        # Save reply in the database
                         await save_reply_in_databases(reply_data["text"], reply_data)
                         
-                        print(f"New reply updated for {reply_data["word"]} == {reply_data["text"]}")
+                        print(f"New reply updated for {reply_data['word']} == {reply_data['text']}")
                     else:
                         print("Invalid API response format; using original text.")
-
                     
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(1)  # Short pause after each API call
 
                 except Exception as e:
                     print(f"Error in refreshing replies cache: {e}")
 
-            await asyncio.sleep(1) 
+            await asyncio.sleep(5)  # Pause after each iteration through chat_cache
 
+# Assume `save_reply_in_databases` and `api.chatgpt` are defined elsewhere.
 async def load_chat_cache():
     global chat_cache
     chat_cache = await chatai.find().to_list(length=None)
