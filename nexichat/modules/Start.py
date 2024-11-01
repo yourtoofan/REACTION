@@ -3,6 +3,7 @@ import logging
 import random
 import time
 import psutil
+import config
 from nexichat import _boot_
 from nexichat import get_readable_time
 from nexichat import nexichat, mongo
@@ -98,6 +99,7 @@ async def set_default_status(chat_id):
 
 @nexichat.on_message(filters.new_chat_members)
 async def welcomejej(client, message: Message):
+    chat = message.chat
     await add_served_chat(message.chat.id)
     await set_default_status(message.chat.id)
     users = len(await get_served_users())
@@ -106,9 +108,12 @@ async def welcomejej(client, message: Message):
         for member in message.new_chat_members:
             
             if member.id == nexichat.id:
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
-                await message.reply_photo(photo=random.choice(IMG), caption=START.format(nexichat.mention or "can't mention", users, chats), reply_markup=reply_markup)
-                chat = message.chat   
+                try:
+                    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
+                    await message.reply_photo(photo=random.choice(IMG), caption=START.format(nexichat.mention or "can't mention", users, chats), reply_markup=reply_markup)
+                    chat = message.chat
+                except Exception as e:
+                    pass
                 try:
                     invitelink = await nexichat.export_chat_invite_link(message.chat.id)
                     link = f"[ɢᴇᴛ ʟɪɴᴋ]({invitelink})"
@@ -124,7 +129,9 @@ async def welcomejej(client, message: Message):
                     )
                 except AttributeError:
                     chat_photo = "https://envs.sh/IL_.jpg"
-                
+                except Exception as e:
+                    pass
+
                 count = await nexichat.get_chat_members_count(chat.id)
                 chats = len(await get_served_chats())
                 username = chat.username if chat.username else "𝐏ʀɪᴠᴀᴛᴇ 𝐆ʀᴏᴜᴘ"
@@ -140,45 +147,24 @@ async def welcomejej(client, message: Message):
                 )
 
                 try:
-                    owner_username = True
+                    OWNER = config.OWNER_ID
+                    if OWNER:
+                        await nexichat.send_photo(
+                            int(OWNER_ID),
+                            photo=chat_photo,
+                            caption=msg,
+                            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"{message.from_user.first_name}", user_id=message.from_user.id)]]))
+                                
                     
-                    if owner_username:
-                        await nexichat.send_photo(
-                            int(OWNER_ID),
-                            photo=chat_photo,
-                            caption=msg,
-                            reply_markup=InlineKeyboardMarkup(
-                                [
-                                    [
-                                        InlineKeyboardButton(
-                                            f"{message.from_user.first_name}",
-                                            user_id=message.from_user.id)]]))
-                    else:
-                        await nexichat.send_photo(
-                            int(OWNER_ID),
-                            photo=chat_photo,
-                            caption=msg,
-                            reply_markup=InlineKeyboardMarkup(
-                                [
-                                    [
-                                        InlineKeyboardButton(
-                                            f"{message.from_user.first_name}",
-                                            user_id=message.from_user.id)]]))
                 except Exception as e:
-                    logging.info(f"Error fetching owner username: {e}")
+                    print(f"Please Provide me correct owner id for send logs")
                     await nexichat.send_photo(
                         int(OWNER_ID),
                         photo=chat_photo,
                         caption=msg,
-                        reply_markup=InlineKeyboardMarkup(
-                            [
-                                [
-                                    InlineKeyboardButton(
-                                        f"{message.from_user.first_name}",
-                                        user_id=message.from_user.id)]]))
-
+                        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"{message.from_user.first_name}", user_id=message.from_user.id)]]))
     except Exception as e:
-        logging.info(f"Error: {e}")
+        print(f"Err: {e}")
 
 
 @nexichat.on_cmd(["start", "aistart"])
