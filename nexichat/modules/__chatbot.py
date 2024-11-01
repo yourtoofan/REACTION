@@ -162,7 +162,7 @@ async def continuous_update():
     await load_chat_cache()
     while True:
         try:
-            await asyncio.sleep(2)
+            await asyncio.sleep(10)
             await refresh_replies_cache()
         except Exception as e:
             print(f"Error in continuous update: {e}")
