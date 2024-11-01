@@ -86,9 +86,13 @@ async def save_new_reply(x: Message, new_reply: Message):
     try:
         reply_data = {
             "word": x.text,
-            "text": new_reply.text,
+            "text": None,
             "check": "none"
         }
+
+        if new_reply.text:
+            reply_data["text"] = new_reply.text
+            reply_data["check"] = "none"
 
         is_chat = await storeai.find_one(reply_data)
         if not is_chat:
@@ -104,9 +108,13 @@ async def save_new_cache(x: Message, new_reply: Message):
     try:
         reply_data = {
             "word": x.text,
-            "text": new_reply.text,
+            "text": None,
             "check": "none"
         }
+
+        if new_reply.text:
+            reply_data["text"] = new_reply.text
+            reply_data["check"] = "none"
 
         is_chat = await storeai.find_one(reply_data)
         if not is_chat:
