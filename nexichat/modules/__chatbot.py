@@ -276,19 +276,16 @@ AUTO_GCASTS = True
 async def refresh_replies_cache():
     while True:
         for reply_data in database_replies_cache:
-            if reply_data["check"] == "none" and isinstance(reply_data["text"], str):
+             if reply_data["check"] == "none" and isinstance(reply_data["text"], str) and reply_data["text"]:
                 try:
-                    detected_language = detected_lang = detect(reply_data["word"])
+                     if not reply_data["word"] or not isinstance(reply_data["word"], str):
+                        continue  
+                    
+                    detected_language = detect(reply_data["word"])
 
                     existing_reply = next(
-                        (
-                            reply
-                            for reply in database_replies_cache
-                            if reply["word"] == reply_data["word"]
-                            and reply["text"]
-                            and detect(reply["text"]) == detected_language
-                        ),
-                        None,
+                        (reply for reply in database_replies_cache if reply["word"] == reply_data["word"] and reply["text"] and detect(reply["text"]) == detected_language),
+                        None
                     )
                     
                     if existing_reply:
@@ -311,16 +308,14 @@ async def refresh_replies_cache():
                                 {"word": reply_data["word"], "check": "none"},
                                 {"$set": {"text": reply_data["text"]}}
                             )
-
                             database_replies_cache.remove(reply_data)
 
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(5)
 
                 except Exception as e:
                     print(f"Error in refreshing replies cache: {e}")
 
-            await asyncio.sleep(1)
-
+            await asyncio.sleep(5)
 
 async def continuous_update():
     await load_replies_cache()
