@@ -85,7 +85,7 @@ async def save_new_reply(message, new_reply):
     global new_replies_cache
     try:
         reply_data = {
-            "word": message.text,
+            "word": message,
             "text": new_reply,
             "check": "none"
         }
@@ -103,7 +103,7 @@ async def save_new_cache(message, new_reply):
     global new_replies_cache
     try:
         reply_data = {
-            "word": message.text,
+            "word": message,
             "text": new_reply,
             "check": "none"
         }
