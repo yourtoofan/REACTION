@@ -295,7 +295,7 @@ async def generate_reply(word):
         Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
     """
     response = api.gemini(user_input)
-    return response["results"]
+    return response["results"] if results in response else "Hey"
 
 # Update replies in database
 async def update_replies_cache():
@@ -314,7 +314,7 @@ async def update_replies_cache():
             except Exception as e:
                 print(f"Error updating reply for {reply_data['word']}: {e}")
 
-        await asyncio.sleep(2)
+        await asyncio.sleep(5)
 
 # Continuous task to load cache and update replies
 async def continuous_update():
