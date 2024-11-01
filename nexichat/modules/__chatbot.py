@@ -287,6 +287,7 @@ async def refresh_replies_cache():
                             {"word": reply_data["word"], "check": "none"},
                             {"$set": {"text": reply_data["text"]}}
                         )
+                        print(f"New reply updated for {reply_data["word"]} == {reply_data["text"]}")
                     else:
                         print("Invalid API response format; using original text.")
 
