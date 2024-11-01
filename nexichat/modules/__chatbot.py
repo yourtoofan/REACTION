@@ -292,12 +292,12 @@ async def refresh_replies_cache():
                         print("Invalid API response format; using original text.")
 
                     
-                    await asyncio.sleep(5)
+                    await asyncio.sleep(1)
 
                 except Exception as e:
                     print(f"Error in refreshing replies cache: {e}")
 
-            await asyncio.sleep(5) 
+            await asyncio.sleep(1) 
 
 async def continuous_update():
     await load_replies_cache()
@@ -308,7 +308,7 @@ async def continuous_update():
             except Exception as e:
                 pass
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(1)
 
 
 if AUTO_GCASTS:
