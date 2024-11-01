@@ -99,6 +99,23 @@ async def save_new_reply(message, new_reply):
     except Exception as e:
         print(f"Error in save_new_reply: {e}")
 
+async def save_new_cache(message, new_reply):
+    global new_replies_cache
+    try:
+        reply_data = {
+            "word": message.text,
+            "text": new_reply,
+            "check": "none"
+        }
+
+        is_chat = await storeai.find_one(reply_data)
+        if not is_chat:
+      
+            new_replies_cache.append(reply_data)
+            print(f"New AI-generated reply saved only in cache for '{message.text}': {new_reply}")
+
+    except Exception as e:
+        print(f"Error in save_new_cache: {e}")
 
 async def get_reply(word: str):
     global replies_cache
@@ -303,13 +320,14 @@ async def update_replies_cache():
         if "text" in reply_data and reply_data["check"] == "none":
             try:
                 new_reply = await generate_reply(reply_data["word"])
-                if new_reply:
+                if new_reply is "🫣🫣":
                     message = f"{reply_data['word']}"
+                    await save_new_cache(message, new_reply)
+                else:
                     await save_new_reply(message, new_reply)
 
-                    print(f"Updated reply for {reply_data['word']} == {new_reply}")
-                else:
-                    print("API response invalid format.")
+                    print(f"saved reply in databse for {reply_data['word']} == {new_reply}")
+                
             except Exception as e:
                 print(f"Error updating reply for {reply_data['word']}: {e}")
 
