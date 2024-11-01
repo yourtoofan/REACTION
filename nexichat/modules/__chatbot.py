@@ -295,8 +295,7 @@ async def generate_reply(word):
         Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
     """
     response = api.gemini(user_input)
-    return response["results"] if results in response else "Hey"
-
+    return response["results"] if response and "results" in response else "🫣🫣"
 # Update replies in database
 async def update_replies_cache():
     global replies_cache
