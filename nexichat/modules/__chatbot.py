@@ -270,9 +270,7 @@ async def chatbot_response(client: Client, message: Message):
                     await message.reply_voice(reply_data["text"])
                 else:
                     await message.reply_text(translated_text)
-            else:
-                await message.reply_text("**I don't understand. What are you saying?**")
-
+            
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
 
