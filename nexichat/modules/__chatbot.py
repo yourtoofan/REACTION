@@ -264,6 +264,16 @@ async def continuous_update():
                 print(f"Error in continuous update: {e}")
         await asyncio.sleep(1)
 
+async def get_reply(word: str):
+    try:
+        is_chat = await storeai.find({"word": word}).to_list(length=None)
+        if not is_chat:
+            is_chat = await chatai.find().to_list(length=None)
+        return random.choice(is_chat) if is_chat else None
+    except Exception as e:
+        print(f"Error in get_reply: {e}")
+        return None
+        
 @nexichat.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     try:
@@ -280,9 +290,10 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(chat_id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = next((item for item in store_cache if item["word"] == message.text) else "😅🤣😂")
+            reply_data = await get_reply(message.text)
 
             if reply_data:
+                
                 if reply_data["check"] == "sticker":
                     await message.reply_sticker(reply_data["text"])
                 elif reply_data["check"] == "photo":
