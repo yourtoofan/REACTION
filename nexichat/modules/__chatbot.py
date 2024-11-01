@@ -296,6 +296,8 @@ async def save_new_reply(x, new_reply):
         if not is_chat:
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
+            replies_cache.remove(reply_data)
+            await chatai.delete_one(reply_data)
             
     except Exception as e:
         print(f"Error in save_new_reply: {e}")
