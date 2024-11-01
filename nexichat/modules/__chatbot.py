@@ -74,9 +74,13 @@ async def save_reply(original_message: Message, reply_message: Message):
                 Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
             """
             response = api.chatgpt(user_input)
-            ai_reply = response["results"]
 
-            reply_data["text"] = ai_reply if ai_reply else reply_message.text
+            # Ensure response is a dictionary and contains 'results' key
+            if isinstance(response, dict) and "results" in response:
+                ai_reply = response["results"]
+                reply_data["text"] = ai_reply if ai_reply else reply_message.text
+            else:
+                reply_data["text"] = reply_message.text  # fallback if response format is unexpected
             reply_data["check"] = "none"
 
         is_chat = await chatai.find_one(reply_data)
@@ -86,6 +90,7 @@ async def save_reply(original_message: Message, reply_message: Message):
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
+
 
 async def get_reply(word: str):
     global replies_cache
