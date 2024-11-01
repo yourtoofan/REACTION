@@ -144,6 +144,7 @@ async def refresh_replies_cache():
     while True:
         for reply_data in chat_cache:
             if reply_data["check"] == "none" and isinstance(reply_data["text"], str):
+                await asyncio.sleep(5)
                 ai_reply = await generate_ai_reply(reply_data["text"])
                 if ai_reply:
                     reply_data["text"] = ai_reply
@@ -161,6 +162,7 @@ async def continuous_update():
     await load_chat_cache()
     while True:
         try:
+            await asyncio.sleep(2)
             await refresh_replies_cache()
         except Exception as e:
             print(f"Error in continuous update: {e}")
