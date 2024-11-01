@@ -11,7 +11,7 @@ from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
 from config import MONGO_URL
 from nexichat import nexichat, mongo, LOGGER, db
-from nexichat.modules.helpers import chatai, CHATBOT_ON
+from nexichat.modules.helpers import chatai, storeai CHATBOT_ON
 from nexichat.modules.helpers import (
     ABOUT_BTN,
     ABOUT_READ,
@@ -35,7 +35,7 @@ lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 
 replies_cache = []
-
+new_replies_cache = []
 
 async def load_replies_cache():
     global replies_cache
@@ -80,6 +80,25 @@ async def save_reply(original_message: Message, reply_message: Message):
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
+
+async def save_new_reply(original_message: Message, ai_generated_reply: str):
+    global new_replies_cache
+    try:
+        reply_data = {
+            "word": original_message.text,
+            "text": ai_generated_reply,
+            "check": "none"
+        }
+
+        is_chat = await storeai.find_one(reply_data)
+        if not is_chat:
+            await storeai.insert_one(reply_data)
+            new_replies_cache.append(reply_data)
+            print(f"New AI-generated reply saved for '{original_message.text}': {ai_generated_reply}")
+
+    except Exception as e:
+        print(f"Error in save_reply: {e}")
+
 
 async def get_reply(word: str):
     global replies_cache
@@ -276,7 +295,7 @@ async def generate_reply(word):
         Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
     """
     response = api.gemini(user_input)
-    return response["results"] if "results" in response else None
+    return response["results"]
 
 # Update replies in database
 async def update_replies_cache():
@@ -286,11 +305,9 @@ async def update_replies_cache():
             try:
                 new_reply = await generate_reply(reply_data["word"])
                 if new_reply:
-                    # Update reply in database
-                    await chatai.update_one(
-                        {"word": reply_data["word"], "check": "none"},
-                        {"$set": {"text": new_reply}}
-                    )
+                    message = f"{reply_data['word']}"
+                    await save_new_reply(message, new_reply)
+
                     print(f"Updated reply for {reply_data['word']} == {new_reply}")
                 else:
                     print("API response invalid format.")
