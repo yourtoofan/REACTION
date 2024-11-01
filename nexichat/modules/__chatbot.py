@@ -171,12 +171,13 @@ async def refresh_replies_cache():
                     response = api.chatgpt(user_input)
                     
                     if response:
+                        print(f"{reply_data['text']} == {response}")
                         ai_reply = response
                         reply_data["text"] = ai_reply if ai_reply else reply_data["text"]
 
                         await save_reply_in_databases(reply_data["text"], reply_data)
-                        print("8")
-                        print(f"New reply updated for {reply_data["word"]} == {reply_data["text"]}")
+                        
+                        #print(f"New reply updated for {reply_data["word"]} == {reply_data["text"]}")
                     else:
                         print("Invalid API response format; using original text.")
 
