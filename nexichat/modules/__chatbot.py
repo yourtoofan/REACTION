@@ -272,31 +272,34 @@ AUTO_GCASTS = True
 async def refresh_replies_cache():
     while True:
         global replies_cache
-        for reply_data in replies_cache:
-            if reply_data["check"] == "none" and isinstance(reply_data["text"], str):  
-                try:
-                    user_input = f"""
-                    text:- ({reply_data["text"]})
-                    text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
-                    Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
-                    """
-                    response = api.gemini(user_input)
-                    x = response["results"]
+        if not replies_cache:
+            await load_replies_cache()
+            print("Reloaded Chats done")
+            for reply_data in replies_cache:
+                if reply_data["check"] == "none" and isinstance(reply_data["text"], str):  
+                    try:
+                        user_input = f"""
+                        text:- ({reply_data["text"]})
+                        text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+                        Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
+                        """
+                        response = api.gemini(user_input)
+                        x = response["results"]
                     
-                    if x:
-                        print(f"{x}")
-                        await chatai.update_one(
-                            {"word": reply_data["word"], "check": "none"},
-                            {"$set": {"text": x}}
-                        )
-                        print(f"New reply updated for {reply_data['word']} == {x}")
-                    else:
-                        print("Invalid API response format; using original text.")
-                    
-                    await asyncio.sleep(2)
+                        if x:
+                            print(f"{x}")
+                            await chatai.update_one(
+                                {"word": reply_data["word"], "check": "none"},
+                                {"$set": {"text": x}}
+                            )
+                            print(f"New reply updated for {reply_data['word']} == {x}")
+                        else:
+                            print("Invalid API response format; using original text.")
+                     
+                        await asyncio.sleep(2)
 
-                except Exception as e:
-                    print(f"Error in refreshing replies cache: {e}")
+                    except Exception as e:
+                        print(f"Error in refreshing replies cache: {e}")
 
             await asyncio.sleep(2)
 
