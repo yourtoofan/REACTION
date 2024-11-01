@@ -81,12 +81,12 @@ async def save_reply(original_message: Message, reply_message: Message):
     except Exception as e:
         print(f"Error in save_reply: {e}")
 
-async def save_new_reply(x, new_reply):
+async def save_new_reply(x: Message, new_reply: Message):
     global new_replies_cache
     try:
         reply_data = {
-            "word": x,
-            "text": new_reply,
+            "word": x.text,
+            "text": new_reply.text,
             "check": "none"
         }
 
@@ -99,12 +99,12 @@ async def save_new_reply(x, new_reply):
     except Exception as e:
         print(f"Error in save_new_reply: {e}")
 
-async def save_new_cache(x, new_reply):
+async def save_new_cache(x: Message, new_reply: Message):
     global new_replies_cache
     try:
         reply_data = {
-            "word": x,
-            "text": new_reply,
+            "word": x.text,
+            "text": new_reply.text,
             "check": "none"
         }
 
