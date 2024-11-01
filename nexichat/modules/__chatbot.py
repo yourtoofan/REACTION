@@ -1,4 +1,5 @@
 import random
+from TheApi import api
 from pymongo import MongoClient
 from pyrogram import Client, filters
 from pyrogram.errors import MessageEmpty
@@ -38,6 +39,7 @@ async def load_replies_cache():
     global replies_cache
     replies_cache = await chatai.find().to_list(length=None)
 
+
 async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache
     try:
@@ -66,7 +68,15 @@ async def save_reply(original_message: Message, reply_message: Message):
             reply_data["text"] = reply_message.voice.file_id
             reply_data["check"] = "voice"
         elif reply_message.text:
-            reply_data["text"] = reply_message.text
+            user_input = f"""
+                text:- ({reply_message.text})
+                text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+                Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
+            """
+            response = await api.gemini(user_input)
+            ai_reply = response["results"]
+
+            reply_data["text"] = ai_reply if ai_reply else reply_message.text
             reply_data["check"] = "none"
 
         is_chat = await chatai.find_one(reply_data)
