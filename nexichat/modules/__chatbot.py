@@ -271,6 +271,7 @@ AUTO_GCASTS = True
 
 async def refresh_replies_cache():
     while True:
+        global replies_cache
         for reply_data in replies_cache:
             if reply_data["check"] == "none" and isinstance(reply_data["text"], str):  
                 try:
