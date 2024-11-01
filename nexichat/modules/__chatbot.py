@@ -138,6 +138,48 @@ async def chatbot_command(client: Client, message: Message):
         reply_markup=InlineKeyboardMarkup(CHATBOT_ON),
     )
 
+@nexichat.on_message(filters.incoming)
+async def chatbot_response(client: Client, message: Message):
+    try:
+        chat_id = message.chat.id
+        chat_status = await status_db.find_one({"chat_id": chat_id})
+
+        if chat_status and chat_status.get("status") == "disabled":
+            return
+
+        if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
+            if message.chat.type in ["group", "supergroup"]:
+                return await add_served_chat(chat_id)
+            else:
+                return await add_served_user(chat_id)
+        
+        if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
+            reply_data = await get_reply(message.text)
+
+            if reply_data:
+                
+                if reply_data["check"] == "sticker":
+                    await message.reply_sticker(reply_data["text"])
+                elif reply_data["check"] == "photo":
+                    await message.reply_photo(reply_data["text"])
+                elif reply_data["check"] == "video":
+                    await message.reply_video(reply_data["text"])
+                elif reply_data["check"] == "audio":
+                    await message.reply_audio(reply_data["text"])
+                elif reply_data["check"] == "gif":
+                    await message.reply_animation(reply_data["text"])
+                elif reply_data["check"] == "voice":
+                    await message.reply_voice(reply_data["text"])
+                else:
+                    await message.reply_text(reply_data["text"])
+            else:
+                await message.reply_text("**I don't understand. What are you saying?**")
+
+            await save_reply_in_databases(message.reply_to_message, reply_data)
+
+    except Exception as e:
+        print(f"Error handling message: {e}")
+
 import asyncio
 
 AUTO_GCASTS = True
@@ -209,48 +251,6 @@ async def get_reply(word: str):
         print(f"Error in get_reply: {e}")
         return None
         
-@nexichat.on_message(filters.incoming)
-async def chatbot_response(client: Client, message: Message):
-    try:
-        chat_id = message.chat.id
-        chat_status = await status_db.find_one({"chat_id": chat_id})
-
-        if chat_status and chat_status.get("status") == "disabled":
-            return
-
-        if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
-            if message.chat.type in ["group", "supergroup"]:
-                return await add_served_chat(chat_id)
-            else:
-                return await add_served_user(chat_id)
-        
-        if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = await get_reply(message.text)
-
-            if reply_data:
-                
-                if reply_data["check"] == "sticker":
-                    await message.reply_sticker(reply_data["text"])
-                elif reply_data["check"] == "photo":
-                    await message.reply_photo(reply_data["text"])
-                elif reply_data["check"] == "video":
-                    await message.reply_video(reply_data["text"])
-                elif reply_data["check"] == "audio":
-                    await message.reply_audio(reply_data["text"])
-                elif reply_data["check"] == "gif":
-                    await message.reply_animation(reply_data["text"])
-                elif reply_data["check"] == "voice":
-                    await message.reply_voice(reply_data["text"])
-                else:
-                    await message.reply_text(reply_data["text"])
-            else:
-                await message.reply_text("**I don't understand. What are you saying?**")
-
-            await save_reply_in_databases(message.reply_to_message, reply_data)
-
-    except Exception as e:
-        print(f"Error handling message: {e}")
-
 
 if AUTO_GCASTS:
     asyncio.create_task(continuous_update())
