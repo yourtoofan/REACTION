@@ -77,7 +77,7 @@ async def chatbot_response(client: Client, message: Message):
                 selected_reply = random.choice(reply_data)  # Select random reply from stored replies
                 await send_reply_based_on_type(message, selected_reply)
             else:
-                # Generate AI-based reply if no stored replies are found
+                
                 ai_reply = await generate_ai_reply(message.text)
                 if ai_reply:
                     await message.reply_text(ai_reply)
@@ -118,8 +118,8 @@ async def get_reply(word: str):
 
 async def save_reply_in_databases(word, reply_data):
     if "_id" in reply_data:
-        reply_data.pop("_id")  # Remove MongoDB's ID if it exists
-    reply_data["word"] = word  # Store the word that triggered the reply
+        reply_data.pop("_id")  
+    reply_data["word"] = word 
     store_cache.append(reply_data)
 
     try:
