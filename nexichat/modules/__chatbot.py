@@ -47,7 +47,6 @@ async def status_command(client: Client, message: Message):
     else:
         await message.reply("No status found for this chat.")
 
-
 @nexichat.on_message(filters.command("chatbot"))
 async def chatbot_command(client: Client, message: Message):
     await message.reply_text(
@@ -59,37 +58,52 @@ async def chatbot_command(client: Client, message: Message):
 async def chatbot_response(client: Client, message: Message):
     try:
         chat_id = message.chat.id
+        text = message.text
+        
         chat_status = await status_db.find_one({"chat_id": chat_id})
-
         if chat_status and chat_status.get("status") == "disabled":
             return
 
-        if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
+        if text and any(text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
             if message.chat.type in ["group", "supergroup"]:
                 return await add_served_chat(chat_id)
             else:
                 return await add_served_user(chat_id)
+
+        cached_replies = [item for item in store_cache if item["word"] == text]
         
-        if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = await get_reply(message.text)
+        if cached_replies:
+            text_replies = [reply for reply in cached_replies if reply["check"] == "text"]
+            non_text_replies = [reply for reply in cached_replies if reply["check"] != "text"]
 
-            if reply_data:
-                selected_reply = random.choice(reply_data)  # Select random reply from stored replies
-                await send_reply_based_on_type(message, selected_reply)
+            if non_text_replies:
+                selected_reply = random.choice(non_text_replies)
+            elif text_replies:
+                selected_reply = text_replies[0]
             else:
-                
-                ai_reply = await generate_ai_reply(message.text)
-                if ai_reply:
-                    await message.reply_text(ai_reply)
-                    await save_reply_in_databases(message.text, {"text": ai_reply, "check": "text"})
-                else:
-                    await message.reply_text("**I don't understand. What are you saying?**")
+                selected_reply = None
 
+            if selected_reply:
+                await send_reply_based_on_type(message, selected_reply)
+                return
+
+        reply_data = await generate_and_cache_reply(text)
+        if reply_data:
+            await send_reply_based_on_type(message, reply_data)
+        
     except Exception as e:
         print(f"Error handling message: {e}")
 
+async def generate_and_cache_reply(text):
+    ai_reply = await generate_ai_reply(text)
+    if ai_reply:
+        reply_data = {"word": text, "text": ai_reply, "check": "text"}
+        store_cache.append(reply_data)
+        await save_reply_in_databases(text, reply_data)
+        return reply_data
+    return None
+
 async def send_reply_based_on_type(message, reply_data):
-    """Send reply based on type of content in reply_data."""
     if reply_data["check"] == "sticker":
         await message.reply_sticker(reply_data["text"])
     elif reply_data["check"] == "photo":
@@ -105,23 +119,10 @@ async def send_reply_based_on_type(message, reply_data):
     else:
         await message.reply_text(reply_data["text"])
 
-async def get_reply(word: str):
-    try:
-        # Find multiple responses for the word in `storeai`, else look in `chatai`
-        is_chat = await storeai.find({"word": word}).to_list(length=None)
-        if not is_chat:
-            is_chat = await chatai.find().to_list(length=None)
-        return is_chat if is_chat else None
-    except Exception as e:
-        print(f"Error in get_reply: {e}")
-        return None
-
 async def save_reply_in_databases(word, reply_data):
     if "_id" in reply_data:
-        reply_data.pop("_id")  
-    reply_data["word"] = word 
-    store_cache.append(reply_data)
-
+        reply_data.pop("_id")
+    reply_data["word"] = word
     try:
         if reply_data["check"] == "text":
             await storeai.insert_one(reply_data)
@@ -132,10 +133,9 @@ async def save_reply_in_databases(word, reply_data):
 
 async def generate_ai_reply(text):
     try:
-        user_input = f"text: ({text}) Give a short, chatty, fun reply. in same lang in which lang that text is written"
+        user_input = f"text: ({text}) Give a short, chatty, fun reply in the same language as the input."
         response = api.chatgpt(user_input)
-        if response:
-            return response
+        return response if response else None
     except Exception as e:
         print(f"Error generating AI reply: {e}")
     return None
@@ -143,31 +143,14 @@ async def generate_ai_reply(text):
 async def refresh_replies_cache():
     while True:
         for reply_data in chat_cache:
-            if reply_data["check"] == "none" and isinstance(reply_data["text"], str):  
-                user_input = f"""
-                    sentence:- ({reply_data['text']})
-                    upar ek sentence use sentence ke liye ek chat vote Ki Tarah Chhota se Chhota reply do ladki banke jyada bada reply mat dena jitna chhota se chhota me kkam ho jaye aur Jis language mein sentence likha gaya Usi language mein reply likhkar ke do taki samjh aaye ki kya likha hua hai aur bas reply do uske alava extra kuch nhi"""
-                try:
-                    response = api.chatgpt(user_input)
-                    
-                    if response:
-                        print(f"{reply_data['text']} == {response}")
-                        ai_reply = response
-                        reply_data["text"] = ai_reply if ai_reply else reply_data["text"]
-
-                        await save_reply_in_databases(reply_data["text"], reply_data)
-                        
-                        #print(f"New reply updated for {reply_data["word"]} == {reply_data["text"]}")
-                    else:
-                        print("Invalid API response format; using original text.")
-
-                    
-                    await asyncio.sleep(1)
-
-                except Exception as e:
-                    print(f"Error in refreshing replies cache: {e}")
-
-            await asyncio.sleep(1) 
+            if reply_data["check"] == "none" and isinstance(reply_data["text"], str):
+                ai_reply = await generate_ai_reply(reply_data["text"])
+                if ai_reply:
+                    reply_data["text"] = ai_reply
+                    await save_reply_in_databases(reply_data["word"], reply_data)
+                    store_cache.append(reply_data)
+                chat_cache.remove(reply_data)
+        await asyncio.sleep(CHAT_REFRESH_INTERVAL)
 
 async def load_chat_cache():
     global chat_cache
@@ -175,15 +158,11 @@ async def load_chat_cache():
 
 async def continuous_update():
     await load_chat_cache()
-    print("2")
     while True:
         try:
-            print("3")
             await refresh_replies_cache()
-            print("5")
         except Exception as e:
             print(f"Error in continuous update: {e}")
-        
+
 if AUTO_GCASTS:
-    print("1")
     asyncio.create_task(continuous_update())
