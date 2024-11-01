@@ -36,9 +36,11 @@ status_db = db.chatbot_status_db.status
 
 replies_cache = []
 
+
 async def load_replies_cache():
     global replies_cache
-    replies_cache = await chatai.find().to_list(length=None)
+    replies_cache = await chatai.find({"check": "none"}).to_list(length=None)
+
 
 async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache
@@ -265,60 +267,47 @@ async def chatbot_response(client: Client, message: Message):
         return
 
 
-import asyncio
-import time
-AUTO_GCASTS = True
 
-async def refresh_replies_cache():
-    while True:
-        replies_cache = await chatai.find().to_list(length=None)                     
-        for reply_data in replies_cache:
-               
-            if reply_data["check"] == "none" and isinstance(reply_data["text"], str):  
-           
-                try:         
-                    user_input = f"""
-        
-                        text:- ({reply_data["word"]})
-                        text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
-                        Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
-                        """
-           
-                    response = api.gemini(user_input)
-                    x = response["results"]                    
-       
-                    if x:    
-                        print(f"{x}")
-                        await chatai.update_one(
-     
-                            {"word": reply_data["word"], "check": "none"},
-                  
-                            {"$set": {"text": x}}     
-                        )
-              
-                        print(f"New reply updated for {reply_data['word']} == {x}")
-        
-                    else:
-                
-                        print("Invalid API response format; using original text.")    
-                        await asyncio.sleep(2)
-        
-                except Exception as e:    
-                    print(f"Error in refreshing replies cache: {e}")
+# Function to generate reply for a message text
+async def generate_reply(word):
+    user_input = f"""
+        text:- ({word})
+        text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+        Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
+    """
+    response = api.gemini(user_input)
+    return response["results"] if "results" in response else None
 
-      
-
-async def continuous_update():
-    await load_replies_cache()
-    while True:
-        if AUTO_GCASTS:
+# Update replies in database
+async def update_replies_cache():
+    global replies_cache
+    for reply_data in replies_cache:
+        if "text" in reply_data and reply_data["check"] == "none":
             try:
-                await refresh_replies_cache()
+                new_reply = await generate_reply(reply_data["word"])
+                if new_reply:
+                    # Update reply in database
+                    await chatai.update_one(
+                        {"word": reply_data["word"], "check": "none"},
+                        {"$set": {"text": new_reply}}
+                    )
+                    print(f"Updated reply for {reply_data['word']} == {new_reply}")
+                else:
+                    print("API response invalid format.")
             except Exception as e:
-                pass
+                print(f"Error updating reply for {reply_data['word']}: {e}")
 
         await asyncio.sleep(2)
 
+# Continuous task to load cache and update replies
+async def continuous_update():
+    await load_replies_cache()
+    while True:
+        try:
+            await update_replies_cache()
+        except Exception as e:
+            print(f"Error in continuous_update: {e}")
+        await asyncio.sleep(2)
 
-if AUTO_GCASTS:
-    asyncio.create_task(continuous_update())
+# Start the update loop
+asyncio.create_task(continuous_update())
