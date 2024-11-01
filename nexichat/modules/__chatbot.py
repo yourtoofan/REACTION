@@ -107,7 +107,7 @@ async def save_new_cache(x: Message, new_reply: Message):
     global new_replies_cache
     try:
         reply_data = {
-            "word": x.text,
+            "word": x,
             "text": None,
             "check": "none"
         }
