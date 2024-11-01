@@ -1,10 +1,10 @@
 import random
 from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
-CHAT_STORAGE = [
+CHATS_STORAGE = [
     "mongodb+srv://chutiyapa:bihar@cluster0.bph5t.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
 ]
 
-CHATS_STORAGE = [
+CHAT_STORAGE = [
     "mongodb+srv://chutiyapa:bihar@cluster0.bph5t.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
     "mongodb+srv://bikash:bikash@bikash.3jkvhp7.mongodb.net/?retryWrites=true&w=majority",
     "mongodb+srv://Bikash:Bikash@bikash.yl2nhcy.mongodb.net/?retryWrites=true&w=majority",
