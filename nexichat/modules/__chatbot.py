@@ -143,12 +143,16 @@ async def generate_ai_reply(text):
 async def refresh_replies_cache():
     while True:
         for reply_data in chat_cache[:]:
+            print("4")
             if reply_data["check"] == "text" and isinstance(reply_data["text"], str) and reply_data["text"]:
+                print("5")
                 ai_reply = await generate_ai_reply(reply_data["text"])
+                print("6")
                 if ai_reply:
                     reply_data["text"] = ai_reply
-                    print("4")
+                    print("7")
                     await save_reply_in_databases(reply_data["text"], reply_data)
+                    print("8")
                     chat_cache.remove(reply_data)
                     print(f"New reply saved for {reply_data['text']}")
         await asyncio.sleep(CHAT_REFRESH_INTERVAL)
