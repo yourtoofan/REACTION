@@ -280,7 +280,7 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(chat_id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = next((item for item in store_cache if item["word"] == message.text), None)
+            reply_data = next((item for item in store_cache if item["word"] == message.text) else "😅🤣😂")
 
             if reply_data:
                 if reply_data["check"] == "sticker":
