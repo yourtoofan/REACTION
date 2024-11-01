@@ -81,11 +81,11 @@ async def save_reply(original_message: Message, reply_message: Message):
     except Exception as e:
         print(f"Error in save_reply: {e}")
 
-async def save_new_reply(message, new_reply):
+async def save_new_reply(x, new_reply):
     global new_replies_cache
     try:
         reply_data = {
-            "word": message,
+            "word": x,
             "text": new_reply,
             "check": "none"
         }
@@ -99,11 +99,11 @@ async def save_new_reply(message, new_reply):
     except Exception as e:
         print(f"Error in save_new_reply: {e}")
 
-async def save_new_cache(message, new_reply):
+async def save_new_cache(x, new_reply):
     global new_replies_cache
     try:
         reply_data = {
-            "word": message,
+            "word": x,
             "text": new_reply,
             "check": "none"
         }
@@ -321,10 +321,10 @@ async def update_replies_cache():
             try:
                 new_reply = await generate_reply(reply_data["word"])
                 if new_reply == "🫣🫣":
-                    message = f"{reply_data['word']}"
-                    await save_new_cache(message, new_reply)
+                    x = f"{reply_data['word']}"
+                    await save_new_cache(x, new_reply)
                 else:
-                    await save_new_reply(message, new_reply)
+                    await save_new_reply(x, new_reply)
 
                     print(f"saved reply in databse for {reply_data['word']} == {new_reply}")
                 
