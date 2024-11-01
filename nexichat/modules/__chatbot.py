@@ -1,5 +1,5 @@
 import random
-from TheApi import api
+#from TheApi import api
 from MukeshAPI import api
 from pymongo import MongoClient
 from pyrogram import Client, filters
@@ -268,37 +268,35 @@ async def chatbot_response(client: Client, message: Message):
 import asyncio
 import time
 AUTO_GCASTS = True
+
 async def refresh_replies_cache():
     while True:
         for reply_data in replies_cache:
             if reply_data["check"] == "none" and isinstance(reply_data["text"], str):  
-                user_input = f"""
-                    text:- ({reply_data['text']})
+                try:
+                    user_input = f"""
+                    text:- ({reply_data["text"]})
                     text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
                     Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
-                """
-                try:
-                    response = api.chatgpt(user_input)
+                    """
+                    response = await api.gemini(user_input)
+                    x = response["results"]
                     
-                    if response:
-                        ai_reply = response
-                        reply_data["text"] = ai_reply if ai_reply else reply_data["text"]
-
+                    if x:
                         await chatai.update_one(
                             {"word": reply_data["word"], "check": "none"},
-                            {"$set": {"text": reply_data["text"]}}
+                            {"$set": {"text": x[0]}}
                         )
-                        print(f"New reply updated for {reply_data["word"]} == {reply_data["text"]}")
+                        print(f"New reply updated for {reply_data['word']} == {x[0]}")
                     else:
                         print("Invalid API response format; using original text.")
-
                     
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(2)
 
                 except Exception as e:
                     print(f"Error in refreshing replies cache: {e}")
 
-            await asyncio.sleep(1) 
+            await asyncio.sleep(2)
 
 async def continuous_update():
     await load_replies_cache()
@@ -309,7 +307,7 @@ async def continuous_update():
             except Exception as e:
                 pass
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
 
 
 if AUTO_GCASTS:
