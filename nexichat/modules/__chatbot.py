@@ -139,34 +139,14 @@ async def generate_ai_reply(text):
     except Exception as e:
         print(f"Error generating AI reply: {e}")
     return None
-"""
-async def refresh_replies_cache():
-    while True:
-        for reply_data in chat_cache[:]:
-            print("4")
-            if reply_data["check"] == "text" and isinstance(reply_data["text"], str) and reply_data["text"]:
-                print("5")
-                ai_reply = await generate_ai_reply(reply_data["text"])
-                print("6")
-                if ai_reply:
-                    reply_data["text"] = ai_reply
-                    print("7")
-                    await save_reply_in_databases(reply_data["text"], reply_data)
-                    print("8")
-                    chat_cache.remove(reply_data)
-                    print(f"New reply saved for {reply_data['text']}")
-        await asyncio.sleep(CHAT_REFRESH_INTERVAL)
-"""
 
 async def refresh_replies_cache():
     while True:
         for reply_data in chat_cache:
             if reply_data["check"] == "none" and isinstance(reply_data["text"], str):  
                 user_input = f"""
-                    text:- ({reply_data['text']})
-                    text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
-                    Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
-                """
+                    sentence:- ({reply_data['text']})
+                    upar ek sentence use sentence ke liye ek chat vote Ki Tarah Chhota se Chhota reply do ladki banke jyada bada reply mat dena jitna chhota se chhota me kkam ho jaye aur Jis language mein sentence likha gaya Usi language mein reply likhkar ke do taki samjh aaye ki kya likha hua hai aur bas reply do uske alava extra kuch nhi"""
                 try:
                     response = api.chatgpt(user_input)
                     
