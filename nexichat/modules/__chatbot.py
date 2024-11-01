@@ -147,6 +147,7 @@ async def refresh_replies_cache():
                 ai_reply = await generate_ai_reply(reply_data["text"])
                 if ai_reply:
                     reply_data["text"] = ai_reply
+                    print("4")
                     await save_reply_in_databases(reply_data["text"], reply_data)
                     chat_cache.remove(reply_data)
                     print(f"New reply saved for {reply_data['text']}")
@@ -158,11 +159,15 @@ async def load_chat_cache():
 
 async def continuous_update():
     await load_chat_cache()
+    print("2")
     while True:
         try:
+            print("3")
             await refresh_replies_cache()
+            print("5")
         except Exception as e:
             print(f"Error in continuous update: {e}")
         
 if AUTO_GCASTS:
+    print("1")
     asyncio.create_task(continuous_update())
