@@ -213,14 +213,63 @@ async def chatbot_command(client: Client, message: Message):
         reply_markup=InlineKeyboardMarkup(CHATBOT_ON),
     )
 
+import asyncio
 
-            
+AUTO_GCASTS = True
+CHAT_REFRESH_INTERVAL = 2
+
+chat_cache = []
+store_cache = []
+
+async def load_chat_cache():
+    async for reply_data in chatai.find():
+        chat_cache.append(reply_data)
+
+async def save_reply_in_databases(reply, reply_data):
+    if reply_data["check"] == "text":
+        store_cache.append(reply_data)
+        await storeai.insert_one(reply_data)
+    else:
+        store_cache.append(reply_data)
+        await chatai.insert_one(reply_data)
+
+async def generate_ai_reply(text):
+    try:
+        user_input = f"text: ({text}) Give a short, chatty, fun reply."
+        response = api.chatgpt(user_input)
+        if response:
+            return response
+    except Exception as e:
+        print(f"Error generating AI reply: {e}")
+    return None
+
+async def refresh_replies_cache():
+    while True:
+        for reply_data in list(chat_cache):
+            if reply_data["check"] == "text" and isinstance(reply_data["text"], str) and reply_data["text"]:
+                ai_reply = await generate_ai_reply(reply_data["text"])
+                if ai_reply:
+                    reply_data["text"] = ai_reply
+                    await save_reply_in_databases(reply_data["text"], reply_data)
+                    chat_cache.remove(reply_data)
+            await asyncio.sleep(CHAT_REFRESH_INTERVAL)
+
+async def continuous_update():
+    await load_chat_cache()
+    while True:
+        if AUTO_GCASTS:
+            try:
+                await refresh_replies_cache()
+            except Exception as e:
+                print(f"Error in continuous update: {e}")
+        await asyncio.sleep(1)
+
 @nexichat.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     try:
         chat_id = message.chat.id
         chat_status = await status_db.find_one({"chat_id": chat_id})
-        
+
         if chat_status and chat_status.get("status") == "disabled":
             return
 
@@ -231,17 +280,9 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(chat_id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = await get_reply(message.text)
+            reply_data = next((item for item in store_cache if item["word"] == message.text), None)
 
             if reply_data:
-                response_text = reply_data["text"]
-                chat_lang = await get_chat_language(chat_id)
-
-                if not chat_lang or chat_lang == "nolang":
-                    translated_text = response_text
-                else:
-                    translated_text = GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
-                
                 if reply_data["check"] == "sticker":
                     await message.reply_sticker(reply_data["text"])
                 elif reply_data["check"] == "photo":
@@ -255,77 +296,17 @@ async def chatbot_response(client: Client, message: Message):
                 elif reply_data["check"] == "voice":
                     await message.reply_voice(reply_data["text"])
                 else:
-                    await message.reply_text(translated_text)
+                    await message.reply_text(reply_data["text"])
             else:
                 await message.reply_text("**I don't understand. What are you saying?**")
 
-        if message.reply_to_message:
-            await save_reply(message.reply_to_message, message)
+            await save_reply_in_databases(message.reply_to_message, reply_data)
 
-    except MessageEmpty:
-        await message.reply_text("🙄🙄")
     except Exception as e:
-        return
-
-
-import asyncio
-import time
-AUTO_GCASTS = True
-
-
-async def refresh_replies_cache():
-    while True:
-        for reply_data in database_replies_cache:
-            if reply_data["check"] == "none" and isinstance(reply_data["text"], str) and reply_data["text"]:
-                try:
-                    if not reply_data["word"] or not isinstance(reply_data["word"], str):
-                        continue
-                    
-                    detected_language = detect(reply_data["word"])
-
-                    existing_reply = next(
-                        (reply for reply in database_replies_cache if reply["word"] == reply_data["word"] and reply["text"] and detect(reply["text"]) == detected_language),
-                        None
-                    )
-                    
-                    if existing_reply:
-                        ai_generated_replies_cache.append(existing_reply)
-                        database_replies_cache.remove(existing_reply)
-                    else:
-                        user_input = f"""
-                            text:- ({reply_data['text']})
-                            text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
-                            Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
-                        """
-                        response = api.chatgpt(user_input)
-                        
-                        if response:
-                            ai_reply = response
-                            reply_data["text"] = ai_reply if ai_reply else reply_data["text"]
-
-                            ai_generated_replies_cache.append(reply_data)
-                            await chatai.update_one(
-                                {"word": reply_data["word"], "check": "none"},
-                                {"$set": {"text": reply_data["text"]}}
-                            )
-                            database_replies_cache.remove(reply_data)
-
-                    await asyncio.sleep(5)
-
-                except Exception as e:
-                    print(f"Error in refreshing replies cache: {e}")
-
-            await asyncio.sleep(5)
-async def continuous_update():
-    await load_replies_cache()
-    while True:
-        if AUTO_GCASTS:
-            try:
-                await refresh_replies_cache()
-            except Exception as e:
-                print(f"Error in continuous update: {e}")
-        await asyncio.sleep(1)
+        print(f"Error handling message: {e}")
 
 if AUTO_GCASTS:
     asyncio.create_task(continuous_update())
 
+                    
+                        
