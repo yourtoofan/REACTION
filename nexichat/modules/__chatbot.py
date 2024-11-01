@@ -33,8 +33,7 @@ translator = GoogleTranslator()
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 
-from deep_translator import GoogleTranslator
-
+from langdetect import detect
 
 database_replies_cache = []
 ai_generated_replies_cache = []
@@ -279,10 +278,10 @@ async def refresh_replies_cache():
         for reply_data in database_replies_cache:
             if reply_data["check"] == "none" and isinstance(reply_data["text"], str):
                 try:
-                    detected_language = GoogleTranslator().detect(reply_data["word"])
+                    detected_language = detected_lang = detect(reply_data["word"])
 
                     existing_reply = next(
-                        (reply for reply in database_replies_cache if reply["word"] == reply_data["word"] and reply["text"] and GoogleTranslator().detect(reply["text"]) == detected_language),
+                        (reply for reply in database_replies_cache if reply["word"] == reply_data["word"] and reply["text"] and detected_lang = detect(reply["text"]) == detected_language),
                         None
                     )
                     
