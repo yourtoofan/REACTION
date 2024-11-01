@@ -1,5 +1,4 @@
 import random
-from TheApi import api
 from pymongo import MongoClient
 from pyrogram import Client, filters
 from pyrogram.errors import MessageEmpty
@@ -39,7 +38,6 @@ async def load_replies_cache():
     global replies_cache
     replies_cache = await chatai.find().to_list(length=None)
 
-
 async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache
     try:
@@ -68,19 +66,7 @@ async def save_reply(original_message: Message, reply_message: Message):
             reply_data["text"] = reply_message.voice.file_id
             reply_data["check"] = "voice"
         elif reply_message.text:
-            user_input = f"""
-                text:- ({reply_message.text})
-                text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
-                Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
-            """
-            response = api.chatgpt(user_input)
-
-            # Ensure response is a dictionary and contains 'results' key
-            if isinstance(response, dict) and "results" in response:
-                ai_reply = response["results"]
-                reply_data["text"] = ai_reply if ai_reply else reply_message.text
-            else:
-                reply_data["text"] = reply_message.text  # fallback if response format is unexpected
+            reply_data["text"] = reply_message.text
             reply_data["check"] = "none"
 
         is_chat = await chatai.find_one(reply_data)
@@ -90,7 +76,6 @@ async def save_reply(original_message: Message, reply_message: Message):
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
-
 
 async def get_reply(word: str):
     global replies_cache
@@ -276,3 +261,54 @@ async def chatbot_response(client: Client, message: Message):
         await message.reply_text("🙄🙄")
     except Exception as e:
         return
+
+
+import asyncio
+import time
+AUTO_GCASTS = True
+async def refresh_replies_cache():
+    while True:
+        for reply_data in replies_cache:
+            if reply_data["check"] == "none" and isinstance(reply_data["text"], str):  
+                user_input = f"""
+                    text:- ({reply_data['text']})
+                    text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+                    Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
+                """
+                try:
+                    response = api.chatgpt(user_input)
+                    
+                    if isinstance(response, dict) and "results" in response:
+                        ai_reply = response["results"]
+                        reply_data["text"] = ai_reply if ai_reply else reply_data["text"]
+
+                        
+                        await chatai.update_one(
+                            {"word": reply_data["word"], "check": "none"},
+                            {"$set": {"text": reply_data["text"]}}
+                        )
+                    else:
+                        print("Invalid API response format; using original text.")
+
+                    
+                    await asyncio.sleep(5)
+
+                except Exception as e:
+                    print(f"Error in refreshing replies cache: {e}")
+
+            await asyncio.sleep(5) 
+
+async def continuous_update():
+    await load_replies_cache()
+    while True:
+        if AUTO_GCASTS:
+            try:
+                await refresh_replies_cache()
+            except Exception as e:
+                pass
+
+        await asyncio.sleep(5)
+
+
+if AUTO_GCASTS:
+    asyncio.create_task(continuous_update())
