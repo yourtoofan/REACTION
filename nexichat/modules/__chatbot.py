@@ -81,12 +81,12 @@ async def save_reply(original_message: Message, reply_message: Message):
     except Exception as e:
         print(f"Error in save_reply: {e}")
 
-async def save_new_reply(original_message: Message, ai_generated_reply: str):
+async def save_new_reply(message, new_reply):
     global new_replies_cache
     try:
         reply_data = {
-            "word": original_message.text,
-            "text": ai_generated_reply,
+            "word": message.text,
+            "text": new_reply,
             "check": "none"
         }
 
@@ -94,10 +94,10 @@ async def save_new_reply(original_message: Message, ai_generated_reply: str):
         if not is_chat:
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
-            print(f"New AI-generated reply saved for '{original_message.text}': {ai_generated_reply}")
+            print(f"New AI-generated reply saved for '{message.text}': {new_reply}")
 
     except Exception as e:
-        print(f"Error in save_reply: {e}")
+        print(f"Error in save_new_reply: {e}")
 
 
 async def get_reply(word: str):
