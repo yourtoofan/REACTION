@@ -281,8 +281,14 @@ async def refresh_replies_cache():
                     detected_language = detected_lang = detect(reply_data["word"])
 
                     existing_reply = next(
-                        (reply for reply in database_replies_cache if reply["word"] == reply_data["word"] and reply["text"] and detected_lang = detect(reply["text"]) == detected_language),
-                        None
+                        (
+                            reply
+                            for reply in database_replies_cache
+                            if reply["word"] == reply_data["word"]
+                            and reply["text"]
+                            and detect(reply["text"]) == detected_language
+                        ),
+                        None,
                     )
                     
                     if existing_reply:
