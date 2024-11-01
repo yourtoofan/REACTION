@@ -157,7 +157,7 @@ async def refresh_replies_cache():
 
                         await save_reply_in_databases(reply_data["text"], reply_data)
                         
-                        #print(f"New reply updated for {reply_data["word"]} == {reply_data["text"]}")
+                        print(f"New reply updated for {reply_data["word"]} == {reply_data["text"]}")
                     else:
                         print("Invalid API response format; using original text.")
 
