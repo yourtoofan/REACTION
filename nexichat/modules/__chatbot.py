@@ -81,49 +81,6 @@ async def save_reply(original_message: Message, reply_message: Message):
     except Exception as e:
         print(f"Error in save_reply: {e}")
 
-async def save_new_reply(x: Message, new_reply: Message):
-    global new_replies_cache
-    try:
-        reply_data = {
-            "word": x.text,
-            "text": None,
-            "check": "none"
-        }
-
-        if new_reply.text:
-            reply_data["text"] = new_reply.text
-            reply_data["check"] = "none"
-
-        is_chat = await storeai.find_one(reply_data)
-        if not is_chat:
-            await storeai.insert_one(reply_data)
-            new_replies_cache.append(reply_data)
-            print(f"New AI-generated reply saved for '{message.text}': {new_reply}")
-
-    except Exception as e:
-        print(f"Error in save_new_reply: {e}")
-
-async def save_new_cache(x: Message, new_reply: Message):
-    global new_replies_cache
-    try:
-        reply_data = {
-            "word": x,
-            "text": None,
-            "check": "none"
-        }
-
-        if new_reply.text:
-            reply_data["text"] = new_reply.text
-            reply_data["check"] = "none"
-
-        is_chat = await storeai.find_one(reply_data)
-        if not is_chat:
-      
-            new_replies_cache.append(reply_data)
-            print(f"New AI-generated reply saved only in cache for '{message.text}': {new_reply}")
-
-    except Exception as e:
-        print(f"Error in save_new_cache: {e}")
 
 async def get_reply(word: str):
     global replies_cache
@@ -312,7 +269,25 @@ async def chatbot_response(client: Client, message: Message):
 
 
 
-# Function to generate reply for a message text
+import asyncio
+
+async def save_new_reply(x, new_reply):
+    global new_replies_cache
+    try:
+        reply_data = {
+            "word": x,
+            "text": new_reply,
+            "check": "none"
+        }
+
+        is_chat = await storeai.find_one(reply_data)
+        if not is_chat:
+            await storeai.insert_one(reply_data)
+            print(f"New AI-generated reply saved for '{x}': {new_reply}")
+
+    except Exception as e:
+        print(f"Error in save_new_reply: {e}")
+
 async def generate_reply(word):
     user_input = f"""
         text:- ({word})
@@ -320,21 +295,22 @@ async def generate_reply(word):
         Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
     """
     response = api.gemini(user_input)
-    return response["results"] if response and "results" in response else "🫣🫣"
-# Update replies in database
+    return response["results"] if response and "results" in response else None
+
 async def update_replies_cache():
     global replies_cache
     for reply_data in replies_cache:
         if "text" in reply_data and reply_data["check"] == "none":
             try:
                 new_reply = await generate_reply(reply_data["word"])
-                if new_reply == "🫣🫣":
-                    x = reply_data['word']
-                    await save_new_cache(x, new_reply)
+                x = reply_data["word"]
+
+                if new_reply is None:
+                    print(f"No valid reply generated for '{x}', sleeping for 12 hours.")
+                    await asyncio.sleep(43200)  # 12 hours
                 else:
                     await save_new_reply(x, new_reply)
-
-                    print(f"saved reply in databse for {reply_data['word']} == {new_reply}")
+                    print(f"Saved reply in database for {x} == {new_reply}")
                 
             except Exception as e:
                 print(f"Error updating reply for {reply_data['word']}: {e}")
