@@ -226,12 +226,20 @@ async def load_chat_cache():
         chat_cache.append(reply_data)
 
 async def save_reply_in_databases(reply, reply_data):
+    if reply_data.get("_id"):
+        reply_data.pop("_id")  
     if reply_data["check"] == "text":
         store_cache.append(reply_data)
-        await storeai.insert_one(reply_data)
+        try:
+            await storeai.insert_one(reply_data)
+        except Exception as e:
+            print(f"Error saving to storeai: {e}")
     else:
         store_cache.append(reply_data)
-        await chatai.insert_one(reply_data)
+        try:
+            await chatai.insert_one(reply_data)
+        except Exception as e:
+            print(f"Error saving to chatai: {e}")
 
 async def generate_ai_reply(text):
     try:
