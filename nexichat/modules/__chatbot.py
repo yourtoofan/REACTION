@@ -76,7 +76,7 @@ async def save_reply(original_message: Message, reply_message: Message):
         is_chat = await chatai.find_one(reply_data)
         if not is_chat:
             await chatai.insert_one(reply_data)
-            replies_cache.append(reply_data)
+            await replies_cache.append(reply_data)
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
