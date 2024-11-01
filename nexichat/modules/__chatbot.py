@@ -283,11 +283,12 @@ async def refresh_replies_cache():
                     x = response["results"]
                     
                     if x:
+                        print(f"{x}")
                         await chatai.update_one(
                             {"word": reply_data["word"], "check": "none"},
-                            {"$set": {"text": x[0]}}
+                            {"$set": {"text": x}}
                         )
-                        print(f"New reply updated for {reply_data['word']} == {x[0]}")
+                        print(f"New reply updated for {reply_data['word']} == {x}")
                     else:
                         print("Invalid API response format; using original text.")
                     
