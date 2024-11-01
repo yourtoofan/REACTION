@@ -321,7 +321,7 @@ async def update_replies_cache():
             try:
                 new_reply = await generate_reply(reply_data["word"])
                 if new_reply == "🫣🫣":
-                    x = f"{reply_data['word']}"
+                    x = reply_data['word']
                     await save_new_cache(x, new_reply)
                 else:
                     await save_new_reply(x, new_reply)
