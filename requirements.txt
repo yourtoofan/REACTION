@@ -8,7 +8,7 @@ tgcrypto==1.2.2
 asyncio
 python-dotenv
 lexica-api
-MukeshAPI
+git+https://github.com/Vivekkumar-IN/TheApi@main
 deep-translator
 pycgi
 apscheduler
