@@ -147,6 +147,7 @@ async def refresh_replies_cache():
                 ai_reply = await generate_ai_reply(reply_data["text"])
                 if ai_reply:
                     reply_data["text"] = ai_reply
+                    print(f"{reply_data["word"]} = {reply_data}")
                     await save_reply_in_databases(reply_data["word"], reply_data)
                     store_cache.append(reply_data)
                 chat_cache.remove(reply_data)
