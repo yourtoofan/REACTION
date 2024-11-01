@@ -168,7 +168,7 @@ async def save_reply_in_databases(reply, reply_data):
 
 async def generate_ai_reply(text):
     try:
-        user_input = f"text: ({text}) Give a short, chatty, fun reply."
+        user_input = f"text: ({text}) Give a short, chatty, fun reply. in same lang in which lang that text is written"
         response = api.chatgpt(user_input)
         if response:
             return response
@@ -185,6 +185,7 @@ async def refresh_replies_cache():
                     reply_data["text"] = ai_reply
                     await save_reply_in_databases(reply_data["text"], reply_data)
                     chat_cache.remove(reply_data)
+                    print(f"new reply saved for {reply_data["text"]} = {reply_data}")
             await asyncio.sleep(CHAT_REFRESH_INTERVAL)
 
 async def continuous_update():
