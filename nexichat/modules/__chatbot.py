@@ -86,11 +86,21 @@ async def get_reply(word: str):
     global replies_cache
     if not replies_cache:
         await load_replies_cache()
-        print("Reloaded Chats")
+        print("Reloaded Chats from database")
     relevant_replies = [reply for reply in replies_cache if reply['word'] == word]
     if not relevant_replies:
         relevant_replies = replies_cache
     return random.choice(relevant_replies) if relevant_replies else None
+
+async def get_new_reply(word: str):
+    global new_replies_cache
+    if not new_replies_cache:
+        await new_replies_cache()
+        print("Reloaded Chats from Ai")
+    relevant_replies = [reply for reply in new_replies_cache if reply['word'] == word]
+    if not relevant_replies:
+        relevant_replies = new_replies_cache
+    return None
 
 
 @nexichat.on_message(filters.command("status"))
@@ -231,12 +241,16 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(chat_id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = await get_reply(message.text)
+            reply_data = await get_new_reply(message.text)
 
             if reply_data:
                 response_text = reply_data["text"]
                 chat_lang = await get_chat_language(chat_id)
-
+            else:
+                reply_data = await get_reply(message.text)
+                response_text = reply_data["text"]
+                chat_lang = await get_chat_language(chat_id)
+                
                 if not chat_lang or chat_lang == "nolang":
                     translated_text = response_text
                 else:
@@ -283,8 +297,8 @@ async def save_new_reply(x, new_reply):
         is_chat = await storeai.find_one(reply_data)
         if not is_chat:
             await storeai.insert_one(reply_data)
-            print(f"New AI-generated reply saved for '{x}': {new_reply}")
-
+            new_replies_cache.append(reply_data)
+            
     except Exception as e:
         print(f"Error in save_new_reply: {e}")
 
