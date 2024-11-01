@@ -347,7 +347,7 @@ async def continuous_update():
             await update_replies_cache()
         except Exception as e:
             print(f"Error in continuous_update: {e}")
-        await asyncio.sleep(2)
+        await asyncio.sleep(5)
 
 # Start the update loop
 asyncio.create_task(continuous_update())
