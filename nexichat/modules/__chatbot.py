@@ -88,38 +88,31 @@ async def get_reply(word: str):
     return random.choice(relevant_replies) if relevant_replies else None
 
 
-
-
 @nexichat.on_message(filters.command("status"))
 async def status_command(client: Client, message: Message):
     chat_id = message.chat.id
-
-    # Retrieve the status for the given chat_id
     chat_status = await status_db.find_one({"chat_id": chat_id})
-
-    # Check if a status was found
     if chat_status:
         current_status = chat_status.get("status", "not found")
         await message.reply(f"Chatbot status for this chat: **{current_status}**")
     else:
         await message.reply("No status found for this chat.")
 
-# Example usage of Client
 
 languages = {
     # Top 20 languages used on Telegram
-    'english': 'en', 'hindi': 'hi', 'Myanmar': 'my', 'russian': 'ru', 'spanish': 'es', 
-    'arabic': 'ar', 'turkish': 'tr', 'german': 'de', 'french': 'fr', 
+    'english': 'en', 'hindi': 'hi', 'amharic': 'am', 'Myanmar': 'my', 'russian': 'ru',  
+    'arabic': 'ar', 'turkish': 'tr', 'german': 'de', 'french': 'fr', 'spanish': 'es',
     'italian': 'it', 'persian': 'fa', 'indonesian': 'id', 'portuguese': 'pt',
     'ukrainian': 'uk', 'filipino': 'tl', 'korean': 'ko', 'japanese': 'ja', 
     'polish': 'pl', 'vietnamese': 'vi', 'thai': 'th', 'dutch': 'nl',
 
     # Top languages spoken in Bihar
-    'bhojpuri': 'bho', 'maithili': 'mai', 'urdu': 'ur', 
-    'bengali': 'bn', 'angika': 'anp', 'sanskrit': 'sa', 
-    'oriya': 'or', 'nepali': 'ne', 'santhali': 'sat', 'khortha': 'kht', 
+    'bhojpuri': 'bho', 'maithili': 'mai', 'urdu': 'ur', 'tamil': 'ta',
+    'bengali': 'bn', 'angika': 'anp', 'sanskrit': 'sa', 'nepali': 'ne',
+    'oriya': 'or', 'santhali': 'sat', 'khortha': 'kht', 
     'kurmali': 'kyu', 'ho': 'hoc', 'munda': 'unr', 'kharwar': 'kqw', 
-    'mundari': 'unr', 'sadri': 'sck', 'pali': 'pi', 'tamil': 'ta',
+    'mundari': 'unr', 'sadri': 'sck', 'pali': 'pi',
 
     # Top languages spoken in India
     'telugu': 'te', 'bengali': 'bn', 'marathi': 'mr', 'tamil': 'ta', 
@@ -129,7 +122,7 @@ languages = {
     'dogri': 'doi', 'santali': 'sat', 'meitei': 'mni', 'nepali': 'ne',
 
     # Other language
-    'afrikaans': 'af', 'albanian': 'sq', 'amharic': 'am', 'armenian': 'hy', 
+    'afrikaans': 'af', 'albanian': 'sq', 'armenian': 'hy', 
     'aymara': 'ay', 'azerbaijani': 'az', 'bambara': 'bm', 
     'basque': 'eu', 'belarusian': 'be', 'bosnian': 'bs', 'bulgarian': 'bg', 
     'catalan': 'ca', 'cebuano': 'ceb', 'chichewa': 'ny', 
@@ -171,7 +164,6 @@ def generate_language_buttons(languages):
     return InlineKeyboardMarkup(buttons)
 
 async def get_chat_language(chat_id):
-    # Await the async call to find_one
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
     
@@ -183,27 +175,10 @@ async def set_language(client: Client, message: Message):
     )
 
 
-@nexichat.on_callback_query(filters.regex(r"setlang_"))
-async def language_selection_callback(client: Client, callback_query: CallbackQuery):
-    lang_code = callback_query.data.split("_")[1]
-    chat_id = callback_query.message.chat.id
-    if lang_code in languages.values():
-        lang_db.update_one({"chat_id": chat_id}, {"$set": {"language": lang_code}}, upsert=True)
-        await callback_query.answer(f"Your chat language has been set to {lang_code.title()}.", show_alert=True)
-        await callback_query.message.edit_text(f"Chat language has been set to {lang_code.title()}.")
-    else:
-        await callback_query.answer("Invalid language selection.", show_alert=True)
-
-
-
 @nexichat.on_message(filters.command("status"))
 async def status_command(client: Client, message: Message):
     chat_id = message.chat.id
-
-    # Retrieve the status for the given chat_id
     chat_status = await status_db.find_one({"chat_id": chat_id})
-
-    # Check if a status was found
     if chat_status:
         current_status = chat_status.get("status", "not found")
         await message.reply(f"Chatbot status for this chat: **{current_status}**")
@@ -233,126 +208,8 @@ async def chatbot_command(client: Client, message: Message):
         reply_markup=InlineKeyboardMarkup(CHATBOT_ON),
     )
 
-@nexichat.on_callback_query()
-async def cb_handler(client: Client, query: CallbackQuery):
-    LOGGER.info(query.data)
 
-    # Help menu
-    if query.data == "HELP":
-        await query.message.edit_text(
-            text=HELP_READ,
-            reply_markup=InlineKeyboardMarkup(HELP_BTN),
-            disable_web_page_preview=True,
-        )
-
-    # Close menu
-    elif query.data == "CLOSE":
-        await query.message.delete()
-        await query.answer("Closed menu!", show_alert=True)
-
-    # Go back to the main menu
-    elif query.data == "BACK":
-        await query.message.edit(
-            text=START,
-            reply_markup=InlineKeyboardMarkup(DEV_OP),
-        )
-
-    # Show source information
-    elif query.data == "SOURCE":
-        await query.message.edit(
-            text=SOURCE_READ,
-            reply_markup=InlineKeyboardMarkup(BACK),
-            disable_web_page_preview=True,
-        )
-
-    # Show about information
-    elif query.data == "ABOUT":
-        await query.message.edit(
-            text=ABOUT_READ,
-            reply_markup=InlineKeyboardMarkup(ABOUT_BTN),
-            disable_web_page_preview=True,
-        )
-
-    # Show admin information
-    elif query.data == "ADMINS":
-        await query.message.edit(
-            text=ADMIN_READ,
-            reply_markup=InlineKeyboardMarkup(MUSIC_BACK_BTN),
-        )
-
-    # Show tools information
-    elif query.data == "TOOLS_DATA":
-        await query.message.edit(
-            text=TOOLS_DATA_READ,
-            reply_markup=InlineKeyboardMarkup(CHATBOT_BACK),
-        )
-
-    # Back to the help menu
-    elif query.data == "BACK_HELP":
-        await query.message.edit(
-            text=HELP_READ,
-            reply_markup=InlineKeyboardMarkup(HELP_BTN),
-        )
-
-    # Chatbot commands
-    elif query.data == "CHATBOT_CMD":
-        await query.message.edit(
-            text=CHATBOT_READ,
-            reply_markup=InlineKeyboardMarkup(CHATBOT_BACK),
-        )
-
-    # Back to the chatbot menu
-    elif query.data == "CHATBOT_BACK":
-        await query.message.edit(
-            text=HELP_READ,
-            reply_markup=InlineKeyboardMarkup(HELP_BTN),
-        )
-
-    # Enable chatbot for the chat
-    elif query.data == "enable_chatbot":
-        chat_id = query.message.chat.id
-        status_db.update_one({"chat_id": chat_id}, {"$set": {"status": "enabled"}}, upsert=True)
-        await query.answer("Chatbot enabled ✅", show_alert=True)
-        await query.edit_message_text(
-            f"Chat: {query.message.chat.title}\n**Chatbot has been enabled.**"
-        )
-
-    # Disable chatbot for the chat
-    elif query.data == "disable_chatbot":
-        chat_id = query.message.chat.id
-        status_db.update_one({"chat_id": chat_id}, {"$set": {"status": "disabled"}}, upsert=True)
-        await query.answer("Chatbot disabled!", show_alert=True)
-        await query.edit_message_text(
-            f"Chat: {query.message.chat.title}\n**Chatbot has been disabled.**"
-        )
-
-    # Set chat language
-    elif query.data.startswith("setlang_"):
-        lang_code = query.data.split("_")[1]
-        chat_id = query.message.chat.id
-        if lang_code in languages.values():
-            lang_db.update_one({"chat_id": chat_id}, {"$set": {"language": lang_code}}, upsert=True)
-            await query.answer(f"Your chat language has been set to {lang_code.title()}.", show_alert=True)
-            await query.message.edit_text(f"Chat language has been set to {lang_code.title()}.")
-        else:
-            await query.answer("Invalid language selection.", show_alert=True)
-
-    # Reset language selection to mix language
-    elif query.data == "nolang":
-        chat_id = query.message.chat.id
-        lang_db.update_one({"chat_id": chat_id}, {"$set": {"language": "nolang"}}, upsert=True)
-        await query.answer("Bot language has been reset to mix language.", show_alert=True)
-        await query.message.edit_text("**Bot language has been reset to mix language.**")
-
-    # Choose language for the chatbot
-    elif query.data == "choose_lang":
-        await query.answer("Choose chatbot language for this chat.", show_alert=True)
-        await query.message.edit_text(
-            "**Please select your preferred language for the chatbot.**",
-            reply_markup=generate_language_buttons(languages)
-        )
-
-
+            
 @nexichat.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     try:
