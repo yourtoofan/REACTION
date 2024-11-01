@@ -138,7 +138,7 @@ async def generate_ai_reply(text):
     
 async def refresh_replies_cache():
     while True:
-        for reply_data in list(chat_cache):
+        for reply_data in chat_cache:
             if reply_data["check"] == "text" and isinstance(reply_data["text"], str) and reply_data["text"]:
                 ai_reply = await generate_ai_reply(reply_data["text"])
                 if ai_reply:
