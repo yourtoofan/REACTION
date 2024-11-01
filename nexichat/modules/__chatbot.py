@@ -297,6 +297,16 @@ async def generate_reply(word):
     response = api.gemini(user_input)
     return response["results"] if response and "results" in response else None
 
+async def creat_reply(word):
+    from TheApi import api
+    user_input = f"""
+        text:- ({word})
+        text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+        Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
+    """
+    results = api.chatgpt(user_input)
+    return results
+    
 async def update_replies_cache():
     global replies_cache
     for reply_data in replies_cache:
@@ -306,11 +316,11 @@ async def update_replies_cache():
                 x = reply_data["word"]
 
                 if new_reply is None:
-                    print(f"No valid reply generated for '{x}', sleeping for 12 hours.")
-                    await asyncio.sleep(43200)  # 12 hours
-                else:
-                    await save_new_reply(x, new_reply)
-                    print(f"Saved reply in database for {x} == {new_reply}")
+                    from TheApi import api
+                    new_reply = await creat_reply(reply_data["word"])
+
+                await save_new_reply(x, new_reply)
+                print(f"Saved reply in database for {x} == {new_reply}")
                 
             except Exception as e:
                 print(f"Error updating reply for {reply_data['word']}: {e}")
