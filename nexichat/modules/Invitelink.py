@@ -8,7 +8,7 @@ from nexichat import nexichat
 from config import OWNER_ID
 
 
-@nexichat.on_message(filters.command("givelink"))
+@nexichat.on_message(filters.command("givelink") & filters.user(int(OWNER_ID))
 async def give_link_command(client, message):
     chat = message.chat.id
     link = await nexichat.export_chat_invite_link(chat)
