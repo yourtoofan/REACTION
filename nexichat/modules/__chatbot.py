@@ -147,8 +147,9 @@ chat_cache = []
 store_cache = []
 
 async def load_chat_cache():
-    async for reply_data in chatai.find():
-        chat_cache.append(reply_data)
+    global chat_cache
+    chat_cache = await chatai.find().to_list(length=None)
+
 
 async def save_reply_in_databases(reply, reply_data):
     if reply_data.get("_id"):
@@ -250,8 +251,6 @@ async def chatbot_response(client: Client, message: Message):
     except Exception as e:
         print(f"Error handling message: {e}")
 
+
 if AUTO_GCASTS:
     asyncio.create_task(continuous_update())
-
-                    
-                        
