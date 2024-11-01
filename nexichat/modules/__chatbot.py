@@ -320,7 +320,7 @@ async def update_replies_cache():
         if "text" in reply_data and reply_data["check"] == "none":
             try:
                 new_reply = await generate_reply(reply_data["word"])
-                if new_reply is "🫣🫣":
+                if new_reply == "🫣🫣":
                     message = f"{reply_data['word']}"
                     await save_new_cache(message, new_reply)
                 else:
