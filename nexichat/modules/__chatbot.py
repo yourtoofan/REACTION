@@ -41,45 +41,7 @@ ai_generated_replies_cache = []
 async def load_replies_cache():
     global database_replies_cache
     database_replies_cache = await chatai.find().to_list(length=None)
-
-async def save_reply(original_message: Message, reply_message: Message):
-    global database_replies_cache
-    try:
-        reply_data = {
-            "word": original_message.text,
-            "text": None,
-            "check": "none",
-        }
-
-        if reply_message.sticker:
-            reply_data["text"] = reply_message.sticker.file_id
-            reply_data["check"] = "sticker"
-        elif reply_message.photo:
-            reply_data["text"] = reply_message.photo.file_id
-            reply_data["check"] = "photo"
-        elif reply_message.video:
-            reply_data["text"] = reply_message.video.file_id
-            reply_data["check"] = "video"
-        elif reply_message.audio:
-            reply_data["text"] = reply_message.audio.file_id
-            reply_data["check"] = "audio"
-        elif reply_message.animation:
-            reply_data["text"] = reply_message.animation.file_id
-            reply_data["check"] = "gif"
-        elif reply_message.voice:
-            reply_data["text"] = reply_message.voice.file_id
-            reply_data["check"] = "voice"
-        elif reply_message.text:
-            reply_data["text"] = reply_message.text
-            reply_data["check"] = "none"
-
-        is_chat = await chatai.find_one(reply_data)
-        if not is_chat:
-            await chatai.insert_one(reply_data)
-            database_replies_cache.append(reply_data)
-
-    except Exception as e:
-        print(f"Error in save_reply: {e}")
+"""
 
 
 async def get_reply(word: str):
@@ -92,7 +54,7 @@ async def get_reply(word: str):
         return random.choice(relevant_replies)
 
     return random.choice(database_replies_cache) if database_replies_cache else None
-
+"""
 @nexichat.on_message(filters.command("status"))
 async def status_command(client: Client, message: Message):
     chat_id = message.chat.id
@@ -156,29 +118,6 @@ languages = {
 
 
 
-def generate_language_buttons(languages):
-    buttons = []
-    current_row = []
-    for lang, code in languages.items():
-        current_row.append(InlineKeyboardButton(lang.capitalize(), callback_data=f'setlang_{code}'))
-        if len(current_row) == 4:
-            buttons.append(current_row)
-            current_row = []
-    if current_row:
-        buttons.append(current_row)
-    return InlineKeyboardMarkup(buttons)
-
-async def get_chat_language(chat_id):
-    chat_lang = await lang_db.find_one({"chat_id": chat_id})
-    return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
-    
-@nexichat.on_message(filters.command(["lang", "language", "setlang"]))
-async def set_language(client: Client, message: Message):
-    await message.reply_text(
-        "Please select your chat language:",
-        reply_markup=generate_language_buttons(languages)
-    )
-
 
 @nexichat.on_message(filters.command("status"))
 async def status_command(client: Client, message: Message):
@@ -190,20 +129,6 @@ async def status_command(client: Client, message: Message):
     else:
         await message.reply("No status found for this chat.")
 
-
-@nexichat.on_message(filters.command(["lang", "language", "setlang"]))
-async def set_language(client: Client, message: Message):
-    await message.reply_text(
-        "Please select your chat language:",
-        reply_markup=generate_language_buttons(languages)
-    )
-
-
-@nexichat.on_message(filters.command(["resetlang", "nolang"]))
-async def reset_language(client: Client, message: Message):
-    chat_id = message.chat.id
-    lang_db.update_one({"chat_id": chat_id}, {"$set": {"language": "nolang"}}, upsert=True)
-    await message.reply_text("**Bot language has been reset in this chat to mix language.**")
 
 
 @nexichat.on_message(filters.command("chatbot"))
