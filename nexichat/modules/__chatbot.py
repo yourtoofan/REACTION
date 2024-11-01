@@ -151,7 +151,7 @@ async def refresh_replies_cache():
                     upar ek sentence use sentence ke liye ek chat vote Ki Tarah Chhota se Chhota reply do ladki banke jyada bada reply mat dena jitna chhota se chhota me kkam ho jaye aur Jis language mein sentence likha gaya Usi language mein reply likhkar ke do taki samjh aaye ki kya likha hua hai aur bas reply do uske alava extra kuch nhi
                 """
                 try:
-                    response = api.chatgpt(user_input)
+                    response = api.gemini(user_input)
                     
                     if response:
                         print(f"{reply_data['text']} == {response}")
