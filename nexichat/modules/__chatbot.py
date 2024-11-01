@@ -1,6 +1,5 @@
 import random
-import asyncio
-from MukeshAPI import api
+from TheApi import api
 from pymongo import MongoClient
 from pyrogram import Client, filters
 from pyrogram.errors import MessageEmpty
@@ -11,7 +10,7 @@ from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
 from config import MONGO_URL
 from nexichat import nexichat, mongo, LOGGER, db
-from nexichat.modules.helpers import chatai, storeai, CHATBOT_ON
+from nexichat.modules.helpers import chatai, CHATBOT_ON
 from nexichat.modules.helpers import (
     ABOUT_BTN,
     ABOUT_READ,
@@ -27,15 +26,68 @@ from nexichat.modules.helpers import (
     START,
     TOOLS_DATA_READ,
 )
+import asyncio
 
-AUTO_GCASTS = True
-CHAT_REFRESH_INTERVAL = 2
-
-chat_cache = []
-store_cache = []
+translator = GoogleTranslator()
 
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
+
+replies_cache = []
+
+async def load_replies_cache():
+    global replies_cache
+    replies_cache = await chatai.find().to_list(length=None)
+
+async def save_reply(original_message: Message, reply_message: Message):
+    global replies_cache
+    try:
+        reply_data = {
+            "word": original_message.text,
+            "text": None,
+            "check": "none",
+        }
+
+        if reply_message.sticker:
+            reply_data["text"] = reply_message.sticker.file_id
+            reply_data["check"] = "sticker"
+        elif reply_message.photo:
+            reply_data["text"] = reply_message.photo.file_id
+            reply_data["check"] = "photo"
+        elif reply_message.video:
+            reply_data["text"] = reply_message.video.file_id
+            reply_data["check"] = "video"
+        elif reply_message.audio:
+            reply_data["text"] = reply_message.audio.file_id
+            reply_data["check"] = "audio"
+        elif reply_message.animation:
+            reply_data["text"] = reply_message.animation.file_id
+            reply_data["check"] = "gif"
+        elif reply_message.voice:
+            reply_data["text"] = reply_message.voice.file_id
+            reply_data["check"] = "voice"
+        elif reply_message.text:
+            reply_data["text"] = reply_message.text
+            reply_data["check"] = "none"
+
+        is_chat = await chatai.find_one(reply_data)
+        if not is_chat:
+            await chatai.insert_one(reply_data)
+            replies_cache.append(reply_data)
+
+    except Exception as e:
+        print(f"Error in save_reply: {e}")
+
+async def get_reply(word: str):
+    global replies_cache
+    if not replies_cache:
+        await load_replies_cache()
+        print("Reloaded Chats")
+    relevant_replies = [reply for reply in replies_cache if reply['word'] == word]
+    if not relevant_replies:
+        relevant_replies = replies_cache
+    return random.choice(relevant_replies) if relevant_replies else None
+
 
 @nexichat.on_message(filters.command("status"))
 async def status_command(client: Client, message: Message):
@@ -48,6 +100,108 @@ async def status_command(client: Client, message: Message):
         await message.reply("No status found for this chat.")
 
 
+languages = {
+    # Top 20 languages used on Telegram
+    'english': 'en', 'hindi': 'hi', 'amharic': 'am', 'Myanmar': 'my', 'russian': 'ru',  
+    'arabic': 'ar', 'turkish': 'tr', 'german': 'de', 'french': 'fr', 'spanish': 'es',
+    'italian': 'it', 'persian': 'fa', 'indonesian': 'id', 'portuguese': 'pt',
+    'ukrainian': 'uk', 'filipino': 'tl', 'korean': 'ko', 'japanese': 'ja', 
+    'polish': 'pl', 'vietnamese': 'vi', 'thai': 'th', 'dutch': 'nl',
+
+    # Top languages spoken in Bihar
+    'bhojpuri': 'bho', 'maithili': 'mai', 'urdu': 'ur', 'tamil': 'ta',
+    'bengali': 'bn', 'angika': 'anp', 'sanskrit': 'sa', 'nepali': 'ne',
+    'oriya': 'or', 'santhali': 'sat', 'khortha': 'kht', 
+    'kurmali': 'kyu', 'ho': 'hoc', 'munda': 'unr', 'kharwar': 'kqw', 
+    'mundari': 'unr', 'sadri': 'sck', 'pali': 'pi',
+
+    # Top languages spoken in India
+    'telugu': 'te', 'bengali': 'bn', 'marathi': 'mr', 'tamil': 'ta', 
+    'gujarati': 'gu', 'urdu': 'ur', 'kannada': 'kn', 'malayalam': 'ml', 
+    'odia': 'or', 'punjabi': 'pa', 'assamese': 'as', 'sanskrit': 'sa', 
+    'kashmiri': 'ks', 'konkani': 'gom', 'sindhi': 'sd', 'bodo': 'brx', 
+    'dogri': 'doi', 'santali': 'sat', 'meitei': 'mni', 'nepali': 'ne',
+
+    # Other language
+    'afrikaans': 'af', 'albanian': 'sq', 'armenian': 'hy', 
+    'aymara': 'ay', 'azerbaijani': 'az', 'bambara': 'bm', 
+    'basque': 'eu', 'belarusian': 'be', 'bosnian': 'bs', 'bulgarian': 'bg', 
+    'catalan': 'ca', 'cebuano': 'ceb', 'chichewa': 'ny', 
+    'chinese (simplified)': 'zh-CN', 'chinese (traditional)': 'zh-TW', 
+    'corsican': 'co', 'croatian': 'hr', 'czech': 'cs', 'danish': 'da', 
+    'dhivehi': 'dv', 'esperanto': 'eo', 'estonian': 'et', 'ewe': 'ee', 
+    'finnish': 'fi', 'frisian': 'fy', 'galician': 'gl', 'georgian': 'ka', 
+    'greek': 'el', 'guarani': 'gn', 'haitian creole': 'ht', 'hausa': 'ha', 
+    'hawaiian': 'haw', 'hebrew': 'iw', 'hmong': 'hmn', 'hungarian': 'hu', 
+    'icelandic': 'is', 'igbo': 'ig', 'ilocano': 'ilo', 'irish': 'ga', 
+    'javanese': 'jw', 'kazakh': 'kk', 'khmer': 'km', 'kinyarwanda': 'rw', 
+    'krio': 'kri', 'kurdish (kurmanji)': 'ku', 'kurdish (sorani)': 'ckb', 
+    'kyrgyz': 'ky', 'lao': 'lo', 'latin': 'la', 'latvian': 'lv', 
+    'lingala': 'ln', 'lithuanian': 'lt', 'luganda': 'lg', 'luxembourgish': 'lb', 
+    'macedonian': 'mk', 'malagasy': 'mg', 'maltese': 'mt', 'maori': 'mi', 
+    'mizo': 'lus', 'mongolian': 'mn', 'myanmar': 'my', 'norwegian': 'no', 
+    'oromo': 'om', 'pashto': 'ps', 'quechua': 'qu', 'romanian': 'ro', 
+    'samoan': 'sm', 'scots gaelic': 'gd', 'sepedi': 'nso', 'serbian': 'sr', 
+    'sesotho': 'st', 'shona': 'sn', 'sinhala': 'si', 'slovak': 'sk', 
+    'slovenian': 'sl', 'somali': 'so', 'sundanese': 'su', 'swahili': 'sw', 
+    'swedish': 'sv', 'tajik': 'tg', 'tatar': 'tt', 'tigrinya': 'ti', 
+    'tsonga': 'ts', 'turkmen': 'tk', 'twi': 'ak', 'uyghur': 'ug', 
+    'uzbek': 'uz', 'welsh': 'cy', 'xhosa': 'xh', 'yiddish': 'yi', 
+    'yoruba': 'yo', 'zulu': 'zu'
+}
+
+
+
+def generate_language_buttons(languages):
+    buttons = []
+    current_row = []
+    for lang, code in languages.items():
+        current_row.append(InlineKeyboardButton(lang.capitalize(), callback_data=f'setlang_{code}'))
+        if len(current_row) == 4:
+            buttons.append(current_row)
+            current_row = []
+    if current_row:
+        buttons.append(current_row)
+    return InlineKeyboardMarkup(buttons)
+
+async def get_chat_language(chat_id):
+    chat_lang = await lang_db.find_one({"chat_id": chat_id})
+    return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
+    
+@nexichat.on_message(filters.command(["lang", "language", "setlang"]))
+async def set_language(client: Client, message: Message):
+    await message.reply_text(
+        "Please select your chat language:",
+        reply_markup=generate_language_buttons(languages)
+    )
+
+
+@nexichat.on_message(filters.command("status"))
+async def status_command(client: Client, message: Message):
+    chat_id = message.chat.id
+    chat_status = await status_db.find_one({"chat_id": chat_id})
+    if chat_status:
+        current_status = chat_status.get("status", "not found")
+        await message.reply(f"Chatbot status for this chat: **{current_status}**")
+    else:
+        await message.reply("No status found for this chat.")
+
+
+@nexichat.on_message(filters.command(["lang", "language", "setlang"]))
+async def set_language(client: Client, message: Message):
+    await message.reply_text(
+        "Please select your chat language:",
+        reply_markup=generate_language_buttons(languages)
+    )
+
+
+@nexichat.on_message(filters.command(["resetlang", "nolang"]))
+async def reset_language(client: Client, message: Message):
+    chat_id = message.chat.id
+    lang_db.update_one({"chat_id": chat_id}, {"$set": {"language": "nolang"}}, upsert=True)
+    await message.reply_text("**Bot language has been reset in this chat to mix language.**")
+
+
 @nexichat.on_message(filters.command("chatbot"))
 async def chatbot_command(client: Client, message: Message):
     await message.reply_text(
@@ -55,12 +209,14 @@ async def chatbot_command(client: Client, message: Message):
         reply_markup=InlineKeyboardMarkup(CHATBOT_ON),
     )
 
+
+            
 @nexichat.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     try:
         chat_id = message.chat.id
         chat_status = await status_db.find_one({"chat_id": chat_id})
-
+        
         if chat_status and chat_status.get("status") == "disabled":
             return
 
@@ -74,120 +230,86 @@ async def chatbot_response(client: Client, message: Message):
             reply_data = await get_reply(message.text)
 
             if reply_data:
-                selected_reply = random.choice(reply_data)  # Select random reply from stored replies
-                await send_reply_based_on_type(message, selected_reply)
-            else:
-                
-                ai_reply = await generate_ai_reply(message.text)
-                if ai_reply:
-                    await message.reply_text(ai_reply)
-                    await save_reply_in_databases(message.text, {"text": ai_reply, "check": "text"})
+                response_text = reply_data["text"]
+                chat_lang = await get_chat_language(chat_id)
+
+                if not chat_lang or chat_lang == "nolang":
+                    translated_text = response_text
                 else:
-                    await message.reply_text("**I don't understand. What are you saying?**")
+                    translated_text = GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
+                
+                if reply_data["check"] == "sticker":
+                    await message.reply_sticker(reply_data["text"])
+                elif reply_data["check"] == "photo":
+                    await message.reply_photo(reply_data["text"])
+                elif reply_data["check"] == "video":
+                    await message.reply_video(reply_data["text"])
+                elif reply_data["check"] == "audio":
+                    await message.reply_audio(reply_data["text"])
+                elif reply_data["check"] == "gif":
+                    await message.reply_animation(reply_data["text"])
+                elif reply_data["check"] == "voice":
+                    await message.reply_voice(reply_data["text"])
+                else:
+                    await message.reply_text(translated_text)
+            else:
+                await message.reply_text("**I don't understand. What are you saying?**")
 
+        if message.reply_to_message:
+            await save_reply(message.reply_to_message, message)
+
+    except MessageEmpty:
+        await message.reply_text("🙄🙄")
     except Exception as e:
-        print(f"Error handling message: {e}")
+        return
 
-async def send_reply_based_on_type(message, reply_data):
-    """Send reply based on type of content in reply_data."""
-    if reply_data["check"] == "sticker":
-        await message.reply_sticker(reply_data["text"])
-    elif reply_data["check"] == "photo":
-        await message.reply_photo(reply_data["text"])
-    elif reply_data["check"] == "video":
-        await message.reply_video(reply_data["text"])
-    elif reply_data["check"] == "audio":
-        await message.reply_audio(reply_data["text"])
-    elif reply_data["check"] == "gif":
-        await message.reply_animation(reply_data["text"])
-    elif reply_data["check"] == "voice":
-        await message.reply_voice(reply_data["text"])
-    else:
-        await message.reply_text(reply_data["text"])
-
-async def get_reply(word: str):
-    try:
-        # Find multiple responses for the word in `storeai`, else look in `chatai`
-        is_chat = await storeai.find({"word": word}).to_list(length=None)
-        if not is_chat:
-            is_chat = await chatai.find().to_list(length=None)
-        return is_chat if is_chat else None
-    except Exception as e:
-        print(f"Error in get_reply: {e}")
-        return None
-
-async def save_reply_in_databases(word, reply_data):
-    if "_id" in reply_data:
-        reply_data.pop("_id")  
-    reply_data["word"] = word 
-    store_cache.append(reply_data)
-
-    try:
-        if reply_data["check"] == "text":
-            await storeai.insert_one(reply_data)
-        else:
-            await chatai.insert_one(reply_data)
-    except Exception as e:
-        print(f"Error saving to database: {e}")
-
-async def generate_ai_reply(text):
-    try:
-        user_input = f"text: ({text}) Give a short, chatty, fun reply. in same lang in which lang that text is written"
-        response = api.chatgpt(user_input)
-        if response:
-            return response
-    except Exception as e:
-        print(f"Error generating AI reply: {e}")
-    return None
 
 import asyncio
-
+import time
+AUTO_GCASTS = True
 async def refresh_replies_cache():
     while True:
-        for reply_data in chat_cache:
-            if reply_data["check"] == "none" and isinstance(reply_data["text"], str):
+        for reply_data in replies_cache:
+            if reply_data["check"] == "none" and isinstance(reply_data["text"], str):  
                 user_input = f"""
-                    sentence:- ({reply_data['text']})
-                    upar ek sentence use sentence ke liye ek chat vote Ki Tarah Chhota se Chhota reply do ladki banke jyada bada reply mat dena jitna chhota se chhota me kkam ho jaye aur Jis language mein sentence likha gaya Usi language mein reply likhkar ke do taki samjh aaye ki kya likha hua hai aur bas reply do uske alava extra kuch nhi
+                    text:- ({reply_data['text']})
+                    text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+                    Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
                 """
                 try:
-                    response = api.gemini(user_input)
+                    response = api.chatgpt(user_input)
                     
                     if response:
-                        print(f"{reply_data['text']} == {response}")
-                        ai_reply = response.strip()  # Trim whitespace from the response
+                        ai_reply = response
                         reply_data["text"] = ai_reply if ai_reply else reply_data["text"]
 
-                        # Save reply in the database
-                        await save_reply_in_databases(reply_data["text"], reply_data)
-                        
-                        print(f"New reply updated for {reply_data['word']} == {reply_data['text']}")
+                        await chatai.update_one(
+                            {"word": reply_data["word"], "check": "none"},
+                            {"$set": {"text": reply_data["text"]}}
+                        )
+                        print(f"New reply updated for {reply_data["word"]} == {reply_data["text"]}")
                     else:
                         print("Invalid API response format; using original text.")
+
                     
-                    await asyncio.sleep(1)  # Short pause after each API call
+                    await asyncio.sleep(1)
 
                 except Exception as e:
                     print(f"Error in refreshing replies cache: {e}")
 
-            await asyncio.sleep(5)  # Pause after each iteration through chat_cache
-
-# Assume `save_reply_in_databases` and `api.chatgpt` are defined elsewhere.
-async def load_chat_cache():
-    global chat_cache
-    chat_cache = await chatai.find().to_list(length=None)
+            await asyncio.sleep(1) 
 
 async def continuous_update():
-    await load_chat_cache()
-    print("2")
+    await load_replies_cache()
     while True:
-        try:
-            print("3")
-            await refresh_replies_cache()
-            print("5")
-        except Exception as e:
-            print(f"Error in continuous update: {e}")
-        
+        if AUTO_GCASTS:
+            try:
+                await refresh_replies_cache()
+            except Exception as e:
+                pass
+
+        await asyncio.sleep(1)
+
+
 if AUTO_GCASTS:
-    print("1")
     asyncio.create_task(continuous_update())
