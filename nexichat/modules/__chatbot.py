@@ -1,4 +1,5 @@
 import random
+from TheApi import api
 from pymongo import MongoClient
 from pyrogram import Client, filters
 from pyrogram.errors import MessageEmpty
@@ -278,11 +279,10 @@ async def refresh_replies_cache():
                 try:
                     response = api.chatgpt(user_input)
                     
-                    if isinstance(response, dict) and "results" in response:
-                        ai_reply = response["results"]
+                    if response:
+                        ai_reply = response
                         reply_data["text"] = ai_reply if ai_reply else reply_data["text"]
 
-                        
                         await chatai.update_one(
                             {"word": reply_data["word"], "check": "none"},
                             {"$set": {"text": reply_data["text"]}}
