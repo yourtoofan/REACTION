@@ -244,7 +244,8 @@ async def creat_reply(word):
     """
     results = api.chatgpt(user_input)
     return results
- '''   
+
+'''   
 async def update_replies_cache():
     global replies_cache
     for reply_data in replies_cache:
