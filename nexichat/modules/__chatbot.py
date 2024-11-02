@@ -41,6 +41,9 @@ async def load_replies_cache():
     global replies_cache
     replies_cache = await chatai.find({"check": "none"}).to_list(length=None)
 
+async def new_replies_cache():
+    global replies_cache
+    replies_cache = await storeai.find({"check": "none"}).to_list(length=None)
 
 async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache
