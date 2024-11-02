@@ -25,6 +25,7 @@ status_db = db.chatbot_status_db.status
 replies_cache = []
 new_replies_cache = []
 
+
 async def get_reply(message_text):
     global replies_cache
     try:
@@ -34,17 +35,14 @@ async def get_reply(message_text):
                 print("nhi mila")
                 return reply_data["text"], reply_data["check"]
         
-        reply_data = await chatai.find_one({"word": message_text})
-        
-        if reply_data:
-            replies_cache.append(reply_data)
-            return reply_data["text"], reply_data["check"]
-        
         if replies_cache:
-            random_reply = random.choice(replies_cache)
-            return random_reply["text"], random_reply["check"]
-        
-        return "I'm sorry, I don't have a reply for that.", "text"
+            random_reply = random.choice(reply_data in replies_cache)
+            print("Random reply selected")
+            return reply_data["text"], reply_data["check"]
+        else:
+            print("Cache is empty")
+            return None, None
+
     except Exception as e:
         print(f"Error in get_reply: {e}")
         return None, None
