@@ -53,6 +53,7 @@ async def get_new_reply(message_text):
     global new_replies_cache
     try:
         for reply_data in new_replies_cache:
+            print(f"{reply_data}\n\n")
             if reply_data["word"] == message_text:
                 return reply_data["text"], reply_data["check"]
         
