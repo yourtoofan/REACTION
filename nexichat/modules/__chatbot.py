@@ -39,7 +39,7 @@ async def get_reply(message_text):
         
         if replies_cache:
             random_reply = random.choice(replies_cache)
-            print("Random reply selected")
+            
             return random_reply["text"], random_reply["check"]
         else:
             await load_replies_cache()
@@ -205,7 +205,6 @@ async def load_replies_cache():
         storeai_data = await storeai.find().to_list(length=None)
         new_replies_cache = [{"word": reply_data["word"], "text": reply_data["text"], "check": reply_data["check"]} for reply_data in storeai_data]
 
-        print("Cache loaded from databases.")
     except Exception as e:
         print(f"Error loading replies cache: {e}")
 
@@ -231,7 +230,7 @@ async def update_replies_cache():
                 
             except Exception as e:
                 print(f"Error updating reply for {reply_data['word']}: {e}")
-        print(f"not found")
+        
         await asyncio.sleep(5)
 
 
@@ -254,6 +253,7 @@ async def save_new_reply(x, new_reply):
     except Exception as e:
         print(f"Error in save_new_reply: {e}")
 
+
 async def generate_reply(word):
     try:
         user_input = f"""
@@ -263,29 +263,24 @@ async def generate_reply(word):
         """
         response = api.gemini(user_input)
         
-        return response["results"] if response and "results" in response else None
-    except Exception as e:
-        return None
-
-async def creat_reply(word):
-    try:
-        from TheApi import api
+        if response and "results" in response:
+            return response["results"]
+        
+        from TheApi import api as a
         url_pattern = re.compile(r'(https?://\S+)')
-        user_input = f"""
-            text:- ({word})
-            text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
-            Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
-        """
-        results = api.chatgpt(user_input)
         
-        if results and url_pattern.search(results):
-            return await update_replies_cache()
+        results = a.chatgpt(user_input)
         
-        return results
-    except Exception as e:
-        print(f"Both Chatgpt Api dead retrying...")
+        if results and not url_pattern.search(results):
+            return results
+     
         await asyncio.sleep(10)
-        return await update_replies_cache()
+        return await generate_reply(word)
+
+    except Exception as e:
+        print("Both ChatGPT APIs failed, retrying in 10 seconds...")
+        await asyncio.sleep(10)
+        return await generate_reply(word)
 
 
 async def continuous_update():
@@ -298,5 +293,4 @@ async def continuous_update():
             print(f"Error in continuous_update: {e}")
         await asyncio.sleep(5)
 
-# Start the update loop
 asyncio.create_task(continuous_update())
