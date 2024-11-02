@@ -23,13 +23,6 @@ CHAT_STORAGE = [
 ]
 
 
-def get_chatai():
-    chatdb = MongoCli(random.choice(CHAT_STORAGE))
-    return chatdb.Anonymous.Word.WordDb
-
-def get_storeai():
-    storedb = MongoCli(random.choice(CHAT_STORAGE))
-    return storedb.Anonymous.Word.WordDb
-
-chatai = get_chatai()
-storeai = get_storeai()
+VIPBOY = MongoCli(random.choice(CHAT_STORAGE))
+chatai = VIPBOY.Anonymous.Word.WordDb
+storeai = VIPBOY.Anonymous.Word.WordDb  #
