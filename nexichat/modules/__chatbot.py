@@ -334,17 +334,19 @@ async def update_replies_cache():
                     new_reply = await creat_reply(reply_data["word"])
                     
                     if new_reply is None:
-                        print("API dead")
                         continue
 
                 await save_new_reply(x, new_reply)
-                print(f"Saved reply in database for {x} == {new_reply}")
                 
             except Exception as e:
                 print(f"Error updating reply for {reply_data['word']}: {e}")
 
         await asyncio.sleep(5)
 
+    global replies_cache
+    replies_cache.clear()
+    await load_replies_cache()
+    
 # Continuous task to load cache and update replies
 async def continuous_update():
     await load_replies_cache()
