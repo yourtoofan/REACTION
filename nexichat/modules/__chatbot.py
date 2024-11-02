@@ -210,7 +210,7 @@ async def load_replies_cache():
 async def update_replies_cache():
     global replies_cache
     for reply_data in replies_cache:
-        if "text" in reply_data and reply_data["check"] == "none":
+        if "text" in reply_data and reply_data["check"] == "text":
             try:
                 print(f"found")
                 print(f"{reply_data}")
