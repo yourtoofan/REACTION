@@ -34,25 +34,32 @@ async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache
     try:
         reply_data = {
-            "word": original_message.text,
+            "word": original_message.text,  # original message ka text
             "text": None,
             "check": "none",
         }
 
         if reply_message.sticker:
-            reply_data.update({"text": reply_message.sticker.file_id, "check": "sticker"})
+            reply_data["text"] = reply_message.sticker.file_id
+            reply_data["check"] = "sticker"
         elif reply_message.photo:
-            reply_data.update({"text": reply_message.photo.file_id, "check": "photo"})
+            reply_data["text"] = reply_message.photo.file_id
+            reply_data["check"] = "photo"
         elif reply_message.video:
-            reply_data.update({"text": reply_message.video.file_id, "check": "video"})
+            reply_data["text"] = reply_message.video.file_id
+            reply_data["check"] = "video"
         elif reply_message.audio:
-            reply_data.update({"text": reply_message.audio.file_id, "check": "audio"})
+            reply_data["text"] = reply_message.audio.file_id
+            reply_data["check"] = "audio"
         elif reply_message.animation:
-            reply_data.update({"text": reply_message.animation.file_id, "check": "gif"})
+            reply_data["text"] = reply_message.animation.file_id
+            reply_data["check"] = "gif"
         elif reply_message.voice:
-            reply_data.update({"text": reply_message.voice.file_id, "check": "voice"})
+            reply_data["text"] = reply_message.voice.file_id
+            reply_data["check"] = "voice"
         elif reply_message.text:
             reply_data["text"] = reply_message.text
+            reply_data["check"] = "text"  # reply text set aur check mein 'text' format
 
         is_chat = await chatai.find_one(reply_data)
         if not is_chat:
@@ -62,23 +69,31 @@ async def save_reply(original_message: Message, reply_message: Message):
     except Exception as e:
         print(f"Error in save_reply: {e}")
 
-async def get_reply(word: str):
-    global replies_cache
-    if not replies_cache:
-        await load_replies_cache()
-        print("Reloaded Chats from database")
-    relevant_replies = [reply for reply in replies_cache if reply['word'] == word]
-    if not relevant_replies:
-        relevant_replies = replies_cache
-    return random.choice(relevant_replies) if relevant_replies else None
+async def get_reply(message_text):
+    for reply_data in replies_cache:
+        if reply_data["word"] == message_text:
+            return reply_data["text"], reply_data["check"]
+    
+    reply_data = await chatai.find_one({"word": message_text})
+    
+    if reply_data:
+        replies_cache.append(reply_data)
+        return reply_data["text"], reply_data["check"]
+    
+    return "I'm sorry, I don't have a reply for that.", "text"
 
-async def get_new_reply(word: str):
-    global new_replies_cache
-    if not new_replies_cache:
-        await load_replies_cache()
-        print("Reloaded Chats from Ai")
-    relevant_replies = [reply for reply in new_replies_cache if reply['word'] == word]
-    return None
+async def get_new_reply(message_text):
+    for reply_data in new_replies_cache:
+        if reply_data["word"] == message_text:
+            return reply_data["text"], reply_data["check"]
+    
+    reply_data = await storeai.find_one({"word": message_text})
+    
+    if reply_data:
+        new_replies_cache.append(reply_data)
+        return reply_data["text"], reply_data["check"]
+    
+    return "I'm sorry, I don't have a reply for that.", "text"
 
 async def get_chat_language(chat_id):
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
