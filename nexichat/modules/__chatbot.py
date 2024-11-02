@@ -34,7 +34,7 @@ async def get_reply(message_text):
         for reply_data in replies_cache:
             
             if reply_data["word"] == message_text:
-                print("word mila")
+                
                 return reply_data["text"], reply_data["check"]
         
         if replies_cache:
@@ -42,7 +42,7 @@ async def get_reply(message_text):
             print("Random reply selected")
             return random_reply["text"], random_reply["check"]
         else:
-            print("Cache is empty")
+            await load_replies_cache()
             return None, None
 
     except Exception as e:
@@ -228,7 +228,7 @@ async def update_replies_cache():
                 
             except Exception as e:
                 print(f"Error updating reply for {reply_data['word']}: {e}")
-
+        print(f"not found")
         await asyncio.sleep(5)
 
 
