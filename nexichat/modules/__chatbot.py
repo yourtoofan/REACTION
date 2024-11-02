@@ -322,17 +322,29 @@ async def creat_reply(word):
     results = api.chatgpt(user_input)
     return results
     
+import re
+
 async def update_replies_cache():
     global replies_cache
+    url_pattern = re.compile(r'(https?://\S+)')
+    
     for reply_data in replies_cache:
         if "text" in reply_data and reply_data["check"] == "none":
             try:
                 new_reply = await generate_reply(reply_data["word"])
                 x = reply_data["word"]
 
+                if new_reply and url_pattern.search(new_reply):
+                    print(f"Link found in reply for {x}, skipping processing.")
+                    return new_reply
+                
                 if new_reply is None:
                     from TheApi import api
                     new_reply = await creat_reply(reply_data["word"])
+
+                if new_reply and url_pattern.search(new_reply):
+                    print(f"Link found in reply for {x}, skipping processing.")
+                    return new_reply
 
                 await save_new_reply(x, new_reply)
                 print(f"Saved reply in database for {x} == {new_reply}")
