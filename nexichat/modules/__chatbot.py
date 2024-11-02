@@ -26,10 +26,6 @@ status_db = db.chatbot_status_db.status
 replies_cache = []
 new_replies_cache = []
 
-async def load_replies_cache():
-    global replies_cache
-    replies_cache = await chatai.find({"check": "none"}).to_list(length=None)
-
 
 async def get_reply(message_text):
     for reply_data in replies_cache:
@@ -183,21 +179,33 @@ async def save_reply(original_message: Message, reply_message: Message):
     except Exception as e:
         print(f"Error in save_reply: {e}")
 
+async def load_replies_cache():
+    global replies_cache, new_replies_cache
+    # Chatai se data load karke replies_cache me dalna
+    chatai_data = await chatai.find().to_list(length=None)
+    replies_cache = [{"word": data["word"], "text": data["text"], "check": data["check"]} for data in chatai_data]
+
+    # Storeai se data load karke new_replies_cache me dalna
+    storeai_data = await storeai.find().to_list(length=None)
+    new_replies_cache = [{"word": data["word"], "text": data["text"], "check": data["check"]} for data in storeai_data]
+
+    print("Cache loaded from databases.")
+
 async def save_new_reply(x, new_reply):
-    global new_replies_cache
+    global new_replies_cache, replies_cache
     try:
         reply_data = {
             "word": x,
             "text": new_reply,
-            "check": "none"
+            "check": "text"
         }
 
-        is_chat = await storeai.find_one(reply_data)
+        is_chat = await storeai.find_one({"word": x})
         if not is_chat:
             await storeai.insert_one(reply_data)
-            await chatai.delete_one(reply_data)
             new_replies_cache.append(reply_data)
-            replies_cache.remove(reply_data)
+            replies_cache = [r for r in replies_cache if r["word"] != x]
+            await chatai.delete_one({"word": x})
             
     except Exception as e:
         print(f"Error in save_new_reply: {e}")
@@ -229,22 +237,30 @@ async def update_replies_cache():
     url_pattern = re.compile(r'(https?://\S+)')
     
     for reply_data in replies_cache:
-        if "text" in reply_data and reply_data["check"] == "none":
+        if "text" in reply_data and reply_data["check"] == "text":
             try:
                 new_reply = await generate_reply(reply_data["word"])
                 x = reply_data["word"]
 
-                if new_reply is None:
-                    from TheApi import api
-                    new_reply = await creat_reply(reply_data["word"])
+                # Retry pattern
+                retry_count = 0
+                while new_reply is None or url_pattern.search(new_reply):
+                    if retry_count % 2 == 0:
+                        new_reply = await creat_reply(x)
+                    else:
+                        new_reply = await generate_reply(x)
                     
-                    if new_reply is None:
-                        print("API dead")
-                        continue
+                    if new_reply is not None and not url_pattern.search(new_reply):
+                        break
+                    retry_count += 1
+                    if retry_count >= 4:
+                        print("Retry limit reached for:", x)
+                        break
 
-                await save_new_reply(x, new_reply)
-                print(f"Saved reply in database for {x} == {new_reply}")
-                
+                if new_reply:
+                    await save_new_reply(x, new_reply)
+                    print(f"Saved reply in database for {x} == {new_reply}")
+
             except Exception as e:
                 print(f"Error updating reply for {reply_data['word']}: {e}")
 
