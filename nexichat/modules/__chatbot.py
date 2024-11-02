@@ -276,8 +276,6 @@ async def save_reply(original_message: Message, reply_message: Message):
 
 
 
-new_replies_cache = []
-
 async def load_new_replies_cache():
     global new_replies_cache
     new_replies_cache = await storeai.find({"check": "none"}).to_list(length=None)
@@ -295,6 +293,7 @@ async def save_new_reply(x, new_reply):
         if not is_chat:
             await storeai.insert_one(reply_data)
             await chatai.delete_one(reply_data)
+            print(f"replies deleted from chatai == {reply_data}")
             new_replies_cache.append(reply_data)
             
     except Exception as e:
