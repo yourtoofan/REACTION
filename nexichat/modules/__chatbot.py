@@ -64,26 +64,7 @@ async def get_new_reply(message_text):
     except Exception as e:
         print(f"Error in get_new_reply: {e}")
         return None, None
-"""
-async def get_reply(word: str):
-    global replies_cache
-    if not replies_cache:
-        await load_replies_cache()
-        print("Reloaded Chats from database")
-    relevant_replies = [reply for reply in replies_cache if reply['word'] == word]
-    if not relevant_replies:
-        relevant_replies = replies_cache
-    return random.choice(relevant_replies) if relevant_replies else None
 
-async def get_new_reply(word: str):
-    global new_replies_cache
-    if not new_replies_cache:
-        await new_replies_cache()
-        print("Reloaded Chats from Ai")
-    relevant_replies = [reply for reply in new_replies_cache if reply['word'] == word]
-    if not relevant_replies:
-        relevant_replies = new_replies_cache
-    return None"""
 async def get_chat_language(chat_id):
     try:
         chat_lang = await lang_db.find_one({"chat_id": chat_id})
