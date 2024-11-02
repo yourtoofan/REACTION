@@ -225,7 +225,7 @@ async def save_new_reply(x, new_reply):
             
     except Exception as e:
         print(f"Error in save_new_reply: {e}")
-
+'''
 async def generate_reply(word):
     user_input = f"""
         text:- ({word})
@@ -245,7 +245,7 @@ async def creat_reply(word):
     results = api.chatgpt(user_input)
     return results
 
-'''   
+
 async def update_replies_cache():
     global replies_cache
     for reply_data in replies_cache:
@@ -287,7 +287,7 @@ async def save_new_reply(x, new_reply):
             
     except Exception as e:
         print(f"Error in save_new_reply: {e}")
-
+'''
 async def generate_reply(word):
     try:
         user_input = f"""
@@ -320,7 +320,7 @@ async def creat_reply(word):
     except Exception as e:
         print(f"Error in creat_reply: {e}")
         return None
-'''
+
 async def update_replies_cache():
     global replies_cache
     url_pattern = re.compile(r'(https?://\S+)')
