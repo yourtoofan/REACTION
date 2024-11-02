@@ -289,7 +289,7 @@ async def save_new_reply(x, new_reply):
             await storeai.insert_one(reply_data)
             await chatai.delete_one(reply_data)
             new_replies_cache.append(reply_data)
-            replies_cache.remove(reply_data)
+            
             
             
     except Exception as e:
