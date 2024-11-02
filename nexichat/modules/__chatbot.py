@@ -215,16 +215,9 @@ async def update_replies_cache():
         from config import OWNER_ID
         if "text" in reply_data and reply_data["check"] == "text":
             try:
-                
                 new_reply = await generate_reply(reply_data["word"])
                 x = reply_data["word"]
-
-                if new_reply is None:
-                    from TheApi import api
-                    print("1st api is dead 2nd is using")
-                    await asyncio.sleep(2)
-                    new_reply = await creat_reply(reply_data["word"])
-
+                
                 await save_new_reply(x, new_reply)
                 print(f"Saved reply in database for {x} == {new_reply}")
                 
