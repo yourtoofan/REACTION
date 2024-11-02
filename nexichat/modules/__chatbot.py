@@ -41,9 +41,45 @@ async def load_replies_cache():
     global replies_cache
     replies_cache = await chatai.find({"check": "none"}).to_list(length=None)
 
-async def new_replies_cache():
+
+async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache
-    replies_cache = await storeai.find({"check": "none"}).to_list(length=None)
+    try:
+        reply_data = {
+            "word": original_message.text,
+            "text": None,
+            "check": "none",
+        }
+
+        if reply_message.sticker:
+            reply_data["text"] = reply_message.sticker.file_id
+            reply_data["check"] = "sticker"
+        elif reply_message.photo:
+            reply_data["text"] = reply_message.photo.file_id
+            reply_data["check"] = "photo"
+        elif reply_message.video:
+            reply_data["text"] = reply_message.video.file_id
+            reply_data["check"] = "video"
+        elif reply_message.audio:
+            reply_data["text"] = reply_message.audio.file_id
+            reply_data["check"] = "audio"
+        elif reply_message.animation:
+            reply_data["text"] = reply_message.animation.file_id
+            reply_data["check"] = "gif"
+        elif reply_message.voice:
+            reply_data["text"] = reply_message.voice.file_id
+            reply_data["check"] = "voice"
+        elif reply_message.text:
+            reply_data["text"] = reply_message.text
+            reply_data["check"] = "none"
+
+        is_chat = await chatai.find_one(reply_data)
+        if not is_chat:
+            await chatai.insert_one(reply_data)
+            replies_cache.append(reply_data)
+
+    except Exception as e:
+        print(f"Error in save_reply: {e}")
 
 
 async def get_reply(word: str):
@@ -189,52 +225,6 @@ async def chatbot_command(client: Client, message: Message):
 
 
             
-async def save_reply(original_message: Message, reply_message: Message):
-    global replies_cache
-    try:
-        reply_data = {
-            "word": original_message.text,
-            "text": None,
-            "check": "none",
-        }
-
-        if reply_message.sticker:
-            reply_data["text"] = reply_message.sticker.file_id
-            reply_data["check"] = "sticker"
-        elif reply_message.photo:
-            reply_data["text"] = reply_message.photo.file_id
-            reply_data["check"] = "photo"
-        elif reply_message.video:
-            reply_data["text"] = reply_message.video.file_id
-            reply_data["check"] = "video"
-        elif reply_message.audio:
-            reply_data["text"] = reply_message.audio.file_id
-            reply_data["check"] = "audio"
-        elif reply_message.animation:
-            reply_data["text"] = reply_message.animation.file_id
-            reply_data["check"] = "gif"
-        elif reply_message.voice:
-            reply_data["text"] = reply_message.voice.file_id
-            reply_data["check"] = "voice"
-        elif reply_message.text:
-            reply_data["text"] = reply_message.text
-            reply_data["check"] = "text"  
-
-        
-        is_chat = await chatai.find_one(reply_data)
-        if not is_chat:
-            await chatai.insert_one(reply_data)
-            replies_cache.append(reply_data)
-
-        
-        if reply_data["check"] != "text":
-            is_storeai_chat = await storeai.find_one(reply_data)
-            if not is_storeai_chat:
-                await storeai.insert_one(reply_data)
-
-    except Exception as e:
-        print(f"Error in save_reply: {e}")
-        
 @nexichat.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     try:
@@ -290,9 +280,8 @@ async def chatbot_response(client: Client, message: Message):
         return
 
 
-async def load_new_replies_cache():
-    global new_replies_cache
-    new_replies_cache = await storeai.find({"check": "none"}).to_list(length=None)
+
+import asyncio
 
 async def save_new_reply(x, new_reply):
     global new_replies_cache
@@ -307,8 +296,9 @@ async def save_new_reply(x, new_reply):
         if not is_chat:
             await storeai.insert_one(reply_data)
             await chatai.delete_one(reply_data)
-            print(f"replies deleted from chatai == {reply_data}")
             new_replies_cache.append(reply_data)
+            replies_cache.remove(reply_data)
+            
             
     except Exception as e:
         print(f"Error in save_new_reply: {e}")
@@ -352,20 +342,17 @@ async def update_replies_cache():
                     new_reply = await creat_reply(reply_data["word"])
                     
                     if new_reply is None:
+                        print("API dead")
                         continue
 
                 await save_new_reply(x, new_reply)
+                print(f"Saved reply in database for {x} == {new_reply}")
                 
             except Exception as e:
                 print(f"Error updating reply for {reply_data['word']}: {e}")
 
-        await asyncio.sleep(3)
+        await asyncio.sleep(5)
 
-    
-    replies_cache.clear()
-    await asyncio.sleep(2)
-    await load_replies_cache()
-    
 # Continuous task to load cache and update replies
 async def continuous_update():
     await load_replies_cache()
