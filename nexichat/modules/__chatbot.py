@@ -266,17 +266,7 @@ async def update_replies_cache():
         await asyncio.sleep(5)
 
 # Continuous task to load cache and update replies
-async def continuous_update():
-    await load_replies_cache()
-    while True:
-        try:
-            await update_replies_cache()
-        except Exception as e:
-            print(f"Error in continuous_update: {e}")
-        await asyncio.sleep(5)
 
-# Start the update loop
-asyncio.create_task(continuous_update())
 '''
 async def save_new_reply(x, new_reply):
     global new_replies_cache, replies_cache
@@ -381,17 +371,15 @@ async def load_replies_cache():
     except Exception as e:
         print(f"Error loading replies cache: {e}")
 
-async def continuous_update():
-    try:
-        await load_replies_cache()
-        while True:
-            try:
-                await update_replies_cache()
-            except Exception as e:
-                print(f"Error in continuous_update loop: {e}")
-            await asyncio.sleep(5)
-    except Exception as e:
-        print(f"Error starting continuous_update: {e}")
-
-asyncio.create_task(continuous_update())
 '''
+async def continuous_update():
+    await load_replies_cache()
+    while True:
+        try:
+            await update_replies_cache()
+        except Exception as e:
+            print(f"Error in continuous_update: {e}")
+        await asyncio.sleep(5)
+
+# Start the update loop
+asyncio.create_task(continuous_update())
