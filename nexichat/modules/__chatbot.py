@@ -26,19 +26,21 @@ replies_cache = []
 new_replies_cache = []
 
 
+import random
+
 async def get_reply(message_text):
     global replies_cache
     try:
         for reply_data in replies_cache:
-            
+            print("mila")
             if reply_data["word"] == message_text:
                 print("nhi mila")
                 return reply_data["text"], reply_data["check"]
         
         if replies_cache:
-            random_reply = random.choice(reply_data in replies_cache)
+            random_reply = random.choice(replies_cache)
             print("Random reply selected")
-            return reply_data["text"], reply_data["check"]
+            return random_reply["text"], random_reply["check"]
         else:
             print("Cache is empty")
             return None, None
