@@ -209,7 +209,7 @@ async def load_replies_cache():
            
 async def update_replies_cache():
     global replies_cache
-    prunt("2")
+    print("2")
     for reply_data in replies_cache:
         print("3")
         if "text" in reply_data and reply_data["check"] == "text":
@@ -274,10 +274,10 @@ async def creat_reply(word):
             Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
         """
         results = api.chatgpt(user_input)
-        print("1")
+        print("11")
         if results and url_pattern.search(results):
             return None
-        print("2")
+        print("20")
         return results
     except Exception as e:
         print(f"Error in creat_reply: {e}")
