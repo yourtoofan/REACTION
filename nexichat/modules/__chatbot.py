@@ -24,7 +24,7 @@ lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 replies_cache = []
 new_replies_cache = []
-"""
+
 async def get_reply(message_text):
     global replies_cache
     try:
@@ -83,7 +83,7 @@ async def get_new_reply(word: str):
     relevant_replies = [reply for reply in new_replies_cache if reply['word'] == word]
     if not relevant_replies:
         relevant_replies = new_replies_cache
-    return None
+    return None"""
 async def get_chat_language(chat_id):
     try:
         chat_lang = await lang_db.find_one({"chat_id": chat_id})
