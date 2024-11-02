@@ -45,45 +45,6 @@ async def new_replies_cache():
     global replies_cache
     replies_cache = await storeai.find({"check": "none"}).to_list(length=None)
 
-async def save_reply(original_message: Message, reply_message: Message):
-    global replies_cache
-    try:
-        reply_data = {
-            "word": original_message.text,
-            "text": None,
-            "check": "none",
-        }
-
-        if reply_message.sticker:
-            reply_data["text"] = reply_message.sticker.file_id
-            reply_data["check"] = "sticker"
-        elif reply_message.photo:
-            reply_data["text"] = reply_message.photo.file_id
-            reply_data["check"] = "photo"
-        elif reply_message.video:
-            reply_data["text"] = reply_message.video.file_id
-            reply_data["check"] = "video"
-        elif reply_message.audio:
-            reply_data["text"] = reply_message.audio.file_id
-            reply_data["check"] = "audio"
-        elif reply_message.animation:
-            reply_data["text"] = reply_message.animation.file_id
-            reply_data["check"] = "gif"
-        elif reply_message.voice:
-            reply_data["text"] = reply_message.voice.file_id
-            reply_data["check"] = "voice"
-        elif reply_message.text:
-            reply_data["text"] = reply_message.text
-            reply_data["check"] = "none"
-
-        is_chat = await chatai.find_one(reply_data)
-        if not is_chat:
-            await chatai.insert_one(reply_data)
-            replies_cache.append(reply_data)
-
-    except Exception as e:
-        print(f"Error in save_reply: {e}")
-
 
 async def get_reply(word: str):
     global replies_cache
@@ -273,7 +234,60 @@ async def save_reply(original_message: Message, reply_message: Message):
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
+        
+@nexichat.on_message(filters.incoming)
+async def chatbot_response(client: Client, message: Message):
+    try:
+        chat_id = message.chat.id
+        chat_status = await status_db.find_one({"chat_id": chat_id})
+        
+        if chat_status and chat_status.get("status") == "disabled":
+            return
 
+        if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
+            if message.chat.type in ["group", "supergroup"]:
+                return await add_served_chat(chat_id)
+            else:
+                return await add_served_user(chat_id)
+        
+        if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
+            reply_data = await get_new_reply(message.text)
+
+            if reply_data:
+                response_text = reply_data["text"]
+                chat_lang = await get_chat_language(chat_id)
+            else:
+                reply_data = await get_reply(message.text)
+                response_text = reply_data["text"]
+                chat_lang = await get_chat_language(chat_id)
+                
+                if not chat_lang or chat_lang == "nolang":
+                    translated_text = response_text
+                else:
+                    translated_text = GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
+                
+                if reply_data["check"] == "sticker":
+                    await message.reply_sticker(reply_data["text"])
+                elif reply_data["check"] == "photo":
+                    await message.reply_photo(reply_data["text"])
+                elif reply_data["check"] == "video":
+                    await message.reply_video(reply_data["text"])
+                elif reply_data["check"] == "audio":
+                    await message.reply_audio(reply_data["text"])
+                elif reply_data["check"] == "gif":
+                    await message.reply_animation(reply_data["text"])
+                elif reply_data["check"] == "voice":
+                    await message.reply_voice(reply_data["text"])
+                else:
+                    await message.reply_text(translated_text)
+            
+        if message.reply_to_message:
+            await save_reply(message.reply_to_message, message)
+
+    except MessageEmpty:
+        await message.reply_text("🙄🙄")
+    except Exception as e:
+        return
 
 
 async def load_new_replies_cache():
