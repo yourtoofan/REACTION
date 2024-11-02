@@ -342,9 +342,9 @@ async def update_replies_cache():
                     from TheApi import api
                     new_reply = await creat_reply(reply_data["word"])
 
-                if new_reply and url_pattern.search(new_reply):
+                #if new_reply and url_pattern.search(new_reply):
                     
-                    continue
+                    #continue
 
                 await save_new_reply(x, new_reply)
                 print(f"Saved reply in database for {x} == {new_reply}")
