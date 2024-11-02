@@ -1,5 +1,4 @@
 import random
-#from TheApi import api
 from MukeshAPI import api
 from pymongo import MongoClient
 from pyrogram import Client, filters
@@ -13,24 +12,14 @@ from config import MONGO_URL
 from nexichat import nexichat, mongo, LOGGER, db
 from nexichat.modules.helpers import chatai, storeai, languages, CHATBOT_ON
 from nexichat.modules.helpers import (
-    ABOUT_BTN,
-    ABOUT_READ,
-    ADMIN_READ,
-    BACK,
-    CHATBOT_BACK,
-    CHATBOT_READ,
-    DEV_OP,
-    HELP_BTN,
-    HELP_READ,
-    MUSIC_BACK_BTN,
-    SOURCE_READ,
-    START,
+    ABOUT_BTN, ABOUT_READ, ADMIN_READ, BACK, CHATBOT_BACK, CHATBOT_READ,
+    DEV_OP, HELP_BTN, HELP_READ, MUSIC_BACK_BTN, SOURCE_READ, START,
     TOOLS_DATA_READ,
 )
 import asyncio
+import re
 
 translator = GoogleTranslator()
-
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 
@@ -40,7 +29,6 @@ new_replies_cache = []
 async def load_replies_cache():
     global replies_cache
     replies_cache = await chatai.find({"check": "none"}).to_list(length=None)
-
 
 async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache
@@ -52,26 +40,19 @@ async def save_reply(original_message: Message, reply_message: Message):
         }
 
         if reply_message.sticker:
-            reply_data["text"] = reply_message.sticker.file_id
-            reply_data["check"] = "sticker"
+            reply_data.update({"text": reply_message.sticker.file_id, "check": "sticker"})
         elif reply_message.photo:
-            reply_data["text"] = reply_message.photo.file_id
-            reply_data["check"] = "photo"
+            reply_data.update({"text": reply_message.photo.file_id, "check": "photo"})
         elif reply_message.video:
-            reply_data["text"] = reply_message.video.file_id
-            reply_data["check"] = "video"
+            reply_data.update({"text": reply_message.video.file_id, "check": "video"})
         elif reply_message.audio:
-            reply_data["text"] = reply_message.audio.file_id
-            reply_data["check"] = "audio"
+            reply_data.update({"text": reply_message.audio.file_id, "check": "audio"})
         elif reply_message.animation:
-            reply_data["text"] = reply_message.animation.file_id
-            reply_data["check"] = "gif"
+            reply_data.update({"text": reply_message.animation.file_id, "check": "gif"})
         elif reply_message.voice:
-            reply_data["text"] = reply_message.voice.file_id
-            reply_data["check"] = "voice"
+            reply_data.update({"text": reply_message.voice.file_id, "check": "voice"})
         elif reply_message.text:
             reply_data["text"] = reply_message.text
-            reply_data["check"] = "none"
 
         is_chat = await chatai.find_one(reply_data)
         if not is_chat:
@@ -80,7 +61,6 @@ async def save_reply(original_message: Message, reply_message: Message):
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
-
 
 async def get_reply(word: str):
     global replies_cache
@@ -95,20 +75,15 @@ async def get_reply(word: str):
 async def get_new_reply(word: str):
     global new_replies_cache
     if not new_replies_cache:
-        await new_replies_cache()
+        await load_replies_cache()
         print("Reloaded Chats from Ai")
     relevant_replies = [reply for reply in new_replies_cache if reply['word'] == word]
-    if not relevant_replies:
-        relevant_replies = new_replies_cache
     return None
-
 
 async def get_chat_language(chat_id):
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
 
-
-            
 @nexichat.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     try:
@@ -126,7 +101,6 @@ async def chatbot_response(client: Client, message: Message):
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
             reply_data = await get_new_reply(message.text)
-
             if reply_data:
                 response_text = reply_data["text"]
                 chat_lang = await get_chat_language(chat_id)
@@ -135,10 +109,7 @@ async def chatbot_response(client: Client, message: Message):
                 response_text = reply_data["text"]
                 chat_lang = await get_chat_language(chat_id)
                 
-                if not chat_lang or chat_lang == "nolang":
-                    translated_text = response_text
-                else:
-                    translated_text = GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
+                translated_text = response_text if not chat_lang or chat_lang == "nolang" else GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
                 
                 if reply_data["check"] == "sticker":
                     await message.reply_sticker(reply_data["text"])
@@ -163,10 +134,6 @@ async def chatbot_response(client: Client, message: Message):
     except Exception as e:
         return
 
-
-
-import asyncio
-
 async def save_new_reply(x, new_reply):
     global new_replies_cache
     try:
@@ -182,7 +149,6 @@ async def save_new_reply(x, new_reply):
             await chatai.delete_one(reply_data)
             new_replies_cache.append(reply_data)
             replies_cache.remove(reply_data)
-            
             
     except Exception as e:
         print(f"Error in save_new_reply: {e}")
@@ -208,8 +174,6 @@ async def creat_reply(word):
     if results and url_pattern.search(results):
         return None
     return results
-    
-import re
 
 async def update_replies_cache():
     global replies_cache
@@ -247,5 +211,5 @@ async def continuous_update():
             print(f"Error in continuous_update: {e}")
         await asyncio.sleep(5)
 
-# Start the update loop
+# Start the update
 asyncio.create_task(continuous_update())
