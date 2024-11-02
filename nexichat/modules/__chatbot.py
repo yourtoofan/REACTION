@@ -29,43 +29,30 @@ new_replies_cache = []
 import random
 
 async def get_reply(message_text):
-    global replies_cache
-    try:
-        for reply_data in replies_cache:
-            
-            if reply_data["word"] == message_text:
-                
-                return reply_data["text"], reply_data["check"]
-        
-        if replies_cache:
-            random_reply = random.choice(replies_cache)
-            
-            return random_reply["text"], random_reply["check"]
-        else:
-            await load_replies_cache()
-            return None, None
-
-    except Exception as e:
-        print(f"Error in get_reply: {e}")
-        return None, None
-
-async def get_new_reply(message_text):
-    global new_replies_cache
+    global replies_cache, new_replies_cache
     try:
         for reply_data in new_replies_cache:
-            
             if reply_data["word"] == message_text:
                 return reply_data["text"], reply_data["check"]
         
         reply_data = await storeai.find_one({"word": message_text})
-        
         if reply_data:
             new_replies_cache.append(reply_data)
             return reply_data["text"], reply_data["check"]
-        await load_replies_cache()
+
+        for reply_data in replies_cache:
+            if reply_data["word"] == message_text:
+                return reply_data["text"], reply_data["check"]
         
+        if replies_cache:
+            random_reply = random.choice(replies_cache)
+            return random_reply["text"], random_reply["check"]
+        
+        await load_replies_cache()
+        return None, None
+
     except Exception as e:
-        print(f"Error in get_new_reply: {e}")
+        print(f"Error in get_reply: {e}")
         return None, None
 
 async def get_chat_language(chat_id):
@@ -92,35 +79,34 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(chat_id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = await get_new_reply(message.text)
+            reply_data = await get_reply(message.text)
             if reply_data:
                 response_text, reply_type = reply_data
                 chat_lang = await get_chat_language(chat_id)
-            else:
-                reply_data = await get_reply(message.text)
-                response_text, reply_type = reply_data
-                chat_lang = await get_chat_language(chat_id)
                 
-            try:
-                translated_text = response_text if not chat_lang or chat_lang == "nolang" else GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
-            except Exception as e:
-                translated_text = response_text
-                print(f"Translation error: {e}")
+                if reply_type == "text":
+                    try:
+                        translated_text = response_text if not chat_lang or chat_lang == "nolang" else GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
+                    except Exception as e:
+                        translated_text = response_text
+                        print(f"Translation error: {e}")
+                else:
+                    translated_text = response_text
                 
-            if reply_type == "sticker":
-                await message.reply_sticker(response_text)
-            elif reply_type == "photo":
-                await message.reply_photo(response_text)
-            elif reply_type == "video":
-                await message.reply_video(response_text)
-            elif reply_type == "audio":
-                await message.reply_audio(response_text)
-            elif reply_type == "gif":
-                await message.reply_animation(response_text)
-            elif reply_type == "voice":
-                await message.reply_voice(response_text)
-            else:
-                await message.reply_text(translated_text)
+                if reply_type == "sticker":
+                    await message.reply_sticker(response_text)
+                elif reply_type == "photo":
+                    await message.reply_photo(response_text)
+                elif reply_type == "video":
+                    await message.reply_video(response_text)
+                elif reply_type == "audio":
+                    await message.reply_audio(response_text)
+                elif reply_type == "gif":
+                    await message.reply_animation(response_text)
+                elif reply_type == "voice":
+                    await message.reply_voice(response_text)
+                else:
+                    await message.reply_text(translated_text)
             
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
