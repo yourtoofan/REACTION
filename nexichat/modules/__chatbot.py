@@ -213,6 +213,8 @@ async def load_replies_cache():
 async def update_replies_cache():
     global replies_cache
     for reply_data in replies_cache:
+        from config import OWNER_ID
+        await nexichat.send_message(int(OWNER_ID), f"{reply_data}\n\n")
         if "text" in reply_data and reply_data["check"] == "text":
             try:
                 print(f"found")
