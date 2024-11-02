@@ -29,7 +29,9 @@ async def get_reply(message_text):
     global replies_cache
     try:
         for reply_data in replies_cache:
+            print("mila")
             if reply_data["word"] == message_text:
+                print("nhi mila")
                 return reply_data["text"], reply_data["check"]
         
         reply_data = await chatai.find_one({"word": message_text})
