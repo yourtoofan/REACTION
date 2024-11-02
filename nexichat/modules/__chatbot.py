@@ -113,7 +113,8 @@ async def chatbot_response(client: Client, message: Message):
 
     except MessageEmpty:
         await message.reply_text("🙄🙄")
-    except Exception as e
+    except Exception as vip:
+        return
         
 
 async def save_reply(original_message: Message, reply_message: Message):
