@@ -344,10 +344,11 @@ async def update_replies_cache():
             except Exception as e:
                 print(f"Error updating reply for {reply_data['word']}: {e}")
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(3)
 
-    global replies_cache
+    
     replies_cache.clear()
+    await asyncio.sleep(2)
     await load_replies_cache()
     
 # Continuous task to load cache and update replies
