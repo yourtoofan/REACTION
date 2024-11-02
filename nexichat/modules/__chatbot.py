@@ -252,6 +252,7 @@ async def generate_reply(word):
             Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
         """
         response = api.gemini(user_input)
+        print(f"3== {response}")
         return response["results"] if response and "results" in response else None
     except Exception as e:
         print(f"Error in generate_reply: {e}")
@@ -267,8 +268,10 @@ async def creat_reply(word):
             Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
         """
         results = api.chatgpt(user_input)
+        print("1")
         if results and url_pattern.search(results):
             return None
+        print("2")
         return results
     except Exception as e:
         print(f"Error in creat_reply: {e}")
@@ -303,6 +306,7 @@ async def update_replies_cache():
                         break
 
                 if new_reply:
+                    print(f"4== {x} = {new_reply}")
                     await save_new_reply(x, new_reply)
                     print(f"Saved reply in database for {x} == {new_reply}")
 
