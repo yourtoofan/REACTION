@@ -245,6 +245,7 @@ async def creat_reply(word):
     results = api.chatgpt(user_input)
     return results
 
+'''
 
 async def update_replies_cache():
     global replies_cache
@@ -268,7 +269,7 @@ async def update_replies_cache():
 
 # Continuous task to load cache and update replies
 
-
+'''
 async def save_new_reply(x, new_reply):
     global new_replies_cache, replies_cache
     try:
@@ -321,6 +322,7 @@ async def creat_reply(word):
         print(f"Error in creat_reply: {e}")
         return None
 
+"""
 async def update_replies_cache():
     global replies_cache
     url_pattern = re.compile(r'(https?://\S+)')
@@ -346,7 +348,7 @@ async def update_replies_cache():
 
         await asyncio.sleep(5)
 
-
+"""
 async def continuous_update():
     await load_replies_cache()
     while True:
