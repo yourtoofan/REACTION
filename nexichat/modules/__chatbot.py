@@ -331,23 +331,10 @@ async def update_replies_cache():
                 new_reply = await generate_reply(reply_data["word"])
                 x = reply_data["word"]
 
-                retry_count = 0
                 while new_reply is None or url_pattern.search(new_reply):
-                    try:
-                        if retry_count % 2 == 0:
-                            new_reply = await creat_reply(x)
-                        else:
-                            new_reply = await generate_reply(x)
-                    
-                        if new_reply is not None and not url_pattern.search(new_reply):
-                            break
-                    except Exception as retry_error:
-                        print(f"Error in retry {retry_count} for word '{x}': {retry_error}")
-                    
-                    retry_count += 1
-                    if retry_count >= 4:
-                        print("Retry limit reached for:", x)
-                        break
+                    print("Retrying...")
+                    await asyncio.sleep(5)
+                    return await generate_reply(reply_data["word"])
 
                 if new_reply:
                     print(f"4== {x} = {new_reply}")
