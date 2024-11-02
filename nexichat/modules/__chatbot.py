@@ -343,7 +343,7 @@ async def update_replies_cache():
                     new_reply = await creat_reply(reply_data["word"])
 
                 if new_reply and url_pattern.search(new_reply):
-                    print(f"Link found in reply for {x}, skipping processing.")
+                    
                     continue
 
                 await save_new_reply(x, new_reply)
