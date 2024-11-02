@@ -29,7 +29,7 @@ def get_chatai():
 
 def get_storeai():
     storedb = MongoCli(random.choice(CHAT_STORAGE))
-    return storedb.Vipchatbot.storeWord.storeWordDb
+    return storedb.Anonymous.Word.WordDb
 
 chatai = get_chatai()
 storeai = get_storeai()
