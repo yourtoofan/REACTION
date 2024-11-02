@@ -209,8 +209,10 @@ async def load_replies_cache():
            
 async def update_replies_cache():
     global replies_cache
+    prunt("2")
     for reply_data in replies_cache:
-        if reply_data["text"] in reply_data and reply_data["check"] == "text":
+        print("3")
+        if "text" in reply_data and reply_data["check"] == "text":
             print(f"{reply_data["word"]} --- {reply_data["text"]}")
             try:
                 new_reply = await generate_reply(reply_data["word"])
@@ -286,6 +288,7 @@ async def continuous_update():
     await load_replies_cache()
     while True:
         try:
+            print("1")
             await update_replies_cache()
         except Exception as e:
             print(f"Error in continuous_update: {e}")
