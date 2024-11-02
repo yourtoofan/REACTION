@@ -265,8 +265,7 @@ async def generate_reply(word):
         
         return response["results"] if response and "results" in response else None
     except Exception as e:
-        print(f"Error in generate_reply: {e}")
-        return 
+        return None
 
 async def creat_reply(word):
     try:
@@ -284,7 +283,8 @@ async def creat_reply(word):
         
         return results
     except Exception as e:
-        print(f"Error in creat_reply: {e}")
+        print(f"Both Chatgpt Api dead retrying...")
+        await asyncio.sleep(10)
         return await update_replies_cache()
 
 
