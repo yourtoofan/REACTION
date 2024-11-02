@@ -113,8 +113,8 @@ async def chatbot_response(client: Client, message: Message):
 
     except MessageEmpty:
         await message.reply_text("🙄🙄")
-    except Exception as e:
-        print(f"Error in chatbot_response: {e}")
+    except Exception as e
+        
 
 async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache, new_replies_cache
