@@ -60,7 +60,7 @@ async def get_new_reply(message_text):
             new_replies_cache.append(reply_data)
             return reply_data["text"], reply_data["check"]
         await load_replies_cache()
-        return "I'm sorry, I don't have a reply for that."
+        
     except Exception as e:
         print(f"Error in get_new_reply: {e}")
         return None, None
