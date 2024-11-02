@@ -207,6 +207,78 @@ async def load_replies_cache():
         print(f"Error loading replies cache: {e}")
 
 async def save_new_reply(x, new_reply):
+    global new_replies_cache
+    try:
+        reply_data = {
+            "word": x,
+            "text": new_reply,
+            "check": "none"
+        }
+
+        is_chat = await storeai.find_one(reply_data)
+        if not is_chat:
+            await storeai.insert_one(reply_data)
+            await chatai.delete_one(reply_data)
+            new_replies_cache.append(reply_data)
+            replies_cache.remove(reply_data)
+            
+            
+    except Exception as e:
+        print(f"Error in save_new_reply: {e}")
+
+async def generate_reply(word):
+    user_input = f"""
+        text:- ({word})
+        text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+        Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
+    """
+    response = api.gemini(user_input)
+    return response["results"] if response and "results" in response else None
+
+async def creat_reply(word):
+    from TheApi import api
+    user_input = f"""
+        text:- ({word})
+        text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+        Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do!
+    """
+    results = api.chatgpt(user_input)
+    return results
+    
+async def update_replies_cache():
+    global replies_cache
+    for reply_data in replies_cache:
+        if "text" in reply_data and reply_data["check"] == "none":
+            try:
+                new_reply = await generate_reply(reply_data["word"])
+                x = reply_data["word"]
+
+                if new_reply is None:
+                    from TheApi import api
+                    new_reply = await creat_reply(reply_data["word"])
+
+                await save_new_reply(x, new_reply)
+                print(f"Saved reply in database for {x} == {new_reply}")
+                
+            except Exception as e:
+                print(f"Error updating reply for {reply_data['word']}: {e}")
+
+        await asyncio.sleep(5)
+
+# Continuous task to load cache and update replies
+async def continuous_update():
+    await load_replies_cache()
+    while True:
+        try:
+            await update_replies_cache()
+        except Exception as e:
+            print(f"Error in continuous_update: {e}")
+        await asyncio.sleep(5)
+
+# Start the update loop
+asyncio.create_task(continuous_update())
+'''
+async def save_new_reply(x, new_reply):
     global new_replies_cache, replies_cache
     try:
         reply_data = {
@@ -322,3 +394,4 @@ async def continuous_update():
         print(f"Error starting continuous_update: {e}")
 
 asyncio.create_task(continuous_update())
+'''
