@@ -336,7 +336,7 @@ async def update_replies_cache():
 
                 if new_reply and url_pattern.search(new_reply):
                     print(f"Link found in reply for {x}, skipping processing.")
-                    return new_reply
+                    continue
                 
                 if new_reply is None:
                     from TheApi import api
@@ -344,7 +344,7 @@ async def update_replies_cache():
 
                 if new_reply and url_pattern.search(new_reply):
                     print(f"Link found in reply for {x}, skipping processing.")
-                    return new_reply
+                    continue
 
                 await save_new_reply(x, new_reply)
                 print(f"Saved reply in database for {x} == {new_reply}")
