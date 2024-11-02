@@ -213,7 +213,7 @@ async def update_replies_cache():
     for reply_data in replies_cache:
         print("3")
         if "text" in reply_data and reply_data["check"] == "text":
-            print(f"{reply_data["word"]} --- {reply_data["text"]}")
+            print(f"{reply_data}")
             try:
                 new_reply = await generate_reply(reply_data["word"])
                 x = reply_data["word"]
