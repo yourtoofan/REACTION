@@ -26,6 +26,7 @@ replies_cache = []
 new_replies_cache = []
 
 async def get_reply(message_text):
+    global replies_cache
     try:
         for reply_data in replies_cache:
             if reply_data["word"] == message_text:
@@ -47,6 +48,7 @@ async def get_reply(message_text):
         return None, None
 
 async def get_new_reply(message_text):
+    global new_replies_cache
     try:
         for reply_data in new_replies_cache:
             if reply_data["word"] == message_text:
