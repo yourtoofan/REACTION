@@ -212,7 +212,7 @@ async def load_replies_cache():
 async def update_replies_cache():
     global replies_cache
     for reply_data in replies_cache:
-        from config import OWNER_ID
+        
         if "text" in reply_data and reply_data["check"] == "text":
             try:
                 new_reply = await generate_reply(reply_data["word"])
