@@ -1,8 +1,22 @@
+import random
+import asyncio
+import re
+from MukeshAPI import api
+from pymongo import MongoClient
 from pyrogram import Client, filters
-from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
-from nexichat import nexichat, LOGGER, db
+from pyrogram.errors import MessageEmpty
+from pyrogram.enums import ChatAction, ChatMemberStatus as CMS
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
+from deep_translator import GoogleTranslator
+from nexichat.database.chats import add_served_chat
+from nexichat.database.users import add_served_user
+from config import MONGO_URL
+from nexichat import nexichat, mongo, LOGGER, db
+from nexichat.modules.helpers import chatai, storeai, languages, CHATBOT_ON
 from nexichat.modules.helpers import (
-    HELP_READ, HELP_BTN, ABOUT_READ, ABOUT_BTN, BACK, START, DEV_OP, SOURCE_READ
+    ABOUT_BTN, ABOUT_READ, ADMIN_READ, BACK, CHATBOT_BACK, CHATBOT_READ,
+    DEV_OP, HELP_BTN, HELP_READ, MUSIC_BACK_BTN, SOURCE_READ, START,
+    TOOLS_DATA_READ,
 )
 
 lang_db = db.ChatLangDb.LangCollection
