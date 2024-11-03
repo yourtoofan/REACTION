@@ -101,36 +101,33 @@ async def chatbot_response(client: Client, message: Message):
         await message.reply_text("🙄🙄")
         print(f"Error in chatbot_response: {e}")
 
-async def generate_reply_and_send(message):
-    reply_data = await get_reply(message.text if message.text else "")
-    if reply_data:
-        response_text, reply_type = reply_data
-        chat_lang = await get_chat_language(message.chat.id)
+            
 
-        try:
-            translated_text = (
-                response_text if chat_lang == "en" or chat_lang == "nolang" else
-                translator.translate(response_text, target=chat_lang)
-            )
-        except Exception as e:
-            print(f"Translation error: {e}")
-            translated_text = response_text
-
-        # Respond based on message format type
-        if reply_type == "text":
-            await message.reply_text(translated_text)
-        elif reply_type == "sticker":
-            await message.reply_sticker(response_text)
-        elif reply_type == "photo":
-            await message.reply_photo(response_text)
-        elif reply_type == "video":
-            await message.reply_video(response_text)
-        elif reply_type == "audio":
-            await message.reply_audio(response_text)
-        elif reply_type == "gif":
-            await message.reply_animation(response_text)
-        elif reply_type == "voice":
-            await message.reply_voice(response_text)
+async def get_reply_text(message_text):
+    global replies_cache, new_replies_cache
+    try:
+        # Check if reply is cached
+        for reply_data in new_replies_cache:
+            if reply_data["word"] == message_text:
+                return reply_data["text"], reply_data["check"]
+        
+        # Check in the database if not in cache
+        reply_data = await storeai.find_one({"word": message_text})
+        if reply_data:
+            new_replies_cache.append(reply_data)
+            return reply_data["text"], reply_data["check"]
+        
+        # Fallback to random reply from cache
+        if new_replies_cache:
+            random_reply = random.choice(new_replies_cache)
+            return random_reply["text"], random_reply["check"]
+        
+        # Load cache if empty
+        await load_replies_cache()
+        return None, None
+    except Exception as e:
+        print(f"Error in get_reply: {e}")
+        return None, None
 
 
 async def save_text(original_message: Message):
@@ -200,7 +197,6 @@ async def save_reply(original_message: Message, reply_message: Message):
 
 async def get_reply(original_message):
     try:
-        # Fetch the stored replies for the original message from the cache or database
         cached_reply = next(
             (entry for entry in new_replies_cache if entry["original_word"] == original_message.file_id), 
             None
@@ -208,7 +204,6 @@ async def get_reply(original_message):
         if not cached_reply:
             cached_reply = await storeai.find_one({"original_word": original_message.file_id})
 
-        # If replies are available, return a random one
         if cached_reply and cached_reply.get("replies"):
             return random.choice(cached_reply["replies"])
 
@@ -217,6 +212,62 @@ async def get_reply(original_message):
     except Exception as e:
         print(f"Error in get_reply: {e}")
         return None
+
+async def generate_reply_and_send(message):
+    if message.text:
+        reply_data = await get_reply_for_text(message.text)
+        if reply_data:
+            response_text = reply_data["text"]
+            reply_type = reply_data.get("check", "text")
+            chat_lang = await get_chat_language(message.chat.id)
+
+            try:
+                translated_text = (
+                    response_text if chat_lang == "en" or chat_lang == "nolang" else
+                    translator.translate(response_text, target=chat_lang)
+                )
+            except Exception as e:
+                print(f"Translation error: {e}")
+                translated_text = response_text
+
+            if reply_type == "text":
+                await message.reply_text(translated_text)
+            elif reply_type == "sticker":
+                await message.reply_sticker(response_text)
+            elif reply_type == "photo":
+                await message.reply_photo(response_text)
+            elif reply_type == "video":
+                await message.reply_video(response_text)
+            elif reply_type == "audio":
+                await message.reply_audio(response_text)
+            elif reply_type == "gif":
+                await message.reply_animation(response_text)
+            elif reply_type == "voice":
+                await message.reply_voice(response_text)
+        else:
+            await message.reply_text("Koi saved reply nahi mila!")
+    else:
+        reply_data = await get_reply(message)
+        if reply_data:
+            response_text = reply_data["text"]
+            reply_type = reply_data.get("check", "text")
+
+            if reply_type == "sticker":
+                await message.reply_sticker(response_text)
+            elif reply_type == "photo":
+                await message.reply_photo(response_text)
+            elif reply_type == "video":
+                await message.reply_video(response_text)
+            elif reply_type == "audio":
+                await message.reply_audio(response_text)
+            elif reply_type == "gif":
+                await message.reply_animation(response_text)
+            elif reply_type == "voice":
+                await message.reply_voice(response_text)
+            else:
+                await message.reply_text(response_text)
+        else:
+            await message.reply_text("Koi saved reply nahi mila!")
 
 async def load_replies_cache():
     global replies_cache, new_replies_cache
