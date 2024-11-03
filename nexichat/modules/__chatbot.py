@@ -215,12 +215,12 @@ async def get_reply(original_message):
 
 async def generate_reply_and_send(message):
     if message.text:
-        reply_data = await get_reply_for_text(message.text)
+        reply_data = await get_reply_for_text(message)
         if reply_data:
             response_text = reply_data["text"]
-            reply_type = reply_data.get("check", "text")
+            reply_type = reply_data["check"]
             chat_lang = await get_chat_language(message.chat.id)
-
+            
             try:
                 translated_text = (
                     response_text if chat_lang == "en" or chat_lang == "nolang" else
@@ -250,7 +250,7 @@ async def generate_reply_and_send(message):
         reply_data = await get_reply(message)
         if reply_data:
             response_text = reply_data["text"]
-            reply_type = reply_data.get("check", "text")
+            reply_type = reply_data["check"]
 
             if reply_type == "sticker":
                 await message.reply_sticker(response_text)
@@ -384,13 +384,13 @@ async def get_reply_for_text(word):
     try:
         reply_data = await storeai.find_one({"word": word})
         if reply_data:
-            return reply_data["text"]
+            return reply_data["text"], reply_data["check"]
 
-        return None
+        return None, None
 
     except Exception as e:
         print(f"Error in get_reply_for_text for {word}: {e}")
-        return None
+        return None, None
 
 async def continuous_update():
     await load_replies_cache()
