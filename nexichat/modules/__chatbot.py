@@ -78,7 +78,7 @@ async def chatbot_response(client: Client, message: Message):
         if user_id in blocklist:
             return
 
-         if user_id not in message_counts:
+        if user_id not in message_counts:
             message_counts[user_id] = {"count": 1, "last_time": current_time}
         else:
             time_diff = (current_time - message_counts[user_id]["last_time"]).total_seconds()
