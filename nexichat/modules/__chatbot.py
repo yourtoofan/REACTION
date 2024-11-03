@@ -31,25 +31,6 @@ message_counts = {}
 
 
 
-import random
-import asyncio
-from deep_translator import GoogleTranslator
-from datetime import datetime, timedelta
-from pyrogram import Client, filters
-from pyrogram.types import Message
-from pymongo import MongoClient
-
-translator = GoogleTranslator()
-# Assume your MongoDB collections are properly connected:
-lang_db = db.ChatLangDb.LangCollection
-status_db = db.chatbot_status_db.status
-
-
-replies_cache = []
-new_replies_cache = []
-blocklist = {}
-message_counts = {}
-
 async def get_reply(message_text):
     global replies_cache, new_replies_cache
     try:
@@ -88,29 +69,30 @@ async def get_chat_language(chat_id):
 @nexichat.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     global blocklist, message_counts
+    global blocklist, message_counts
     try:
         user_id = message.from_user.id
         chat_id = message.chat.id
         current_time = datetime.now()
-
-        # Update blocklist
+        
         blocklist = {uid: time for uid, time in blocklist.items() if time > current_time}
 
         if user_id in blocklist:
             return
 
-        # Track message frequency to detect spamming
         if user_id not in message_counts:
             message_counts[user_id] = {"count": 1, "last_time": current_time}
         else:
             time_diff = (current_time - message_counts[user_id]["last_time"]).total_seconds()
-            message_counts[user_id]["count"] += 1 if time_diff <= 3 else 1
-            message_counts[user_id]["last_time"] = current_time
-
+            if time_diff <= 3:
+                message_counts[user_id]["count"] += 1
+            else:
+                message_counts[user_id] = {"count": 1, "last_time": current_time}
+            
             if message_counts[user_id]["count"] >= 4:
                 blocklist[user_id] = current_time + timedelta(minutes=1)
                 message_counts.pop(user_id, None)
-                await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You're blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
+                await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You are blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
                 return
 
         # Check chatbot status
