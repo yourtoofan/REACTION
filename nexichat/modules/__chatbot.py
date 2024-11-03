@@ -132,10 +132,26 @@ async def chatbot_response(client: Client, message: Message):
             
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
-
+        if message.text:
+            print(f"new msg:- {message.text}")
+            await save_text(message)
     except Exception as vip:
         return await message.reply_text("🙄🙄")
         
+async def save_text(original_message: Message):
+    global replies_cache
+    try:
+        if original_message.text:
+            word = original_message.text
+            existing_word = await chatai.find_one({"word": word})
+            if not existing_word:
+                word_data = {"word": word}
+                await chatai.insert_one(word_data)
+                replies_cache.append(word_data)
+                print(f"{word_data}")
+    except Exception as e:
+        print(f"Error in save_reply: {e}")
+
 
 async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache, new_replies_cache
