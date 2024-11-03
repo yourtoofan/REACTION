@@ -1,22 +1,8 @@
-import random
-import asyncio
-import re
-from MukeshAPI import api
-from pymongo import MongoClient
 from pyrogram import Client, filters
-from pyrogram.errors import MessageEmpty
-from pyrogram.enums import ChatAction, ChatMemberStatus as CMS
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
-from deep_translator import GoogleTranslator
-from nexichat.database.chats import add_served_chat
-from nexichat.database.users import add_served_user
-from config import MONGO_URL
-from nexichat import nexichat, mongo, LOGGER, db
-from nexichat.modules.helpers import chatai, storeai, languages, CHATBOT_ON
+from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
+from nexichat import nexichat, LOGGER, db
 from nexichat.modules.helpers import (
-    ABOUT_BTN, ABOUT_READ, ADMIN_READ, BACK, CHATBOT_BACK, CHATBOT_READ,
-    DEV_OP, HELP_BTN, HELP_READ, MUSIC_BACK_BTN, SOURCE_READ, START,
-    TOOLS_DATA_READ,
+    HELP_READ, HELP_BTN, ABOUT_READ, ABOUT_BTN, BACK, START, DEV_OP, SOURCE_READ
 )
 
 lang_db = db.ChatLangDb.LangCollection
@@ -72,32 +58,34 @@ languages = {
     'yoruba': 'yo', 'zulu': 'zu'
 }
 
-
-async def safe_edit_message(query: CallbackQuery, text: str, markup=None):
-    try:
-        await query.message.edit_text(text, reply_markup=markup)
-    except FloodWait as e:
-        await asyncio.sleep(e.x)
-    except MessageEmpty:
-        pass
-
 @nexichat.on_callback_query()
 async def cb_handler(client: Client, query: CallbackQuery):
     LOGGER.info(query.data)
     data = query.data
 
     if data == "HELP":
-        await safe_edit_message(query, HELP_READ, InlineKeyboardMarkup(HELP_BTN))
+        await query.message.edit_text(
+            text=HELP_READ,
+            reply_markup=InlineKeyboardMarkup(HELP_BTN),
+            disable_web_page_preview=True,
+        )
 
     elif data == "CLOSE":
         await query.message.delete()
         await query.answer("Closed menu!", show_alert=True)
 
     elif data == "BACK":
-        await safe_edit_message(query, START, InlineKeyboardMarkup(DEV_OP))
+        await query.message.edit(
+            text=START,
+            reply_markup=InlineKeyboardMarkup(DEV_OP),
+        )
 
     elif data == "SOURCE":
-        await safe_edit_message(query, SOURCE_READ, InlineKeyboardMarkup(BACK))
+        await query.message.edit(
+            text=SOURCE_READ,
+            reply_markup=InlineKeyboardMarkup(BACK),
+            disable_web_page_preview=True,
+        )
 
     elif data.startswith("setlang_"):
         lang_code = data.split("_")[1]
@@ -105,7 +93,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         if lang_code in languages.values():
             lang_db.update_one({"chat_id": chat_id}, {"$set": {"language": lang_code}}, upsert=True)
             await query.answer(f"Language set to {lang_code.title()}.", show_alert=True)
-            await safe_edit_message(query, f"Language set to {lang_code.title()}.")
+            await query.message.edit_text(f"Language set to {lang_code.title()}.")
         else:
             await query.answer("Invalid language selection.", show_alert=True)
 
@@ -113,10 +101,14 @@ async def cb_handler(client: Client, query: CallbackQuery):
         chat_id = query.message.chat.id
         status_db.update_one({"chat_id": chat_id}, {"$set": {"status": "enabled"}}, upsert=True)
         await query.answer("Chatbot enabled ✅", show_alert=True)
-        await safe_edit_message(query, f"Chat: {query.message.chat.title}\n**Chatbot enabled.**")
+        await query.edit_message_text(
+            f"Chat: {query.message.chat.title}\n**Chatbot enabled.**"
+        )
 
     elif data == "disable_chatbot":
         chat_id = query.message.chat.id
         status_db.update_one({"chat_id": chat_id}, {"$set": {"status": "disabled"}}, upsert=True)
         await query.answer("Chatbot disabled!", show_alert=True)
-        await safe_edit_message(query, f"Chat: {query.message.chat.title}\n**Chatbot disabled.**")
+        await query.edit_message_text(
+            f"Chat: {query.message.chat.title}\n**Chatbot disabled.**"
+        )
