@@ -207,8 +207,6 @@ async def load_replies_cache():
     except Exception as e:
         print(f"Error loading replies cache: {e}")
 
-
-
 '''
 async def update_replies_cache():
     global replies_cache
@@ -278,8 +276,6 @@ async def generate_reply(word):
 
 '''
 
-import asyncio
-import re
 
 async def update_replies_database():
     batch_size = 10
