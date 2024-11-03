@@ -268,7 +268,7 @@ async def generate_reply(word):
             Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do! aur yrr please hindi me sirf nhi reply ko likho balki text jis lang me bola ja rha hai usi lang me tum reply do yr please barna nhi samjh aata hai
         """
         response = api.gemini(user_input)
-        
+        await asyncio.sleep(2)
         if response and "results" in response:
             return response["results"]
         
@@ -276,7 +276,7 @@ async def generate_reply(word):
         url_pattern = re.compile(r'(https?://\S+)')
         
         results = a.chatgpt(user_input)
-        
+        await asyncio.sleep(2)
         if results and not url_pattern.search(results):
             return results
      
