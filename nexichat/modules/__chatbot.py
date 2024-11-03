@@ -42,8 +42,7 @@ translator = GoogleTranslator()
 # Assume your MongoDB collections are properly connected:
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
-chatai = db.chatai
-storeai = db.storeai
+
 
 replies_cache = []
 new_replies_cache = []
