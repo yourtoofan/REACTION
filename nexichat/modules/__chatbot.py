@@ -1,4 +1,5 @@
 import random
+from pymongo import InsertOne
 import asyncio
 import re
 from MukeshAPI import api
@@ -171,33 +172,77 @@ async def save_text(original_message: Message):
     except Exception as e:
         print(f"Error in save_text: {e}")
 
+
+
 async def save_reply(original_message: Message, reply_message: Message):
-    global replies_cache, new_replies_cache
+    global new_replies_cache
     try:
-        reply_data = {
-            "word": original_message.text,
-            "text": None,
-            "check": None
-        }
+        # Only save original messages that are NOT text
+        if any([original_message.sticker, original_message.photo, original_message.video, 
+                original_message.audio, original_message.voice, original_message.animation]):
+            reply_data = {
+                "original_word": original_message.sticker.file_id if original_message.sticker else 
+                                original_message.photo.file_id if original_message.photo else 
+                                original_message.video.file_id if original_message.video else 
+                                original_message.audio.file_id if original_message.audio else 
+                                original_message.voice.file_id if original_message.voice else 
+                                original_message.animation.file_id,
+                "original_type": "sticker" if original_message.sticker else 
+                                "photo" if original_message.photo else 
+                                "video" if original_message.video else 
+                                "audio" if original_message.audio else 
+                                "voice" if original_message.voice else 
+                                "gif",
+                "replies": []
+            }
 
-        if reply_message.sticker:
-            reply_data.update({"text": reply_message.sticker.file_id, "check": "sticker"})
-        elif reply_message.photo:
-            reply_data.update({"text": reply_message.photo.file_id, "check": "photo"})
-        elif reply_message.video:
-            reply_data.update({"text": reply_message.video.file_id, "check": "video"})
-        elif reply_message.audio:
-            reply_data.update({"text": reply_message.audio.file_id, "check": "audio"})
-        elif reply_message.animation:
-            reply_data.update({"text": reply_message.animation.file_id, "check": "gif"})
-        elif reply_message.voice:
-            reply_data.update({"text": reply_message.voice.file_id, "check": "voice"})
+            # Prepare the reply based on the format of the reply message
+            if reply_message.sticker:
+                reply_data["replies"].append({"text": reply_message.sticker.file_id, "check": "sticker"})
+            elif reply_message.photo:
+                reply_data["replies"].append({"text": reply_message.photo.file_id, "check": "photo"})
+            elif reply_message.video:
+                reply_data["replies"].append({"text": reply_message.video.file_id, "check": "video"})
+            elif reply_message.audio:
+                reply_data["replies"].append({"text": reply_message.audio.file_id, "check": "audio"})
+            elif reply_message.voice:
+                reply_data["replies"].append({"text": reply_message.voice.file_id, "check": "voice"})
+            elif reply_message.animation:
+                reply_data["replies"].append({"text": reply_message.animation.file_id, "check": "gif"})
+            elif reply_message.text:
+                reply_data["replies"].append({"text": reply_message.text, "check": "text"})
 
-        await storeai.insert_one(reply_data)
-        new_replies_cache.append(reply_data)
+            # Insert or update the original message and its replies in the database
+            await storeai.update_one(
+                {"original_word": reply_data["original_word"], "original_type": reply_data["original_type"]},
+                {"$push": {"replies": {"$each": reply_data["replies"]}}},
+                upsert=True
+            )
+
+            new_replies_cache.append(reply_data)
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
+
+async def get_reply(original_message):
+    try:
+        # Fetch the stored replies for the original message from the cache or database
+        cached_reply = next(
+            (entry for entry in new_replies_cache if entry["original_word"] == original_message.file_id), 
+            None
+        )
+        if not cached_reply:
+            cached_reply = await storeai.find_one({"original_word": original_message.file_id})
+
+        # If replies are available, return a random one
+        if cached_reply and cached_reply.get("replies"):
+            return random.choice(cached_reply["replies"])
+
+        return None
+
+    except Exception as e:
+        print(f"Error in get_reply: {e}")
+        return None
 
 async def load_replies_cache():
     global replies_cache, new_replies_cache
