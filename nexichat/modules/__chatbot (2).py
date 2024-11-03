@@ -77,12 +77,12 @@ async def chatbot_response(client: Client, message: Message):
             message_counts[user_id] = {"count": 1, "last_time": current_time}
         else:
             time_diff = (current_time - message_counts[user_id]["last_time"]).total_seconds()
-            if time_diff <= 5:
+            if time_diff <= 3:
                 message_counts[user_id]["count"] += 1
             else:
                 message_counts[user_id] = {"count": 1, "last_time": current_time}
             
-            if message_counts[user_id]["count"] >= 6:
+            if message_counts[user_id]["count"] >= 4:
                 blocklist[user_id] = current_time + timedelta(minutes=1)
                 message_counts.pop(user_id, None)
                 await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You are blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
@@ -130,25 +130,7 @@ async def chatbot_response(client: Client, message: Message):
                 else:
                     await message.reply_text(translated_text)
                     
-        if not message.text and (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = await get_reply(message)
-            if reply_data:
-                response_text, reply_type = reply_data
-                
-                if reply_type == "sticker":
-                    await message.reply_sticker(response_text)
-                elif reply_type == "photo":
-                    await message.reply_photo(response_text)
-                elif reply_type == "video":
-                    await message.reply_video(response_text)
-                elif reply_type == "audio":
-                    await message.reply_audio(response_text)
-                elif reply_type == "gif":
-                    await message.reply_animation(response_text)
-                elif reply_type == "voice":
-                    await message.reply_voice(response_text)
-                else:
-                    await message.reply_text(response_text)
+        
         
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
@@ -177,7 +159,7 @@ async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache, new_replies_cache
     try:
         reply_data = {
-            "word": None,
+            "word": original_message.text,
             "text": None,
             "check": None,
         }
