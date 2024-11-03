@@ -40,13 +40,9 @@ async def get_reply(message_text):
         if reply_data:
             new_replies_cache.append(reply_data)
             return reply_data["text"], reply_data["check"]
-
-        for reply_data in replies_cache:
-            if reply_data["word"] == message_text:
-                return reply_data["text"], reply_data["check"]
         
-        if replies_cache:
-            random_reply = random.choice(replies_cache)
+        if new_replies_cache:
+            random_reply = random.choice(new_replies_cache)
             return random_reply["text"], random_reply["check"]
         
         await load_replies_cache()
@@ -137,10 +133,8 @@ async def chatbot_response(client: Client, message: Message):
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
 
-    except MessageEmpty:
-        await message.reply_text("🙄🙄")
     except Exception as vip:
-        return
+        return await message.reply_text("🙄🙄")
         
 
 async def save_reply(original_message: Message, reply_message: Message):
@@ -155,49 +149,37 @@ async def save_reply(original_message: Message, reply_message: Message):
         if reply_message.sticker:
             reply_data["text"] = reply_message.sticker.file_id
             reply_data["check"] = "sticker"
-            await chatai.insert_one(reply_data)
             await storeai.insert_one(reply_data)
-            replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
         
         elif reply_message.photo:
             reply_data["text"] = reply_message.photo.file_id
             reply_data["check"] = "photo"
-            await chatai.insert_one(reply_data)
             await storeai.insert_one(reply_data)
-            replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
         
         elif reply_message.video:
             reply_data["text"] = reply_message.video.file_id
             reply_data["check"] = "video"
-            await chatai.insert_one(reply_data)
             await storeai.insert_one(reply_data)
-            replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
         
         elif reply_message.audio:
             reply_data["text"] = reply_message.audio.file_id
             reply_data["check"] = "audio"
-            await chatai.insert_one(reply_data)
             await storeai.insert_one(reply_data)
-            replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
         
         elif reply_message.animation:
             reply_data["text"] = reply_message.animation.file_id
             reply_data["check"] = "gif"
-            await chatai.insert_one(reply_data)
             await storeai.insert_one(reply_data)
-            replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
         
         elif reply_message.voice:
             reply_data["text"] = reply_message.voice.file_id
             reply_data["check"] = "voice"
-            await chatai.insert_one(reply_data)
             await storeai.insert_one(reply_data)
-            replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
         
         elif reply_message.text:
@@ -212,9 +194,11 @@ async def save_reply(original_message: Message, reply_message: Message):
 async def load_replies_cache():
     global replies_cache, new_replies_cache
     try:
+        replies_cache.clear()
         chatai_data = await chatai.find().to_list(length=None)
         replies_cache = [{"word": reply_data["word"], "text": reply_data["text"], "check": reply_data["check"]} for reply_data in chatai_data]
 
+        new_replies_cache.clear()
         storeai_data = await storeai.find().to_list(length=None)
         new_replies_cache = [{"word": reply_data["word"], "text": reply_data["text"], "check": reply_data["check"]} for reply_data in storeai_data]
 
