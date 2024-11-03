@@ -32,33 +32,6 @@ message_counts = {}
 
 
 
-async def get_reply(message_text):
-    global replies_cache, new_replies_cache
-    try:
-        # Check if reply is cached
-        for reply_data in new_replies_cache:
-            if reply_data["word"] == message_text:
-                return reply_data["text"], reply_data["check"]
-        
-        # Check in the database if not in cache
-        reply_data = await storeai.find_one({"word": message_text})
-        if reply_data:
-            new_replies_cache.append(reply_data)
-            return reply_data["text"], reply_data["check"]
-        
-        # Fallback to random reply from cache
-        if new_replies_cache:
-            random_reply = random.choice(new_replies_cache)
-            return random_reply["text"], random_reply["check"]
-        
-        # Load cache if empty
-        await load_replies_cache()
-        return None, None
-
-    except Exception as e:
-        print(f"Error in get_reply: {e}")
-        return None, None
-
 async def get_chat_language(chat_id):
     try:
         chat_lang = await lang_db.find_one({"chat_id": chat_id})
@@ -159,6 +132,7 @@ async def generate_reply_and_send(message):
         elif reply_type == "voice":
             await message.reply_voice(response_text)
 
+
 async def save_text(original_message: Message):
     global replies_cache
     try:
@@ -251,75 +225,6 @@ async def load_replies_cache():
         new_replies_cache = await storeai.find().to_list(length=None)
     except Exception as e:
         print(f"Error loading replies cache: {e}")
-
-'''
-async def update_replies_cache():
-    global replies_cache
-    for reply_data in replies_cache:
-        
-        if "text" in reply_data and reply_data["check"] == "text":
-            try:
-                new_reply = await generate_reply(reply_data["word"])
-                x = reply_data["word"]
-                
-                await save_new_reply(x, new_reply)
-                print(f"Saved reply in database for {x} == {new_reply}")
-                
-            except Exception as e:
-                print(f"Error updating reply for {reply_data['word']}: {e}")
-        
-        await asyncio.sleep(5)
-
-
-async def save_new_reply(x, new_reply):
-    global new_replies_cache, replies_cache
-    try:
-        reply_data = {
-            "word": x,
-            "text": new_reply,
-            "check": "text"
-        }
-
-        is_chat = await storeai.find_one({"word": x})
-        if not is_chat:
-            await storeai.insert_one(reply_data)
-            new_replies_cache.append(reply_data)
-            replies_cache = [r for r in replies_cache if r["word"] != x]
-            await chatai.delete_one({"word": x})
-            
-    except Exception as e:
-        print(f"Error in save_new_reply: {e}")
-
-
-async def generate_reply(word):
-    try:
-        user_input = f"""
-            text:- ({word})
-            text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
-            Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do! aur yrr please hindi me sirf nhi reply ko likho balki text jis lang me bola ja rha hai usi lang me aur usi text me har reply do yr please barna nhi samjh aata hai
-        """
-        response = api.gemini(user_input)
-        await asyncio.sleep(2)
-        if response and "results" in response:
-            return response["results"]
-        
-        from TheApi import api as a
-        url_pattern = re.compile(r'(https?://\S+)')
-        
-        results = a.chatgpt(user_input)
-        await asyncio.sleep(2)
-        if results and not url_pattern.search(results):
-            return results
-     
-        await asyncio.sleep(10)
-        return await generate_reply(word)
-
-    except Exception as e:
-        print("Both ChatGPT APIs failed, retrying in 10 seconds...")
-        await asyncio.sleep(10)
-        return await generate_reply(word)
-
-'''
 
 
 async def update_replies_database():
@@ -424,6 +329,17 @@ async def save_new_reply(word, reply):
     except Exception as e:
         print(f"Error in save_new_reply for {word}: {e}")
 
+async def get_reply_for_text(word):
+    try:
+        reply_data = await storeai.find_one({"word": word})
+        if reply_data:
+            return reply_data["text"]
+
+        return None
+
+    except Exception as e:
+        print(f"Error in get_reply_for_text for {word}: {e}")
+        return None
 
 async def continuous_update():
     await load_replies_cache()
