@@ -150,7 +150,7 @@ async def save_text(original_message: Message):
                 replies_cache.append(word_data)
                 
     except Exception as e:
-        print(f"Error in save_reply: {e}")
+        print(f"Error in save_text: {e}")
 
 
 async def save_reply(original_message: Message, reply_message: Message):
