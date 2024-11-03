@@ -129,7 +129,27 @@ async def chatbot_response(client: Client, message: Message):
                     await message.reply_voice(response_text)
                 else:
                     await message.reply_text(translated_text)
-            
+                    
+        if not message.text and (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
+            reply_data = await get_reply(message)
+            if reply_data:
+                response_text, reply_type = reply_data
+                
+                if reply_type == "sticker":
+                    await message.reply_sticker(response_text)
+                elif reply_type == "photo":
+                    await message.reply_photo(response_text)
+                elif reply_type == "video":
+                    await message.reply_video(response_text)
+                elif reply_type == "audio":
+                    await message.reply_audio(response_text)
+                elif reply_type == "gif":
+                    await message.reply_animation(response_text)
+                elif reply_type == "voice":
+                    await message.reply_voice(response_text)
+                else:
+                    await message.reply_text(response_text)
+        
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
         if message.text:
@@ -157,7 +177,7 @@ async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache, new_replies_cache
     try:
         reply_data = {
-            "word": original_message.text,
+            "word": None,
             "text": None,
             "check": None,
         }
@@ -205,6 +225,7 @@ async def save_reply(original_message: Message, reply_message: Message):
             new_replies_cache.append(reply_data)
         
         elif reply_message.text:
+            reply_data["word"] = original_message.text
             reply_data["text"] = reply_message.text
             reply_data["check"] = "text"
             await chatai.insert_one(reply_data)
