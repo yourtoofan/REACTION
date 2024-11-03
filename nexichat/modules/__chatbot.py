@@ -6,6 +6,7 @@ from pymongo import MongoClient
 from pyrogram import Client, filters
 from pyrogram.errors import MessageEmpty
 from pyrogram.enums import ChatAction, ChatMemberStatus as CMS
+from pyrogram.errors.exceptions.flood_420 import SlowmodeWait
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
@@ -122,8 +123,11 @@ async def chatbot_response(client: Client, message: Message):
             return
 
         # Generate and send replies based on message type
-        await generate_reply_and_send(message)
+        try:
+            await generate_reply_and_send(message)
 
+        except SlowmodeWait as e:
+            return
         # Save replies if the message is a response
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
