@@ -221,13 +221,13 @@ async def generate_reply_and_send(message):
             reply_type = reply_data["check"]
             chat_lang = await get_chat_language(message.chat.id)
             
-            try:
-                translated_text = (
-                    response_text if chat_lang == "en" or chat_lang == "nolang" else
-                    translator.translate(response_text, target=chat_lang)
-                )
-            except Exception as e:
-                print(f"Translation error: {e}")
+            if reply_type == "text":
+                try:
+                    translated_text = response_text if not chat_lang or chat_lang == "nolang" else GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
+                except Exception as e:
+                    translated_text = response_text
+                    print(f"Translation error: {e}")
+            else:
                 translated_text = response_text
 
             if reply_type == "text":
@@ -245,7 +245,7 @@ async def generate_reply_and_send(message):
             elif reply_type == "voice":
                 await message.reply_voice(response_text)
         else:
-            await message.reply_text("Koi saved reply nahi mila!")
+            await message.reply_text("Koi saved reply nahi mila! for text")
     else:
         reply_data = await get_reply(message)
         if reply_data:
