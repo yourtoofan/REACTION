@@ -221,7 +221,7 @@ async def load_replies_cache():
     except Exception as e:
         print(f"Error loading replies cache: {e}")
 
-           
+'''
 async def update_replies_cache():
     global replies_cache
     for reply_data in replies_cache:
@@ -287,6 +287,113 @@ async def generate_reply(word):
         print("Both ChatGPT APIs failed, retrying in 10 seconds...")
         await asyncio.sleep(10)
         return await generate_reply(word)
+
+'''
+
+import asyncio
+import re
+
+async def update_replies_database():
+    batch_size = 10
+    try:
+        while True:
+            words_cursor = chatai.find({}).limit(batch_size)
+            words_batch = await words_cursor.to_list(length=batch_size)
+            
+            if not words_batch:
+                break
+
+            prompt = "text:-\n"
+            for i, word_data in enumerate(words_batch, start=1):
+                prompt += f"Word{i} = ({word_data['word']})\n"
+            prompt += """
+            text me message hai uske liye Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply do agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi language mein reply karo. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+
+            Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do! aur yrr please hindi me sirf nhi reply ko likho balki text jis lang me bola ja rha hai usi lang me aur usi text me har reply do yr please barna nhi samjh aata hai. 
+
+            Aur reply format aisa hona chahiye:
+
+            Reply1 = "yaha pe word1 ka reply"
+            Reply2 = "yaha pe word2 ka reply"
+            Reply3 = "yaha pe word3 ka reply"
+            Reply4 = "yaha pe word4 ka reply"
+            Reply5 = "yaha pe word5 ka reply"
+            Reply6 = "yaha pe word6 ka reply"
+            Reply7 = "yaha pe word7 ka reply"
+            Reply8 = "yaha pe word8 ka reply"
+            Reply9 = "yaha pe word9 ka reply"
+            Reply10 = "yaha pe word10 ka reply"
+            """
+
+            replies = await generate_batch_reply(prompt)
+
+            tasks = []
+            for i, word_data in enumerate(words_batch, start=1):
+                word = word_data["word"]
+                reply = replies.get(f"Reply{i}", "Default reply")
+                task = save_new_reply(word, reply)
+                tasks.append(task)
+                
+            await asyncio.gather(*tasks)
+            
+            await asyncio.sleep(5)
+
+    except Exception as e:
+        print(f"Error in update_replies_database: {e}")
+
+
+async def generate_batch_reply(user_input):
+    try:
+        response = api.gemini(user_input)
+        await asyncio.sleep(2)
+        if response and "results" in response:
+            results = response["results"].splitlines()
+            reply_dict = {}
+            for line in results:
+                if "=" in line:
+                    key, value = line.split("=", 1)
+                    reply_dict[key.strip()] = value.strip()
+            return reply_dict
+
+        from TheApi import api as a
+        url_pattern = re.compile(r'(https?://\S+)')
+        
+        results = a.chatgpt(user_input)
+        await asyncio.sleep(2)
+        if results and not url_pattern.search(results):
+            reply_dict = {}
+            for line in results.splitlines():
+                if "=" in line:
+                    key, value = line.split("=", 1)
+                    reply_dict[key.strip()] = value.strip()
+            return reply_dict
+        
+        await asyncio.sleep(10)
+        return await generate_batch_reply(user_input)
+
+    except Exception as e:
+        print("Both ChatGPT APIs failed, retrying in 10 seconds...")
+        await asyncio.sleep(10)
+        return await generate_batch_reply(user_input)
+
+
+async def save_new_reply(word, reply):
+    try:
+        reply_data = {
+            "word": word,
+            "text": reply,
+            "check": "text"
+        }
+
+        is_chat = await storeai.find_one({"word": word})
+        if not is_chat:
+            await storeai.insert_one(reply_data)
+            await chatai.delete_one({"word": word})
+        else:
+            print(f"Reply for {word} already exists in storeai.")
+
+    except Exception as e:
+        print(f"Error in save_new_reply for {word}: {e}")
 
 
 async def continuous_update():
