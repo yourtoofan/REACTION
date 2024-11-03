@@ -272,11 +272,16 @@ async def generate_reply_and_send(message):
 async def load_replies_cache():
     global replies_cache, new_replies_cache
     try:
-        replies_cache = await chatai.find().to_list(length=None)
-        new_replies_cache = await storeai.find().to_list(length=None)
+        
+        chatai_data = await chatai.find().to_list(length=None)
+        replies_cache = [{"word": reply_data["word"], "text": reply_data["text"], "check": reply_data["check"]} for reply_data in chatai_data]
+
+        
+        storeai_data = await storeai.find().to_list(length=None)
+        new_replies_cache = [{"word": reply_data["word"], "text": reply_data["text"], "check": reply_data["check"]} for reply_data in storeai_data]
+
     except Exception as e:
         print(f"Error loading replies cache: {e}")
-
 
 async def update_replies_database():
     batch_size = 10
