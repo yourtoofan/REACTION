@@ -114,20 +114,26 @@ async def chatbot_response(client: Client, message: Message):
                 return
 
         # Check chatbot status
+        chat_id = message.chat.id
         chat_status = await status_db.find_one({"chat_id": chat_id})
+        
         if chat_status and chat_status.get("status") == "disabled":
             return
 
-        # Handle command prefixes for group chats
         if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
-            return
+            if message.chat.type in ["group", "supergroup"]:
+                return await add_served_chat(chat_id)
+            else:
+                return await add_served_user(chat_id)
+        
+        if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
+            try:
+                await generate_reply_and_send(message)
 
-        # Generate and send replies based on message type
-        try:
-            await generate_reply_and_send(message)
-
-        except SlowmodeWait as e:
-            return
+            except SlowmodeWait as e:
+                return
+            except Exception as e:
+                return
         # Save replies if the message is a response
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
