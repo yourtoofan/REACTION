@@ -400,7 +400,7 @@ async def continuous_update():
     await load_replies_cache()
     while True:
         try:           
-            await update_replies_cache()
+            await update_replies_database()
         except Exception as e:
             print(f"Error in continuous_update: {e}")
         await asyncio.sleep(5)
