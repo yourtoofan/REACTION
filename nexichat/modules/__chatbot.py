@@ -104,10 +104,10 @@ async def chatbot_response(client: Client, message: Message):
             message_counts[user_id] = {"count": 1, "last_time": current_time}
         else:
             time_diff = (current_time - message_counts[user_id]["last_time"]).total_seconds()
-            message_counts[user_id]["count"] += 1 if time_diff <= 5 else 1
+            message_counts[user_id]["count"] += 1 if time_diff <= 3 else 1
             message_counts[user_id]["last_time"] = current_time
 
-            if message_counts[user_id]["count"] >= 6:
+            if message_counts[user_id]["count"] >= 4:
                 blocklist[user_id] = current_time + timedelta(minutes=1)
                 message_counts.pop(user_id, None)
                 await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You're blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
