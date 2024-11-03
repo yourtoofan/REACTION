@@ -387,7 +387,7 @@ async def save_new_reply(word, reply):
 
 async def get_reply_for_text(word):
     try:
-        reply_data = await storeai.find_one({"word": word})
+        reply_data = await storeai.find_one({"word": reply_data["word"])
         if reply_data:
             return reply_data["text"], reply_data["check"]
 
