@@ -163,36 +163,42 @@ async def save_reply(original_message: Message, reply_message: Message):
         }
 
         if reply_message.sticker:
+            reply_data["word"] = original_message.sticker.file_id
             reply_data["text"] = reply_message.sticker.file_id
             reply_data["check"] = "sticker"
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
         
         elif reply_message.photo:
+            reply_data["word"] = original_message.photo.file_id
             reply_data["text"] = reply_message.photo.file_id
             reply_data["check"] = "photo"
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
         
         elif reply_message.video:
+            reply_data["word"] = original_message.video.file_id
             reply_data["text"] = reply_message.video.file_id
             reply_data["check"] = "video"
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
         
         elif reply_message.audio:
+            reply_data["word"] = original_message.audio.file_id
             reply_data["text"] = reply_message.audio.file_id
             reply_data["check"] = "audio"
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
         
         elif reply_message.animation:
+            reply_data["word"] = original_message.animation.file_id
             reply_data["text"] = reply_message.animation.file_id
             reply_data["check"] = "gif"
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
         
         elif reply_message.voice:
+            reply_data["word"] = original_message.voice.file_id
             reply_data["text"] = reply_message.voice.file_id
             reply_data["check"] = "voice"
             await storeai.insert_one(reply_data)
