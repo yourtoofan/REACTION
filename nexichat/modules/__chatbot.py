@@ -10,7 +10,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, 
 from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
-from config import MONGO_URL
+from datetime import datetime, timedelta
 from nexichat import nexichat, mongo, LOGGER, db
 from nexichat.modules.helpers import chatai, storeai, languages, CHATBOT_ON
 from nexichat.modules.helpers import (
@@ -25,8 +25,9 @@ status_db = db.chatbot_status_db.status
 replies_cache = []
 new_replies_cache = []
 
+blocklist = {}
+message_counts = {}
 
-import random
 
 async def get_reply(message_text):
     global replies_cache, new_replies_cache
