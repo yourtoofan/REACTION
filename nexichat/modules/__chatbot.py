@@ -194,8 +194,8 @@ async def save_reply(original_message: Message, reply_message: Message):
     try:
         reply_data = {
             "word": original_message.text,
-            "text": reply_message.text,
-            "check": "text"
+            "text": None,
+            "check": None
         }
 
         if reply_message.sticker:
