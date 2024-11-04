@@ -60,7 +60,7 @@ async def get_reply(message):
             if reply_data["word"] == message_id and reply_data["check"] == message_type:
                 return reply_data["text"], reply_data["check"]
         
-        reply_data = await storeai.find_one({reply_data["word"] == message_id, reply_data["check"] == message_type})
+        reply_data = await storeai.find_one({"word": message_id, "check": message_type})
         if reply_data:
             new_replies_cache.append(reply_data)
             return reply_data["text"], reply_data["check"]
