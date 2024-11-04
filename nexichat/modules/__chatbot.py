@@ -191,6 +191,7 @@ async def save_reply(original_message: Message, reply_message: Message):
             }
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
+            print(f"{reply_data}")
 
         elif reply_message.photo:
             reply_data = {
