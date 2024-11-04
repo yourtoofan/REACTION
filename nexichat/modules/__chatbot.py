@@ -158,58 +158,68 @@ async def save_text(original_message: Message):
 async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache, new_replies_cache
     try:
-        reply_data = {
-            "word": None,
-            "text": None,
-            "check": None,
-        }
+        reply_data = {}
 
         if reply_message.sticker:
-            reply_data.update["word"] = original_message.sticker.file_id
-            reply_data.update["text"] = reply_message.sticker.file_id
-            reply_data.update["check"] = "sticker"
+            reply_data = {
+                "word": original_message.sticker.file_id,
+                "text": reply_message.sticker.file_id,
+                "check": "sticker",
+            }
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
-        
+
         elif reply_message.photo:
-            reply_data.update["word"] = original_message.photo.file_id
-            reply_data.update["text"] = reply_message.photo.file_id
-            reply_data.update["check"] = "photo"
+            reply_data = {
+                "word": original_message.photo.file_id,
+                "text": reply_message.photo.file_id,
+                "check": "photo",
+            }
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
-        
+
         elif reply_message.video:
-            reply_data.update["word"] = original_message.video.file_id
-            reply_data.update["text"] = reply_message.video.file_id
-            reply_data.update["check"] = "video"
+            reply_data = {
+                "word": original_message.video.file_id,
+                "text": reply_message.video.file_id,
+                "check": "video",
+            }
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
-        
+
         elif reply_message.audio:
-            reply_data.update["word"] = original_message.audio.file_id
-            reply_data.update["text"] = reply_message.audio.file_id
-            reply_data.update["check"] = "audio"
+            reply_data = {
+                "word": original_message.audio.file_id,
+                "text": reply_message.audio.file_id,
+                "check": "audio",
+            }
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
-        
+
         elif reply_message.animation:
-            reply_data.update["word"] = original_message.animation.file_id
-            reply_data.update["text"] = reply_message.animation.file_id
-            reply_data.update["check"] = "gif"
+            reply_data = {
+                "word": original_message.animation.file_id,
+                "text": reply_message.animation.file_id,
+                "check": "gif",
+            }
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
-        
+
         elif reply_message.voice:
-            reply_data.update["word"] = original_message.voice.file_id
-            reply_data.update["text"] = reply_message.voice.file_id
-            reply_data.update["check"] = "voice"
+            reply_data = {
+                "word": original_message.voice.file_id,
+                "text": reply_message.voice.file_id,
+                "check": "voice",
+            }
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
-        
+
         elif reply_message.text:
-            reply_data.update["word"] = original_message.text
-            reply_data.update["text"] = reply_message.text
-            reply_data.update["check"] = "text"
+            reply_data = {
+                "word": original_message.text,
+                "text": reply_message.text,
+                "check": "text",
+            }
             await chatai.insert_one(reply_data)
             replies_cache.append(reply_data)
 
