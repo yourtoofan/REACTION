@@ -28,19 +28,8 @@ new_replies_cache = []
 blocklist = {}
 message_counts = {}
 
-async def get_reply(word: str):
-    try:
-        is_chat = await storeai.find({"word": word}).to_list(length=None)
-        if not is_chat:
-            is_chat = await storeai.find().to_list(length=None)
-        return random.choice(is_chat) if is_chat else None
-    except Exception as e:
-        print(f"Error in get_reply: {e}")
-        return None
 
-
-
-async def gets_reply(message):
+async def get_reply(message):
     global replies_cache, new_replies_cache
     try:
         if message.text:
@@ -67,16 +56,16 @@ async def gets_reply(message):
         else:
             return None, None
 
+        for reply_data in new_replies_cache:
+            if reply_data["word"] == message_id and reply_data["check"] == message_type:
+                return reply_data["text"], reply_data["check"]
+        
         reply_data = await storeai.find_one({"word": message_id, "check": message_type})
         if reply_data:
             new_replies_cache.append(reply_data)
             return reply_data["text"], reply_data["check"]
 
-        for reply_data in new_replies_cache:
-            if reply_data["word"] == message_id and reply_data["check"] == message_type:
-                return reply_data["text"], reply_data["check"]
-        
-        if not reply_data:
+        if new_replies_cache:
             random_reply = random.choice(new_replies_cache)
             return random_reply["text"], random_reply["check"]
         
@@ -136,7 +125,7 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(chat_id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = await get_reply(message.text)
+            reply_data = await get_reply(message)
             if reply_data:
                 response_text, reply_type = reply_data
         
@@ -192,86 +181,96 @@ async def save_text(original_message: Message):
 async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache, new_replies_cache
     try:
-        if reply_message.sticker:
-            is_chat = await storeai.find_one({
-                "word": original_message.text,
-                "text": reply_message.sticker.file_id,
-                "check": "sticker",
-            })
-            if not is_chat:
-                await storeai.insert_one({
-                    "word": original_message.text,
+        reply_data = {}
+
+        if original_message.sticker:
+            word_id = original_message.sticker.file_id
+        elif original_message.photo:
+            word_id = original_message.photo[-1].file_id
+        elif original_message.video:
+            word_id = original_message.video.file_id
+        elif original_message.audio:
+            word_id = original_message.audio.file_id
+        elif original_message.animation:
+            word_id = original_message.animation.file_id
+        elif original_message.voice:
+            word_id = original_message.voice.file_id
+        elif original_message.text:
+            word_id = original_message.text
+        else:
+            word_id = None  
+
+         if word_id:
+            
+            if reply_message.sticker:
+                reply_data = {
+                    "word": word_id,
                     "text": reply_message.sticker.file_id,
                     "check": "sticker",
-                })
+                }
+                await storeai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
+                
 
-        elif reply_message.photo:
-            is_chat = await storeai.find_one({
-                "word": original_message.text,
-                "text": reply_message.photo.file_id,
-                "check": "photo",
-            })
-            if not is_chat:
-                await storeai.insert_one({
-                    "word": original_message.text,
-                    "text": reply_message.photo.file_id,
+            elif reply_message.photo:
+                reply_data = {
+                    "word": word_id,
+                    "text": reply_message.photo[-1].file_id,
                     "check": "photo",
-                })
+                }
+                await storeai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
 
-        elif reply_message.video:
-            is_chat = await storeai.find_one({
-                "word": original_message.text,
-                "text": reply_message.video.file_id,
-                "check": "video",
-            })
-            if not is_chat:
-                await storeai.insert_one({
-                    "word": original_message.text,
+
+            elif reply_message.video:
+                reply_data = {
+                    "word": word_id,
                     "text": reply_message.video.file_id,
                     "check": "video",
-                })
+                }
+                await storeai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
+                
 
-        elif reply_message.audio:
-            is_chat = await storeai.find_one({
-                "word": original_message.text,
-                "text": reply_message.audio.file_id,
-                "check": "audio",
-            })
-            if not is_chat:
-                await storeai.insert_one({
-                    "word": original_message.text,
+            elif reply_message.audio:
+                reply_data = {
+                    "word": word_id,
                     "text": reply_message.audio.file_id,
                     "check": "audio",
-                })
+                }
+                await storeai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
+                
 
-        elif reply_message.audio:
-            is_chat = await storeai.find_one({
-                "word": original_message.text,
-                "text": reply_message.voice.file_id,
-                "check": "voice",
-            })
-            if not is_chat:
-                await storeai.insert_one({
-                    "word": original_message.text,
-                    "text": reply_message.voice.file_id,
-                    "check": "voice",
-                })
-
-        elif reply_message.animation:  
-            is_chat = await storeai.find_one({
-                "word": original_message.text,
-                "text": reply_message.animation.file_id,
-                "check": "gif",
-            })
-            if not is_chat:
-                await storeai.insert_one({
-                    "word": original_message.text,
+            elif reply_message.animation:
+                reply_data = {
+                    "word": word_id,
                     "text": reply_message.animation.file_id,
                     "check": "gif",
-                })
-
-        
-
+                }
+                await storeai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
+                
+            elif reply_message.voice:
+                reply_data = {
+                    "word": word_id,
+                    "text": reply_message.voice.file_id,
+                    "check": "voice",
+                }
+                await storeai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
+                
+"""
+            elif reply_message.text:
+                reply_data = {
+                    "word": word_id,
+                    "text": reply_message.text,
+                    "check": "text",
+                }
+                await chatai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
+                print("Text reply saved:", reply_data)
+"""
     except Exception as e:
         print(f"Error in save_reply: {e}")
 
@@ -309,10 +308,11 @@ async def load_replies_cache():
 
 
 async def update_replies_database():
+    batch_size = 10
     try:
         while True:
-            words_cursor = chatai.find({})
-            words_batch = await words_cursor.to_list(length=None)  # Fetch all words in chatai
+            words_cursor = chatai.find({}).limit(batch_size)
+            words_batch = await words_cursor.to_list(length=batch_size)
             
             if not words_batch:
                 break
@@ -321,21 +321,25 @@ async def update_replies_database():
             for i, word_data in enumerate(words_batch, start=1):
                 prompt += f"Word{i} = ({word_data['word']})\n"
             prompt += """
-            text me jo sare message hai vo separately Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply generate kro, yad rakhna ki tum ek telegram chatbot ho aur sab members log se group me friendly bat krte ho, agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi official language mein reply karo taki simple se simple translator translate kar sake reply ko. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+            text me jo jo 10 message hai vo sare 10 message ke liye separately Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply generate kro, yad rakhna ki tum ek telegram chatbot ho aur sab members log se group me friendly bat krte ho, agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi official language mein reply karo taki simple se simple translator translate kar sake reply ko. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
 
-            Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do! aur yrr please hindi me sirf nhi reply ko likho balki text jis lang me bola ja rha hai usi official lang me aur usi text me har reply do yr please barna nhi samjh aata hai.
+            Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do! aur yrr please hindi me sirf nhi reply ko likho balki text jis lang me bola ja rha hai usi official lang me aur usi text me har reply do yr please barna nhi samjh aata hai. 
 
             Aur reply bas ish format me likh ke do aur kuch extra nhi:
 
             Reply1 = "yaha pe word1 ka reply"
             Reply2 = "yaha pe word2 ka reply"
-            ...
+            Reply3 = "yaha pe word3 ka reply"
+            Reply4 = "yaha pe word4 ka reply"
+            Reply5 = "yaha pe word5 ka reply"
+            Reply6 = "yaha pe word6 ka reply"
+            Reply7 = "yaha pe word7 ka reply"
+            Reply8 = "yaha pe word8 ka reply"
+            Reply9 = "yaha pe word9 ka reply"
+            Reply10 = "yaha pe word10 ka reply"
             """
 
             replies = await generate_batch_reply(prompt)
-
-            # Delete all words from chatai as they are processed in this batch
-            await chatai.delete_many({})
 
             tasks = []
             for i, word_data in enumerate(words_batch, start=1):
@@ -355,7 +359,7 @@ async def update_replies_database():
 async def generate_batch_reply(user_input):
     try:
         response = api.gemini(user_input)
-        await asyncio.sleep(8)
+        await asyncio.sleep(2)
         if response and "results" in response:
             results = response["results"].splitlines()
             reply_dict = {}
@@ -398,9 +402,10 @@ async def save_new_reply(word, reply):
         is_chat = await storeai.find_one({"word": word})
         if not is_chat:
             await storeai.insert_one(reply_data)
+            await chatai.delete_one({"word": word})
         else:
             print(f"Reply for {word} already exists in storeai.")
-    
+
     except Exception as e:
         print(f"Error in save_new_reply for {word}: {e}")
 
