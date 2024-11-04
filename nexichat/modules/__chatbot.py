@@ -56,16 +56,16 @@ async def get_reply(message):
         else:
             return None, None
 
-        for reply_data in new_replies_cache:
-            if reply_data["word"] == message_id and reply_data["check"] == message_type:
-                return reply_data["text"], reply_data["check"]
-        
         reply_data = await storeai.find_one({"word": message_id, "check": message_type})
         if reply_data:
             new_replies_cache.append(reply_data)
             return reply_data["text"], reply_data["check"]
 
-        if new_replies_cache:
+        for reply_data in new_replies_cache:
+            if reply_data["word"] == message_id and reply_data["check"] == message_type:
+                return reply_data["text"], reply_data["check"]
+        
+        if not reply_data:
             random_reply = random.choice(new_replies_cache)
             return random_reply["text"], random_reply["check"]
         
