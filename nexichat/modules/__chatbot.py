@@ -186,7 +186,7 @@ async def save_reply(original_message: Message, reply_message: Message):
         if original_message.sticker:
             word_id = original_message.sticker.file_id
         elif original_message.photo:
-            word_id = original_message.photo[-1].file_id
+            word_id = original_message.photo.file_id
         elif original_message.video:
             word_id = original_message.video.file_id
         elif original_message.audio:
@@ -215,7 +215,7 @@ async def save_reply(original_message: Message, reply_message: Message):
             elif reply_message.photo:
                 reply_data = {
                     "word": word_id,
-                    "text": reply_message.photo[-1].file_id,
+                    "text": reply_message.photo.file_id,
                     "check": "photo",
                 }
                 await storeai.insert_one(reply_data)
