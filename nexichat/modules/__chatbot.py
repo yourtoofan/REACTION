@@ -136,7 +136,7 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(chat_id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = await get_reply(message)
+            reply_data = await get_reply(message.text)
             if reply_data:
                 response_text, reply_type = reply_data
         
