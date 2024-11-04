@@ -28,8 +28,19 @@ new_replies_cache = []
 blocklist = {}
 message_counts = {}
 
+async def get_reply(word: str):
+    try:
+        is_chat = await storeai.find({"word": word}).to_list(length=None)
+        if not is_chat:
+            is_chat = await storeai.find().to_list(length=None)
+        return random.choice(is_chat) if is_chat else None
+    except Exception as e:
+        print(f"Error in get_reply: {e}")
+        return None
 
-async def get_reply(message):
+
+
+async def gets_reply(message):
     global replies_cache, new_replies_cache
     try:
         if message.text:
