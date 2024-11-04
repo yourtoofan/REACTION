@@ -209,7 +209,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                     "check": "sticker",
                 }
                 await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
+                
                 
 
             elif reply_message.photo:
@@ -219,7 +219,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                     "check": "photo",
                 }
                 await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
+                
 
 
             elif reply_message.video:
@@ -229,7 +229,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                     "check": "video",
                 }
                 await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
+                
                 
 
             elif reply_message.audio:
@@ -239,7 +239,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                     "check": "audio",
                 }
                 await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
+                
                 
 
             elif reply_message.animation:
@@ -249,7 +249,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                     "check": "gif",
                 }
                 await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
+                
                 
             elif reply_message.voice:
                 reply_data = {
@@ -258,7 +258,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                     "check": "voice",
                 }
                 await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
+                
                 
 
             elif reply_message.text:
@@ -268,7 +268,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                     "check": "text",
                 }
                 await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
+                
                 print("Text reply saved:", reply_data)
 
     except Exception as e:
@@ -412,6 +412,7 @@ async def save_new_reply(word, reply):
 
 async def continuous_update():
     await load_replies_cache()
+    print("loaded_replies_cache")
     while True:
         try:           
             await update_replies_database()
