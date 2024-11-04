@@ -178,95 +178,106 @@ async def save_text(original_message: Message):
     except Exception as e:
         print(f"Error in save_text: {e}")
 
-
 async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache, new_replies_cache
     try:
         reply_data = {}
 
-        if reply_message.sticker:
-            reply_data = {
-                "word": original_message.sticker.file_id,
-                "text": reply_message.sticker.file_id,
-                "check": "sticker",
-            }
-            await storeai.insert_one(reply_data)
-            replies_cache.append(reply_data)
-            new_replies_cache.append(reply_data)
-            print("Sticker saved:", reply_data)
+        # Determine the "word" field based on the type of original_message
+        if original_message.sticker:
+            word_id = original_message.sticker.file_id
+        elif original_message.photo:
+            word_id = original_message.photo[-1].file_id
+        elif original_message.video:
+            word_id = original_message.video.file_id
+        elif original_message.audio:
+            word_id = original_message.audio.file_id
+        elif original_message.animation:
+            word_id = original_message.animation.file_id
+        elif original_message.voice:
+            word_id = original_message.voice.file_id
+        elif original_message.text:
+            word_id = original_message.text
+        else:
+            word_id = None  # Unsupported type
 
+        # Proceed only if word_id is defined (i.e., original message has a valid type)
+        if word_id:
+            # Determine the type and data for reply_message
+            if reply_message.sticker:
+                reply_data = {
+                    "word": word_id,
+                    "text": reply_message.sticker.file_id,
+                    "check": "sticker",
+                }
+                await storeai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
+                print("Sticker reply saved:", reply_data)
 
-        elif reply_message.photo:
-            reply_data = {
-                "word": original_message.photo.file_id,
-                "text": reply_message.photo.file_id,
-                "check": "photo",
-            }
-            await storeai.insert_one(reply_data)
-            replies_cache.append(reply_data)
-            new_replies_cache.append(reply_data)
-            print("photo saved:", reply_data)
+            elif reply_message.photo:
+                reply_data = {
+                    "word": word_id,
+                    "text": reply_message.photo[-1].file_id,
+                    "check": "photo",
+                }
+                await storeai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
+                print("Photo reply saved:", reply_data)
 
+            elif reply_message.video:
+                reply_data = {
+                    "word": word_id,
+                    "text": reply_message.video.file_id,
+                    "check": "video",
+                }
+                await storeai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
+                print("Video reply saved:", reply_data)
 
-        elif reply_message.video:
-            reply_data = {
-                "word": original_message.video.file_id,
-                "text": reply_message.video.file_id,
-                "check": "video",
-            }
-            await storeai.insert_one(reply_data)
-            replies_cache.append(reply_data)
-            new_replies_cache.append(reply_data)
-            print("Video saved:", reply_data)
+            elif reply_message.audio:
+                reply_data = {
+                    "word": word_id,
+                    "text": reply_message.audio.file_id,
+                    "check": "audio",
+                }
+                await storeai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
+                print("Audio reply saved:", reply_data)
 
-        elif reply_message.audio:
-            reply_data = {
-                "word": original_message.audio.file_id,
-                "text": reply_message.audio.file_id,
-                "check": "audio",
-            }
-            await storeai.insert_one(reply_data)
-            replies_cache.append(reply_data)
-            new_replies_cache.append(reply_data)
-            print("audio saved:", reply_data)
+            elif reply_message.animation:
+                reply_data = {
+                    "word": word_id,
+                    "text": reply_message.animation.file_id,
+                    "check": "gif",
+                }
+                await storeai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
+                print("GIF reply saved:", reply_data)
 
+            elif reply_message.voice:
+                reply_data = {
+                    "word": word_id,
+                    "text": reply_message.voice.file_id,
+                    "check": "voice",
+                }
+                await storeai.insert_one(reply_data)
+                new_replies_cache.append(reply_data)
+                print("Voice reply saved:", reply_data)
 
-        elif reply_message.animation:
-            reply_data = {
-                "word": original_message.animation.file_id,
-                "text": reply_message.animation.file_id,
-                "check": "gif",
-            }
-            await storeai.insert_one(reply_data)
-            replies_cache.append(reply_data)
-            new_replies_cache.append(reply_data)
-            print("gif saved:", reply_data)
-
-        elif reply_message.voice:
-            reply_data = {
-                "word": original_message.voice.file_id,
-                "text": reply_message.voice.file_id,
-                "check": "voice",
-            }
-            await storeai.insert_one(reply_data)
-            replies_cache.append(reply_data)
-            new_replies_cache.append(reply_data)
-            print("voice saved:", reply_data)
-
-        elif reply_message.text:
-            reply_data = {
-                "word": original_message.text,
-                "text": reply_message.text,
-                "check": "text",
-            }
-            await chatai.insert_one(reply_data)
-            replies_cache.append(reply_data)
-            new_replies_cache.append(reply_data)
-            
-
+            elif reply_message.text:
+                reply_data = {
+                    "word": word_id,
+                    "text": reply_message.text,
+                    "check": "text",
+                }
+                await chatai.insert_one(reply_data)
+                replies_cache.append(reply_data)
+                print("Text reply saved:", reply_data)
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
+
+
 
 async def load_replies_cache():
     global replies_cache, new_replies_cache
