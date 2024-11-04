@@ -155,13 +155,12 @@ async def chatbot_response(client: Client, message: Message):
                     
         
         if message.reply_to_message:
-            
             await save_reply(message.reply_to_message, message)
             
         if message.text:
-            print(f"{message.text}")
             await save_text(message)
-            print(f"new text saved = {message.text}")
+
+
     except Exception as vip:
         return await message.reply_text("🙄🙄")
         
@@ -236,6 +235,7 @@ async def save_reply(original_message: Message, reply_message: Message):
             }
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
+            print("gif saved:", reply_data)
 
         elif reply_message.voice:
             reply_data = {
@@ -245,6 +245,7 @@ async def save_reply(original_message: Message, reply_message: Message):
             }
             await storeai.insert_one(reply_data)
             new_replies_cache.append(reply_data)
+            print("voice saved:", reply_data)
 
         elif reply_message.text:
             reply_data = {
