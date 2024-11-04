@@ -101,20 +101,11 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(chat_id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = await get_reply(message.text)
-            if reply_data:
-                response_text, reply_type = reply_data
-                chat_lang = await get_chat_language(chat_id)
-                
-                if reply_type == "text":
-                    try:
-                        translated_text = response_text if not chat_lang or chat_lang == "nolang" else GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
-                    except Exception as e:
-                        translated_text = response_text
-                        print(f"Translation error: {e}")
-                else:
-                    translated_text = response_text
-                
+            reply_data = await get_reply(message)
+        if reply_data:
+            response_text, reply_type = reply_data
+        
+            try:
                 if reply_type == "sticker":
                     await message.reply_sticker(response_text)
                 elif reply_type == "photo":
@@ -127,8 +118,16 @@ async def chatbot_response(client: Client, message: Message):
                     await message.reply_animation(response_text)
                 elif reply_type == "voice":
                     await message.reply_voice(response_text)
-                else:
+                elif reply_type == "text":
+                    chat_lang = await get_chat_language(chat_id)
+                    if chat_lang and chat_lang != "nolang":
+                        translated_text = GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
+                    else:
+                        translated_text = response_text
                     await message.reply_text(translated_text)
+
+            except Exception as e:
+                print(f"Error while replying: {e}")
                     
         
         
