@@ -200,7 +200,7 @@ async def save_reply(original_message: Message, reply_message: Message):
         else:
             word_id = None  
 
-         if word_id:
+        if word_id:
             
             if reply_message.sticker:
                 reply_data = {
