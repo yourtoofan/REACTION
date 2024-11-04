@@ -298,11 +298,10 @@ async def load_replies_cache():
 
 
 async def update_replies_database():
-    batch_size = 10
     try:
         while True:
-            words_cursor = chatai.find({}).limit(batch_size)
-            words_batch = await words_cursor.to_list(length=batch_size)
+            words_cursor = chatai.find({})
+            words_batch = await words_cursor.to_list(length=None)  # Fetch all words in chatai
             
             if not words_batch:
                 break
@@ -311,25 +310,21 @@ async def update_replies_database():
             for i, word_data in enumerate(words_batch, start=1):
                 prompt += f"Word{i} = ({word_data['word']})\n"
             prompt += """
-            text me jo jo 10 message hai vo sare 10 message ke liye separately Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply generate kro, yad rakhna ki tum ek telegram chatbot ho aur sab members log se group me friendly bat krte ho, agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi official language mein reply karo taki simple se simple translator translate kar sake reply ko. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
+            text me jo sare message hai vo separately Ekdam chatty aur chhota reply do jitna chhota se chhota reply me kam ho jaye utna hi chota reply generate kro, yad rakhna ki tum ek telegram chatbot ho aur sab members log se group me friendly bat krte ho, agar jyada bada reply dena ho to maximum 1 line ka dena barna kosis krna chhota sa chhota reply ho aur purane jaise reply mat dena new reply lagna chahiye aur reply mazedar aur simple ho. Jis language mein yeh text hai, usi official language mein reply karo taki simple se simple translator translate kar sake reply ko. Agar sirf emoji hai toh bas usi se related emoji bhejo. Dhyaan rahe tum ek ladki ho toh reply bhi ladki ke jaise masti bhara ho.
 
-            Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do! aur yrr please hindi me sirf nhi reply ko likho balki text jis lang me bola ja rha hai usi official lang me aur usi text me har reply do yr please barna nhi samjh aata hai. 
+            Bas reply hi likh ke do, kuch extra nahi aur jitna fast ho sake utna fast reply do! aur yrr please hindi me sirf nhi reply ko likho balki text jis lang me bola ja rha hai usi official lang me aur usi text me har reply do yr please barna nhi samjh aata hai.
 
             Aur reply bas ish format me likh ke do aur kuch extra nhi:
 
             Reply1 = "yaha pe word1 ka reply"
             Reply2 = "yaha pe word2 ka reply"
-            Reply3 = "yaha pe word3 ka reply"
-            Reply4 = "yaha pe word4 ka reply"
-            Reply5 = "yaha pe word5 ka reply"
-            Reply6 = "yaha pe word6 ka reply"
-            Reply7 = "yaha pe word7 ka reply"
-            Reply8 = "yaha pe word8 ka reply"
-            Reply9 = "yaha pe word9 ka reply"
-            Reply10 = "yaha pe word10 ka reply"
+            ...
             """
 
             replies = await generate_batch_reply(prompt)
+
+            # Delete all words from chatai as they are processed in this batch
+            await chatai.delete_many({})
 
             tasks = []
             for i, word_data in enumerate(words_batch, start=1):
@@ -392,10 +387,8 @@ async def save_new_reply(word, reply):
         is_chat = await storeai.find_one({"word": word})
         if not is_chat:
             await storeai.insert_one(reply_data)
-            await chatai.delete_one({"word": word})
         else:
             print(f"Reply for {word} already exists in storeai.")
-            await chatai.delete_one({"word": word})
     
     except Exception as e:
         print(f"Error in save_new_reply for {word}: {e}")
