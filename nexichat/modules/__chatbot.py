@@ -191,6 +191,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 "check": "sticker",
             }
             await storeai.insert_one(reply_data)
+            replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
             print("Sticker saved:", reply_data)
 
@@ -202,6 +203,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 "check": "photo",
             }
             await storeai.insert_one(reply_data)
+            replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
             print("photo saved:", reply_data)
 
@@ -213,6 +215,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 "check": "video",
             }
             await storeai.insert_one(reply_data)
+            replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
             print("Video saved:", reply_data)
 
@@ -223,6 +226,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 "check": "audio",
             }
             await storeai.insert_one(reply_data)
+            replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
             print("audio saved:", reply_data)
 
@@ -234,6 +238,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 "check": "gif",
             }
             await storeai.insert_one(reply_data)
+            replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
             print("gif saved:", reply_data)
 
@@ -244,6 +249,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 "check": "voice",
             }
             await storeai.insert_one(reply_data)
+            replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
             print("voice saved:", reply_data)
 
@@ -256,7 +262,7 @@ async def save_reply(original_message: Message, reply_message: Message):
             await chatai.insert_one(reply_data)
             replies_cache.append(reply_data)
             new_replies_cache.append(reply_data)
-            print("Text saved:", reply_data)
+            
 
 
     except Exception as e:
