@@ -181,85 +181,85 @@ async def save_text(original_message: Message):
 async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache, new_replies_cache
     try:
-        reply_data = {}
-
-        if original_message.sticker:
-            word_id = original_message.sticker.file_id
-        elif original_message.photo:
-            word_id = original_message.photo.file_id
-        elif original_message.video:
-            word_id = original_message.video.file_id
-        elif original_message.audio:
-            word_id = original_message.audio.file_id
-        elif original_message.animation:
-            word_id = original_message.animation.file_id
-        elif original_message.voice:
-            word_id = original_message.voice.file_id
-        elif original_message.text:
-            word_id = original_message.text
-        else:
-            word_id = None  
-
-        if word_id:
-            
-            if reply_message.sticker:
-                reply_data = {
-                    "word": word_id,
+        if reply_message.sticker:
+            is_chat = await storeai.find_one({
+                "word": original_message.text,
+                "text": reply_message.sticker.file_id,
+                "check": "sticker",
+            })
+            if not is_chat:
+                await storeai.insert_one({
+                    "word": original_message.text,
                     "text": reply_message.sticker.file_id,
                     "check": "sticker",
-                }
-                await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
-                
+                })
 
-            elif reply_message.photo:
-                reply_data = {
-                    "word": word_id,
+        elif reply_message.photo:
+            is_chat = await storeai.find_one({
+                "word": original_message.text,
+                "text": reply_message.photo.file_id,
+                "check": "photo",
+            })
+            if not is_chat:
+                await storeai.insert_one({
+                    "word": original_message.text,
                     "text": reply_message.photo.file_id,
                     "check": "photo",
-                }
-                await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
+                })
 
-
-            elif reply_message.video:
-                reply_data = {
-                    "word": word_id,
+        elif reply_message.video:
+            is_chat = await storeai.find_one({
+                "word": original_message.text,
+                "text": reply_message.video.file_id,
+                "check": "video",
+            })
+            if not is_chat:
+                await storeai.insert_one({
+                    "word": original_message.text,
                     "text": reply_message.video.file_id,
                     "check": "video",
-                }
-                await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
-                
+                })
 
-            elif reply_message.audio:
-                reply_data = {
-                    "word": word_id,
+        elif reply_message.audio:
+            is_chat = await storeai.find_one({
+                "word": original_message.text,
+                "text": reply_message.audio.file_id,
+                "check": "audio",
+            })
+            if not is_chat:
+                await storeai.insert_one({
+                    "word": original_message.text,
                     "text": reply_message.audio.file_id,
                     "check": "audio",
-                }
-                await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
-                
+                })
 
-            elif reply_message.animation:
-                reply_data = {
-                    "word": word_id,
-                    "text": reply_message.animation.file_id,
-                    "check": "gif",
-                }
-                await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
-                
-            elif reply_message.voice:
-                reply_data = {
-                    "word": word_id,
+        elif reply_message.audio:
+            is_chat = await storeai.find_one({
+                "word": original_message.text,
+                "text": reply_message.voice.file_id,
+                "check": "voice",
+            })
+            if not is_chat:
+                await storeai.insert_one({
+                    "word": original_message.text,
                     "text": reply_message.voice.file_id,
                     "check": "voice",
-                }
-                await storeai.insert_one(reply_data)
-                new_replies_cache.append(reply_data)
-                
+                })
+
+        elif reply_message.animation:  
+            is_chat = await storeai.find_one({
+                "word": original_message.text,
+                "text": reply_message.animation.file_id,
+                "check": "gif",
+            })
+            if not is_chat:
+                await storeai.insert_one({
+                    "word": original_message.text,
+                    "text": reply_message.animation.file_id,
+                    "check": "gif",
+                })
+
+        
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
