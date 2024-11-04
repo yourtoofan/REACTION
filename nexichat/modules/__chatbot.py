@@ -252,6 +252,9 @@ async def save_reply(original_message: Message, reply_message: Message):
             }
             await chatai.insert_one(reply_data)
             replies_cache.append(reply_data)
+            new_replies_cache.append(reply_data)
+            print("Text saved:", reply_data)
+
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
