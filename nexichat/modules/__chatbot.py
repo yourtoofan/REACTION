@@ -39,7 +39,7 @@ async def get_reply(message):
             message_id = message.sticker.file_id
             message_type = "sticker"
         elif message.photo:
-            message_id = message.photo[-1].file_id
+            message_id = message.photo.file_id
             message_type = "photo"
         elif message.video:
             message_id = message.video.file_id
