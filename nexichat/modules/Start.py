@@ -139,9 +139,10 @@ async def welcomejej(client, message: Message):
                     chat = message.chat
                     await set_group_language(chat)
                 except Exception as e:
+                    print(f"{e}")
                     pass
                 try:
-                    invitelink = await nexichat.export_chat_invite_link(messag.chat.id)
+                    invitelink = await nexichat.export_chat_invite_link(message.chat.id)
                                                                         
                     link = f"[ɢᴇᴛ ʟɪɴᴋ]({invitelink})"
                 except ChatAdminRequired:
