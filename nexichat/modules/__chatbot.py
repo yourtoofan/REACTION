@@ -64,7 +64,8 @@ async def get_reply(message):
         if reply_data:
             new_replies_cache.append(reply_data)
             return reply_data["text"], reply_data["check"]
-
+            await load_replies_cache()
+            
         if new_replies_cache:
             random_reply = random.choice(new_replies_cache)
             return random_reply["text"], random_reply["check"]
