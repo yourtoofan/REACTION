@@ -349,7 +349,7 @@ async def update_replies_database():
 async def generate_batch_reply(user_input):
     try:
         response = api.gemini(user_input)
-        await asyncio.sleep(2)
+        await asyncio.sleep(8)
         if response and "results" in response:
             results = response["results"].splitlines()
             reply_dict = {}
