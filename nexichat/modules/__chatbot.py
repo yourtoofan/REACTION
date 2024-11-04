@@ -29,18 +29,42 @@ blocklist = {}
 message_counts = {}
 
 
-async def get_reply(message_text):
+async def get_reply(message):
     global replies_cache, new_replies_cache
     try:
+        if message.text:
+            message_id = message.text
+            message_type = "text"
+        elif message.sticker:
+            message_id = message.sticker.file_id
+            message_type = "sticker"
+        elif message.photo:
+            message_id = message.photo[-1].file_id
+            message_type = "photo"
+        elif message.video:
+            message_id = message.video.file_id
+            message_type = "video"
+        elif message.audio:
+            message_id = message.audio.file_id
+            message_type = "audio"
+        elif message.animation:
+            message_id = message.animation.file_id
+            message_type = "gif"
+        elif message.voice:
+            message_id = message.voice.file_id
+            message_type = "voice"
+        else:
+            return None, None
+
         for reply_data in new_replies_cache:
-            if reply_data["word"] == message_text:
+            if reply_data["word"] == message_id and reply_data["check"] == message_type:
                 return reply_data["text"], reply_data["check"]
         
-        reply_data = await storeai.find_one({"word": message_text})
+        reply_data = await storeai.find_one({"word": message_id, "check": message_type})
         if reply_data:
             new_replies_cache.append(reply_data)
             return reply_data["text"], reply_data["check"]
-        
+
         if new_replies_cache:
             random_reply = random.choice(new_replies_cache)
             return random_reply["text"], random_reply["check"]
