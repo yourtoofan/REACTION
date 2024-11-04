@@ -99,14 +99,17 @@ async def set_default_status(chat_id):
 
 from langdetect import detect
 from collections import Counter
-from pyrogram.types import Message
+from pyrogram.types import Chat
 
-async def set_group_language(chat):
+async def set_group_language(chat: Chat):
     messages = []
     # Get the recent chat history for language detection
     async for message in nexichat.get_chat_history(chat.id, limit=50):
         if message.text and not message.from_user.is_bot:
             messages.append(message.text)
+
+    if not messages:
+        return  # If there are no valid messages, exit the function
 
     # Detect language for each message
     lang_counts = Counter(detect(text) for text in messages if text)
@@ -115,12 +118,11 @@ async def set_group_language(chat):
 
     # If a single language is dominant, set it as chat language
     if max_lang_percentage > 50:
-        lang_db.update_one({"chat_id": chat.id}, {"$set": {"language": most_common_lang}}, upsert=True)
+        await lang_db.update_one({"chat_id": chat.id}, {"$set": {"language": most_common_lang}}, upsert=True)
         await nexichat.send_message(
             chat.id, 
             f"This chat language has been set to {most_common_lang.title()} ({most_common_lang})."
         )
-
 
 @nexichat.on_message(filters.new_chat_members)
 async def welcomejej(client, message: Message):
