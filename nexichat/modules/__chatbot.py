@@ -395,7 +395,8 @@ async def save_new_reply(word, reply):
             await chatai.delete_one({"word": word})
         else:
             print(f"Reply for {word} already exists in storeai.")
-
+            await chatai.delete_one({"word": word})
+    
     except Exception as e:
         print(f"Error in save_new_reply for {word}: {e}")
 
