@@ -97,6 +97,31 @@ async def set_default_status(chat_id):
     except Exception as e:
         print(f"Error setting default status for chat {chat_id}: {e}")
 
+from langdetect import detect
+from collections import Counter
+from pyrogram.types import Message
+
+async def set_group_language(chat):
+    messages = []
+    # Get the recent chat history for language detection
+    async for message in nexichat.get_chat_history(chat.id, limit=50):
+        if message.text and not message.from_user.is_bot:
+            messages.append(message.text)
+
+    # Detect language for each message
+    lang_counts = Counter(detect(text) for text in messages if text)
+    most_common_lang, max_count = lang_counts.most_common(1)[0]
+    max_lang_percentage = (max_count / len(messages)) * 100
+
+    # If a single language is dominant, set it as chat language
+    if max_lang_percentage > 50:
+        lang_db.update_one({"chat_id": chat.id}, {"$set": {"language": most_common_lang}}, upsert=True)
+        await nexichat.send_message(
+            chat.id, 
+            f"This chat language has been set to {most_common_lang.title()} ({most_common_lang})."
+        )
+
+
 @nexichat.on_message(filters.new_chat_members)
 async def welcomejej(client, message: Message):
     chat = message.chat
@@ -112,10 +137,12 @@ async def welcomejej(client, message: Message):
                     reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
                     await message.reply_photo(photo=random.choice(IMG), caption=START.format(nexichat.mention or "can't mention", users, chats), reply_markup=reply_markup)
                     chat = message.chat
+                    await set_group_language(chat)
                 except Exception as e:
                     pass
                 try:
-                    invitelink = await nexichat.export_chat_invite_link(message.chat.id)
+                    invitelink = await nexichat.export_chat_invite_link(messag.chat.id)
+                                                                        
                     link = f"[ɢᴇᴛ ʟɪɴᴋ]({invitelink})"
                 except ChatAdminRequired:
                     link = "No Link"
