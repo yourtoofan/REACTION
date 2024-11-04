@@ -271,7 +271,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                     "check": "text",
                 }
                 await chatai.insert_one(reply_data)
-                replies_cache.append(reply_data)
+                new_replies_cache.append(reply_data)
                 print("Text reply saved:", reply_data)
 
     except Exception as e:
