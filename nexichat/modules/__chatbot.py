@@ -183,7 +183,6 @@ async def save_reply(original_message: Message, reply_message: Message):
     try:
         reply_data = {}
 
-        # Determine the "word" field based on the type of original_message
         if original_message.sticker:
             word_id = original_message.sticker.file_id
         elif original_message.photo:
@@ -199,11 +198,10 @@ async def save_reply(original_message: Message, reply_message: Message):
         elif original_message.text:
             word_id = original_message.text
         else:
-            word_id = None  # Unsupported type
+            word_id = None  
 
-        # Proceed only if word_id is defined (i.e., original message has a valid type)
-        if word_id:
-            # Determine the type and data for reply_message
+         if word_id:
+            
             if reply_message.sticker:
                 reply_data = {
                     "word": word_id,
@@ -212,7 +210,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 }
                 await storeai.insert_one(reply_data)
                 new_replies_cache.append(reply_data)
-                print("Sticker reply saved:", reply_data)
+                
 
             elif reply_message.photo:
                 reply_data = {
@@ -222,7 +220,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 }
                 await storeai.insert_one(reply_data)
                 new_replies_cache.append(reply_data)
-                print("Photo reply saved:", reply_data)
+
 
             elif reply_message.video:
                 reply_data = {
@@ -232,7 +230,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 }
                 await storeai.insert_one(reply_data)
                 new_replies_cache.append(reply_data)
-                print("Video reply saved:", reply_data)
+                
 
             elif reply_message.audio:
                 reply_data = {
@@ -242,7 +240,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 }
                 await storeai.insert_one(reply_data)
                 new_replies_cache.append(reply_data)
-                print("Audio reply saved:", reply_data)
+                
 
             elif reply_message.animation:
                 reply_data = {
@@ -252,8 +250,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 }
                 await storeai.insert_one(reply_data)
                 new_replies_cache.append(reply_data)
-                print("GIF reply saved:", reply_data)
-
+                
             elif reply_message.voice:
                 reply_data = {
                     "word": word_id,
@@ -262,8 +259,8 @@ async def save_reply(original_message: Message, reply_message: Message):
                 }
                 await storeai.insert_one(reply_data)
                 new_replies_cache.append(reply_data)
-                print("Voice reply saved:", reply_data)
-
+                
+"""
             elif reply_message.text:
                 reply_data = {
                     "word": word_id,
@@ -273,7 +270,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 await chatai.insert_one(reply_data)
                 new_replies_cache.append(reply_data)
                 print("Text reply saved:", reply_data)
-
+"""
     except Exception as e:
         print(f"Error in save_reply: {e}")
 
