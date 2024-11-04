@@ -155,12 +155,13 @@ async def chatbot_response(client: Client, message: Message):
                     
         
         if message.reply_to_message:
-            print("new reply fetched")
+            
             await save_reply(message.reply_to_message, message)
-            print("new reply saved")
+            
         if message.text:
             print(f"{message.text}")
             await save_text(message)
+            print(f"new text saved = {message.text}")
     except Exception as vip:
         return await message.reply_text("🙄🙄")
         
