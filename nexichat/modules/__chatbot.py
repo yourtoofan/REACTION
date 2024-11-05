@@ -92,7 +92,6 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(message.chat.id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == shizuchat.id) or not message.reply_to_message:
-            await client.send_chat_action(message.chat.id, ChatAction.TYPING)
             reply_data = await get_reply(message.text)
 
             if reply_data:
@@ -318,16 +317,16 @@ async def update_replies_database():
 
             Aur reply bas ish format me likh ke do aur kuch extra nhi:
 
-            Reply1 = "yaha pe word1 ka reply"
-            Reply2 = "yaha pe word2 ka reply"
-            Reply3 = "yaha pe word3 ka reply"
-            Reply4 = "yaha pe word4 ka reply"
-            Reply5 = "yaha pe word5 ka reply"
-            Reply6 = "yaha pe word6 ka reply"
-            Reply7 = "yaha pe word7 ka reply"
-            Reply8 = "yaha pe word8 ka reply"
-            Reply9 = "yaha pe word9 ka reply"
-            Reply10 = "yaha pe word10 ka reply"
+            Reply1 = yaha pe word1 ka reply
+            Reply2 = yaha pe word2 ka reply
+            Reply3 = yaha pe word3 ka reply
+            Reply4 = yaha pe word4 ka reply
+            Reply5 = yaha pe word5 ka reply
+            Reply6 = yaha pe word6 ka reply
+            Reply7 = yaha pe word7 ka reply
+            Reply8 = yaha pe word8 ka reply
+            Reply9 = yaha pe word9 ka reply
+            Reply10 = yaha pe word10 ka reply
             """
 
             replies = await generate_batch_reply(prompt)
