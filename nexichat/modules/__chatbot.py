@@ -93,7 +93,7 @@ async def chatbot_response(client: Client, message: Message):
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == shizuchat.id) or not message.reply_to_message:
             await client.send_chat_action(message.chat.id, ChatAction.TYPING)
-            reply_data = await get_reply(message)
+            reply_data = await get_reply(message.text)
 
             if reply_data:
                 response_text = reply_data["text"]
@@ -219,7 +219,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 translated_text = GoogleTranslator(source='auto', target='en').translate(reply_message.text)
             except Exception as e:
                 print(f"Translation error: {e}, saving original text.")
-
+                translated_text = reply_message.text
             is_chat = await storeai.find_one({
                 "word": original_message.text,
                 "text": translated_text,
@@ -237,9 +237,9 @@ async def save_reply(original_message: Message, reply_message: Message):
         print(f"Error in save_reply: {e}")
 
 async def get_reply(message_text):
-    global replies_cache
+    global new_replies_cache
     
-    for reply_data in replies_cache:
+    for reply_data in new_replies_cache:
         if reply_data["word"] == message_text:
             return reply_data["text"]
     
