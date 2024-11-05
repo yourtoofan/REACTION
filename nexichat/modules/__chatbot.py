@@ -29,54 +29,6 @@ blocklist = {}
 message_counts = {}
 
 
-async def get_reply(message):
-    global replies_cache, new_replies_cache
-    try:
-        if message.text:
-            message_id = message.text
-            message_type = "text"
-        elif message.sticker:
-            message_id = message.sticker.file_id
-            message_type = "sticker"
-        elif message.photo:
-            message_id = message.photo.file_id
-            message_type = "photo"
-        elif message.video:
-            message_id = message.video.file_id
-            message_type = "video"
-        elif message.audio:
-            message_id = message.audio.file_id
-            message_type = "audio"
-        elif message.animation:
-            message_id = message.animation.file_id
-            message_type = "gif"
-        elif message.voice:
-            message_id = message.voice.file_id
-            message_type = "voice"
-        else:
-            return None, None
-
-        for reply_data in new_replies_cache:
-            if reply_data["word"] == message_id and reply_data["check"] == message_type:
-                return reply_data["text"], reply_data["check"]
-        
-        reply_data = await storeai.find_one({"word": message_id, "check": message_type})
-        if reply_data:
-            new_replies_cache.append(reply_data)
-            return reply_data["text"], reply_data["check"]
-            await load_replies_cache()
-            
-        if new_replies_cache:
-            random_reply = random.choice(new_replies_cache)
-            return random_reply["text"], random_reply["check"]
-        
-        await load_replies_cache()
-        return None, None
-
-    except Exception as e:
-        print(f"Error in get_reply: {e}")
-        return None, None
-
 async def get_chat_language(chat_id):
     try:
         chat_lang = await lang_db.find_one({"chat_id": chat_id})
@@ -179,9 +131,33 @@ async def save_text(original_message: Message):
     except Exception as e:
         print(f"Error in save_text: {e}")
 
-@shizuchat.on_message(filters.incoming)
+@nexichat.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
+    global blocklist, message_counts
     try:
+        user_id = message.from_user.id
+        chat_id = message.chat.id
+        current_time = datetime.now()
+        
+        blocklist = {uid: time for uid, time in blocklist.items() if time > current_time}
+
+        if user_id in blocklist:
+            return
+
+        if user_id not in message_counts:
+            message_counts[user_id] = {"count": 1, "last_time": current_time}
+        else:
+            time_diff = (current_time - message_counts[user_id]["last_time"]).total_seconds()
+            if time_diff <= 3:
+                message_counts[user_id]["count"] += 1
+            else:
+                message_counts[user_id] = {"count": 1, "last_time": current_time}
+            
+            if message_counts[user_id]["count"] >= 4:
+                blocklist[user_id] = current_time + timedelta(minutes=1)
+                message_counts.pop(user_id, None)
+                await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You are blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
+                return
         chat_id = message.chat.id
         chat_status = await status_db.find_one({"chat_id": chat_id})
         
@@ -213,6 +189,8 @@ async def chatbot_response(client: Client, message: Message):
                     await message.reply_photo(reply_data["text"])
                 elif reply_data["check"] == "video":
                     await message.reply_video(reply_data["text"])
+                elif reply_data["check"] == "voice":
+                    await message.reply_voice(reply_data["text"])
                 elif reply_data["check"] == "audio":
                     await message.reply_audio(reply_data["text"])
                 elif reply_data["check"] == "gif":
@@ -232,78 +210,78 @@ async def chatbot_response(client: Client, message: Message):
 async def save_reply(original_message: Message, reply_message: Message):
     try:
         if reply_message.sticker:
-            is_chat = await chatai.find_one({
+            is_chat = await storeai.find_one({
                 "word": original_message.text,
                 "text": reply_message.sticker.file_id,
                 "check": "sticker",
             })
             if not is_chat:
-                await chatai.insert_one({
+                await storeai.insert_one({
                     "word": original_message.text,
                     "text": reply_message.sticker.file_id,
                     "check": "sticker",
                 })
 
         elif reply_message.photo:
-            is_chat = await chatai.find_one({
+            is_chat = await storeai.find_one({
                 "word": original_message.text,
                 "text": reply_message.photo.file_id,
                 "check": "photo",
             })
             if not is_chat:
-                await chatai.insert_one({
+                await storeai.insert_one({
                     "word": original_message.text,
                     "text": reply_message.photo.file_id,
                     "check": "photo",
                 })
 
         elif reply_message.video:
-            is_chat = await chatai.find_one({
+            is_chat = await storeai.find_one({
                 "word": original_message.text,
                 "text": reply_message.video.file_id,
                 "check": "video",
             })
             if not is_chat:
-                await chatai.insert_one({
+                await storeai.insert_one({
                     "word": original_message.text,
                     "text": reply_message.video.file_id,
                     "check": "video",
                 })
 
         elif reply_message.audio:
-            is_chat = await chatai.find_one({
+            is_chat = await storeai.find_one({
                 "word": original_message.text,
                 "text": reply_message.audio.file_id,
                 "check": "audio",
             })
             if not is_chat:
-                await chatai.insert_one({
+                await storeai.insert_one({
                     "word": original_message.text,
                     "text": reply_message.audio.file_id,
                     "check": "audio",
                 })
 
         elif reply_message.animation:  
-            is_chat = await chatai.find_one({
+            is_chat = await storeai.find_one({
                 "word": original_message.text,
                 "text": reply_message.animation.file_id,
                 "check": "gif",
             })
             if not is_chat:
-                await chatai.insert_one({
+                await storeai.insert_one({
                     "word": original_message.text,
                     "text": reply_message.animation.file_id,
                     "check": "gif",
                 })
 
         elif reply_message.text:
-            is_chat = await chatai.find_one({
+            is_chat = await storeai.find_one({
                 "word": original_message.text,
                 "text": reply_message.text,
                 "check": "none",
             })
             if not is_chat:
-                await chatai.insert_one({
+                await storeai.insert_one({
                     "word": original_message.text,
                     "text": reply_message.text,
                     "check": "none",
