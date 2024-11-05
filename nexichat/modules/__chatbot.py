@@ -93,7 +93,7 @@ async def chatbot_response(client: Client, message: Message):
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == shizuchat.id) or not message.reply_to_message:
             await client.send_chat_action(message.chat.id, ChatAction.TYPING)
-            reply_data = await get_reply(message.text)
+            reply_data = await get_reply(message)
 
             if reply_data:
                 response_text = reply_data["text"]
