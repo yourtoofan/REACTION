@@ -223,13 +223,13 @@ async def save_reply(original_message: Message, reply_message: Message):
             is_chat = await storeai.find_one({
                 "word": original_message.text,
                 "text": translated_text,
-                "check": "text",
+                "check": "none",
             })
             if not is_chat:
                 await storeai.insert_one({
                     "word": original_message.text,
                     "text": translated_text,
-                    "check": "text",
+                    "check": "none",
                 })
                 print(f"new reply saved:- word:- {word}\nReply:- {text}")
 
