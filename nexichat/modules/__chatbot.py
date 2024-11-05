@@ -239,15 +239,15 @@ async def save_reply(original_message: Message, reply_message: Message):
 async def get_reply(message_text):
     global replies_cache
     
-    for cached_reply in replies_cache:
-        if cached_reply["word"] == message_text:
-            return cached_reply
+    for reply_data in replies_cache:
+        if reply_data["word"] == message_text:
+            return reply_data["text"]
     
     try:
         reply_data = await chatai.find_one({"word": message_text})
         if reply_data:
             await load_replies_cache()
-            return reply_data
+            return reply_data["text"]
         else:
             return None
     except Exception as e:
