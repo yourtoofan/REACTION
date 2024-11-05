@@ -37,86 +37,7 @@ async def get_chat_language(chat_id):
         print(f"Error in get_chat_language: {e}")
         return "en"
 
-@nexichat.on_message(filters.incoming)
-async def chatbot_response(client: Client, message: Message):
-    global blocklist, message_counts
-    try:
-        user_id = message.from_user.id
-        chat_id = message.chat.id
-        current_time = datetime.now()
-        
-        blocklist = {uid: time for uid, time in blocklist.items() if time > current_time}
-
-        if user_id in blocklist:
-            return
-
-        if user_id not in message_counts:
-            message_counts[user_id] = {"count": 1, "last_time": current_time}
-        else:
-            time_diff = (current_time - message_counts[user_id]["last_time"]).total_seconds()
-            if time_diff <= 3:
-                message_counts[user_id]["count"] += 1
-            else:
-                message_counts[user_id] = {"count": 1, "last_time": current_time}
             
-            if message_counts[user_id]["count"] >= 4:
-                blocklist[user_id] = current_time + timedelta(minutes=1)
-                message_counts.pop(user_id, None)
-                await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You are blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
-                return
-                
-        chat_id = message.chat.id
-        chat_status = await status_db.find_one({"chat_id": chat_id})
-        
-        if chat_status and chat_status.get("status") == "disabled":
-            return
-
-        if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
-            if message.chat.type in ["group", "supergroup"]:
-                return await add_served_chat(chat_id)
-            else:
-                return await add_served_user(chat_id)
-        
-        if (message.reply_to_message and message.reply_to_message.from_user.id == nexichat.id) or not message.reply_to_message:
-            reply_data = await get_reply(message)
-            if reply_data:
-                response_text, reply_type = reply_data
-        
-                try:
-                    if reply_type == "sticker":
-                        await message.reply_sticker(response_text)
-                    elif reply_type == "photo":
-                        await message.reply_photo(response_text)
-                    elif reply_type == "video":
-                        await message.reply_video(response_text)
-                    elif reply_type == "audio":
-                        await message.reply_audio(response_text)
-                    elif reply_type == "gif":
-                        await message.reply_animation(response_text)
-                    elif reply_type == "voice":
-                        await message.reply_voice(response_text)
-                    elif reply_type == "text":
-                        chat_lang = await get_chat_language(chat_id)
-                        if chat_lang and chat_lang != "nolang":
-                            translated_text = GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
-                        else:
-                            translated_text = response_text
-                        await message.reply_text(translated_text)
-
-                except Exception as e:
-                    print(f"Error while replying: {e}")
-                    
-        
-        if message.reply_to_message:
-            await save_reply(message.reply_to_message, message)
-            
-        if message.text:
-            await save_text(message)
-
-
-    except Exception as vip:
-        return await message.reply_text("🙄🙄")
-        
 async def save_text(original_message: Message):
     global replies_cache
     try:
@@ -202,6 +123,10 @@ async def chatbot_response(client: Client, message: Message):
         
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
+
+        if message.text:
+            await save_text(message)
+
     except MessageEmpty as e:
         return await message.reply_text("🙄🙄")
     except Exception as e:
@@ -248,6 +173,19 @@ async def save_reply(original_message: Message, reply_message: Message):
                     "check": "video",
                 })
 
+        elif reply_message.voice:
+            is_chat = await storeai.find_one({
+                "word": original_message.text,
+                "text": reply_message.voice.file_id,
+                "check": "voice",
+            })
+            if not is_chat:
+                await storeai.insert_one({
+                    "word": original_message.text,
+                    "text": reply_message.voice.file_id,
+                    "check": "voice",
+                })
+
         elif reply_message.audio:
             is_chat = await storeai.find_one({
                 "word": original_message.text,
@@ -292,9 +230,9 @@ async def save_reply(original_message: Message, reply_message: Message):
 
 async def get_reply(word: str):
     try:
-        is_chat = await chatai.find({"word": word}).to_list(length=None)
+        is_chat = await storeai.find({"word": word}).to_list(length=None)
         if not is_chat:
-            is_chat = await chatai.find().to_list(length=None)
+            is_chat = await storeai.find().to_list(length=None)
         return random.choice(is_chat) if is_chat else None
     except Exception as e:
         print(f"Error in get_reply: {e}")
