@@ -228,12 +228,20 @@ async def save_reply(original_message: Message, reply_message: Message):
     except Exception as e:
         print(f"Error in save_reply: {e}")
 
-async def get_reply(word: str):
+async def get_reply(message_text):
+    global replies_cache
+    
+    for cached_reply in replies_cache:
+        if cached_reply["word"] == message_text:
+            return cached_reply
+    
     try:
-        is_chat = await storeai.find({"word": word}).to_list(length=None)
-        if not is_chat:
-            is_chat = await storeai.find().to_list(length=None)
-        return random.choice(is_chat) if is_chat else None
+        reply_data = await chatai.find_one({"word": message_text})
+        if reply_data:
+            await load_replies_cache()
+            return reply_data
+        else:
+            return None
     except Exception as e:
         print(f"Error in get_reply: {e}")
         return None
