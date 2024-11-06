@@ -104,7 +104,7 @@ async def chatbot_response(client: Client, message: Message):
                     await message.reply_animation(reply_data["text"]) 
                 elif reply_data["check"] == "text":
                     await message.reply_text(translated_text)
-                elif
+                else:
                     await message.reply_text(translated_text)
             else:
                 await message.reply_text("**I don't understand. what are you saying??**")
