@@ -222,18 +222,25 @@ async def save_reply(original_message: Message, reply_message: Message):
                 })
 
         elif reply_message.text:
-            is_chat = await chatai.find_one({
+            translated_text = reply_message.text
+            try:
+                translated_text = GoogleTranslator(source='auto', target='en').translate(reply_message.text)
+            except Exception as e:
+                print(f"Translation error: {e}, saving original text.")
+                translated_text = reply_message.text
+            is_chat = await storeai.find_one({
                 "word": original_message.text,
-                "text": reply_message.text,
+                "text": translated_text,
                 "check": "text",
             })
             if not is_chat:
-                await chatai.insert_one({
+                await storeai.insert_one({
                     "word": original_message.text,
-                    "text": reply_message.text,
+                    "text": translated_text,
                     "check": "text",
                 })
-
+                print(f"saved reply for '{original_message.text}' == '{translated_text}'")
+                
     except Exception as e:
         print(f"Error in save_reply: {e}")
 
