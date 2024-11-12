@@ -8,13 +8,14 @@ from pyrogram.types import BotCommand
 from config import OWNER_ID
 from nexichat import LOGGER, nexichat
 from nexichat.modules import ALL_MODULES
-
+from nexichat.modules.Clone import restart_bots
 async def anony_boot():
     try:
         await nexichat.start()
+        await restart_bots()
     except Exception as ex:
         LOGGER.error(ex)
-        sys.exit(1)
+        
 
     for all_module in ALL_MODULES:
         importlib.import_module("nexichat.modules." + all_module)
