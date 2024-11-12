@@ -91,7 +91,7 @@ async def clone_txt(client, message):
             }
 
             await app.send_message(
-                int(OWNER_ID), f"**#New_Clones**\n\n**Bot:- @{bot.username}**\n**Details:-**\n{details}"
+                int(OWNER_ID), f"**#New_Clones**\n\n**Bot:- @{bot.username}**\n\n**Details:-**\n{details}"
             )
             
             clonebotdb.insert_one(details)
@@ -102,7 +102,7 @@ async def clone_txt(client, message):
         except BaseException as e:
             logging.exception("**Error while cloning bot.**")
             await mi.edit_text(
-                f"⚠️ <b>Error:</b>\n\n<code>{e}</code>\n\n**Kindly forward this message to @vk_zone to get assistance**"
+                f"⚠️ <b>Error:</b>\n\n<code>{e}</code>\n\n**Kindly forward this message to @THE_VIP_BOY_OP to get assistance**"
             )
     else:
         await message.reply_text(
