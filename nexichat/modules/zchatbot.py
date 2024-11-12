@@ -27,75 +27,11 @@ from nexichat import nexichat as shizuchat
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 
-@shizuchat.on_message(filters.command("status"))
-async def status_command(client: Client, message: Message):
-    chat_id = message.chat.id
+replies_cache = []
+new_replies_cache = []
 
-    # Retrieve the status for the given chat_id
-    chat_status = await status_db.find_one({"chat_id": chat_id})
-
-    # Check if a status was found
-    if chat_status:
-        current_status = chat_status.get("status", "not found")
-        await message.reply(f"Chatbot status for this chat: **{current_status}**")
-    else:
-        await message.reply("No status found for this chat.")
-
-# Example usage of Client
-
-languages = {
-    # Top 20 languages used on Telegram
-    'english': 'en', 'hindi': 'hi', 'Myanmar': 'my', 'russian': 'ru', 'spanish': 'es', 
-    'arabic': 'ar', 'turkish': 'tr', 'german': 'de', 'french': 'fr', 
-    'italian': 'it', 'persian': 'fa', 'indonesian': 'id', 'portuguese': 'pt',
-    'ukrainian': 'uk', 'filipino': 'tl', 'korean': 'ko', 'japanese': 'ja', 
-    'polish': 'pl', 'vietnamese': 'vi', 'thai': 'th', 'dutch': 'nl',
-
-    # Top languages spoken in Bihar
-    'bhojpuri': 'bho', 'maithili': 'mai', 'urdu': 'ur', 
-    'bengali': 'bn', 'angika': 'anp', 'sanskrit': 'sa', 
-    'oriya': 'or', 'nepali': 'ne', 'santhali': 'sat', 'khortha': 'kht', 
-    'kurmali': 'kyu', 'ho': 'hoc', 'munda': 'unr', 'kharwar': 'kqw', 
-    'mundari': 'unr', 'sadri': 'sck', 'pali': 'pi', 'tamil': 'ta',
-
-    # Top languages spoken in India
-    'telugu': 'te', 'bengali': 'bn', 'marathi': 'mr', 'tamil': 'ta', 
-    'gujarati': 'gu', 'urdu': 'ur', 'kannada': 'kn', 'malayalam': 'ml', 
-    'odia': 'or', 'punjabi': 'pa', 'assamese': 'as', 'sanskrit': 'sa', 
-    'kashmiri': 'ks', 'konkani': 'gom', 'sindhi': 'sd', 'bodo': 'brx', 
-    'dogri': 'doi', 'santali': 'sat', 'meitei': 'mni', 'nepali': 'ne',
-
-    # Other language
-    'afrikaans': 'af', 'albanian': 'sq', 'amharic': 'am', 'armenian': 'hy', 
-    'aymara': 'ay', 'azerbaijani': 'az', 'bambara': 'bm', 
-    'basque': 'eu', 'belarusian': 'be', 'bosnian': 'bs', 'bulgarian': 'bg', 
-    'catalan': 'ca', 'cebuano': 'ceb', 'chichewa': 'ny', 
-    'chinese (simplified)': 'zh-CN', 'chinese (traditional)': 'zh-TW', 
-    'corsican': 'co', 'croatian': 'hr', 'czech': 'cs', 'danish': 'da', 
-    'dhivehi': 'dv', 'esperanto': 'eo', 'estonian': 'et', 'ewe': 'ee', 
-    'finnish': 'fi', 'frisian': 'fy', 'galician': 'gl', 'georgian': 'ka', 
-    'greek': 'el', 'guarani': 'gn', 'haitian creole': 'ht', 'hausa': 'ha', 
-    'hawaiian': 'haw', 'hebrew': 'iw', 'hmong': 'hmn', 'hungarian': 'hu', 
-    'icelandic': 'is', 'igbo': 'ig', 'ilocano': 'ilo', 'irish': 'ga', 
-    'javanese': 'jw', 'kazakh': 'kk', 'khmer': 'km', 'kinyarwanda': 'rw', 
-    'krio': 'kri', 'kurdish (kurmanji)': 'ku', 'kurdish (sorani)': 'ckb', 
-    'kyrgyz': 'ky', 'lao': 'lo', 'latin': 'la', 'latvian': 'lv', 
-    'lingala': 'ln', 'lithuanian': 'lt', 'luganda': 'lg', 'luxembourgish': 'lb', 
-    'macedonian': 'mk', 'malagasy': 'mg', 'maltese': 'mt', 'maori': 'mi', 
-    'mizo': 'lus', 'mongolian': 'mn', 'myanmar': 'my', 'norwegian': 'no', 
-    'oromo': 'om', 'pashto': 'ps', 'quechua': 'qu', 'romanian': 'ro', 
-    'samoan': 'sm', 'scots gaelic': 'gd', 'sepedi': 'nso', 'serbian': 'sr', 
-    'sesotho': 'st', 'shona': 'sn', 'sinhala': 'si', 'slovak': 'sk', 
-    'slovenian': 'sl', 'somali': 'so', 'sundanese': 'su', 'swahili': 'sw', 
-    'swedish': 'sv', 'tajik': 'tg', 'tatar': 'tt', 'tigrinya': 'ti', 
-    'tsonga': 'ts', 'turkmen': 'tk', 'twi': 'ak', 'uyghur': 'ug', 
-    'uzbek': 'uz', 'welsh': 'cy', 'xhosa': 'xh', 'yiddish': 'yi', 
-    'yoruba': 'yo', 'zulu': 'zu'
-}
-
-
-
-
+blocklist = {}
+message_counts = {}
 
 
 async def get_chat_language(chat_id):
@@ -104,23 +40,6 @@ async def get_chat_language(chat_id):
     return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
     
 
-
-
-
-
-
-
-
-
-
-
-
-@shizuchat.on_message(filters.command("chatbot"))
-async def chatbot_command(client: Client, message: Message):
-    await message.reply_text(
-        f"Chat: {message.chat.title}\n**Choose an option to enable/disable the chatbot.**",
-        reply_markup=InlineKeyboardMarkup(CHATBOT_ON),
-    )
 
 '''
 @shizuchat.on_callback_query()
@@ -255,7 +174,31 @@ async def cb_handler(client: Client, query: CallbackQuery):
         
 @shizuchat.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
+    global blocklist, message_counts
     try:
+        user_id = message.from_user.id
+        chat_id = message.chat.id
+        current_time = datetime.now()
+        
+        blocklist = {uid: time for uid, time in blocklist.items() if time > current_time}
+
+        if user_id in blocklist:
+            return
+
+        if user_id not in message_counts:
+            message_counts[user_id] = {"count": 1, "last_time": current_time}
+        else:
+            time_diff = (current_time - message_counts[user_id]["last_time"]).total_seconds()
+            if time_diff <= 3:
+                message_counts[user_id]["count"] += 1
+            else:
+                message_counts[user_id] = {"count": 1, "last_time": current_time}
+            
+            if message_counts[user_id]["count"] >= 4:
+                blocklist[user_id] = current_time + timedelta(minutes=1)
+                message_counts.pop(user_id, None)
+                await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You are blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
+                return
         chat_id = message.chat.id
         chat_status = await status_db.find_one({"chat_id": chat_id})
         
@@ -371,7 +314,13 @@ async def save_reply(original_message: Message, reply_message: Message):
                 })
 
         elif reply_message.text:
-            is_chat = await chatai.find_one({
+            translated_text = reply_message.text
+            try:
+                translated_text = GoogleTranslator(source='auto', target='en').translate(reply_message.text)
+            except Exception as e:
+                print(f"Translation error: {e}, saving original text.")
+                translated_text = reply_message.text
+            is_chat = await storeai.find_one({
                 "word": original_message.text,
                 "text": reply_message.text,
                 "check": "none",
