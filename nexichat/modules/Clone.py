@@ -6,7 +6,7 @@ from pyrogram.errors.exceptions.bad_request_400 import (
     AccessTokenExpired,
     AccessTokenInvalid,
 )
-
+import config
 from config import API_HASH, API_ID, OWNER_ID
 from nexichat import nexichat as app
 
@@ -51,11 +51,14 @@ async def clone_txt(client, message):
         mi = await message.reply_text("Please wait while I checking the bot token.")
         try:
             ai = Client(
+                name="nexichat",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                lang_code="en",
                 bot_token,
-                API_ID,
-                API_HASH,
-                bot_token=bot_token,
-                plugins=dict(root="nexichat.modules"),
+                in_memory=True,
+                parse_mode=ParseMode.DEFAULT,
+        
             )
             await ai.start()
             bot = await ai.get_me()
@@ -162,11 +165,14 @@ async def restart_bots():
         async for bot in bots:
             bot_token = bot["token"]
             ai = Client(
-                f"{bot_token}",
-                API_ID,
-                API_HASH,
-                bot_token=bot_token,
-                plugins=dict(root="nexichat.modules"),
+                name="nexichat",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                lang_code="en",
+                bot_token,
+                in_memory=True,
+                parse_mode=ParseMode.DEFAULT,
+        
             )
             await ai.start()
             bot = await ai.get_me()
