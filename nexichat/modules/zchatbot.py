@@ -102,6 +102,8 @@ async def chatbot_response(client: Client, message: Message):
                     await message.reply_video(reply_data["text"])
                 elif reply_data["check"] == "audio":
                     await message.reply_audio(reply_data["text"])
+                elif reply_data["check"] == "voice":
+                    await message.reply_voice(reply_data["text"])
                 elif reply_data["check"] == "gif":
                     await message.reply_animation(reply_data["text"]) 
                 else:
@@ -176,6 +178,13 @@ async def save_reply(original_message: Message, reply_message: Message):
                 "word": original_message.text,
                 "text": reply_message.audio.file_id,
                 "check": "audio",
+            }
+
+        elif reply_message.voice:
+            new_reply = {
+                "word": original_message.text,
+                "text": reply_message.voice.file_id,
+                "check": "voice",
             }
 
         elif reply_message.animation:
