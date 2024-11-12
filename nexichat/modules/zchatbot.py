@@ -195,13 +195,16 @@ async def save_reply(original_message: Message, reply_message: Message):
                 "text": reply_message.text,
                 "check": "none",
             })
-            if not is_chat:
+            if is_chat:
+                print(f"Replies Found:- {is_chat}")
+            else:
                 await chatai.insert_one({
                     "word": original_message.text,
                     "text": reply_message.text,
                     "check": "none",
                 })
-
+                print(f"Replies saved:- {is_chat}")
+             
     except Exception as e:
         print(f"Error in save_reply: {e}")
 
