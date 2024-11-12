@@ -172,10 +172,12 @@ async def restart_bots():
             )
             
             await ai.start()
-            bot_instance = await ai.get_me()  # Renaming to avoid overwriting bot in loop
-            if bot_instance.id not in CLONES:
-                CLONES.add(bot_instance.id)
-                
+            bot = await ai.get_me()
+            if bot.id not in CLONES:
+                try:
+                    CLONES.add(bot.id)
+                except Exception:
+                    pass
     except Exception as e:
         logging.exception("Error while restarting bots.")
 
