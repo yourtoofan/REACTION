@@ -50,7 +50,7 @@ async def clone_txt(client, message):
     if len(message.command) > 1:
         bot_token = message.text.split("/clone", 1)[1].strip()
         mi = await message.reply_text("Please wait while I check the bot token.")
-        bot = None  # Initialize `bot` here
+        #bot = None  # Initialize `bot` here
         
         try:
             ai = Client(
@@ -58,7 +58,7 @@ async def clone_txt(client, message):
                 API_ID,
                 API_HASH,
                 bot_token=bot_token,
-                plugins=dict(root="nexichat/modules"),
+                plugins=dict(root="nexichat/plugin"),
             )
             
             await ai.start()
@@ -77,11 +77,11 @@ async def clone_txt(client, message):
             if cloned_bot:
                 await mi.edit_text("**🤖 Your bot is already cloned ✅**")
                 return
-
+'''
         if bot is None:
             await mi.edit_text("**Failed to retrieve bot information.**")
             return
-
+'''
         # Proceed with the cloning process
         await mi.edit_text(
             "**Cloning process started. Please wait for the bot to start.**"
@@ -171,7 +171,7 @@ async def restart_bots():
                 API_ID,
                 API_HASH,
                 bot_token=bot_token,
-                plugins=dict(root="nexichat/modules"),
+                plugins=dict(root="nexichat/plugin"),
             )
             
             await ai.start()
