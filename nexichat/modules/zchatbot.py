@@ -190,7 +190,7 @@ async def save_reply(original_message: Message, reply_message: Message):
             except Exception as e:
                 print(f"Translation error: {e}, saving original text.")
                 translated_text = reply_message.text
-            is_chat = await storeai.find_one({
+            is_chat = await chatai.find_one({
                 "word": original_message.text,
                 "text": reply_message.text,
                 "check": "none",
