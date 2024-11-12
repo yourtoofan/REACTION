@@ -112,7 +112,7 @@ async def welcomejej(client, message: Message):
             if member.id == client.id:
                 try:
                     reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
-                    await message.reply_photo(photo=random.choice(IMG), caption=START.format(chat.mention or "can't mention", users, chats), reply_markup=reply_markup)
+                    await message.reply_photo(photo=random.choice(IMG), caption=START.format(m.chat.first_name or "can't mention", users, chats), reply_markup=reply_markup)
                     
                 except Exception as e:
                     print(f"{e}")
@@ -317,7 +317,7 @@ async def start(client: Client, m: Message):
         users = len(await get_served_users())
         chats = len(await get_served_chats())
         UP, CPU, RAM, DISK = await bot_sys_stats()
-        await m.reply_photo(photo=chat_photo, caption=START.format(chat.mention or "can't mention", users, chats, UP), reply_markup=InlineKeyboardMarkup(START_BOT))
+        await m.reply_photo(photo=chat_photo, caption=START.format(m.chat.first_name or "can't mention", users, chats, UP), reply_markup=InlineKeyboardMarkup(START_BOT))
         await add_served_user(m.chat.id)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(f"{m.chat.first_name}", user_id=m.chat.id)]])
         await client.send_photo(int(OWNER_ID), photo=chat_photo, caption=f"{m.from_user.mention} ʜᴀs sᴛᴀʀᴛᴇᴅ ʙᴏᴛ. \n\n**ɴᴀᴍᴇ :** {m.chat.first_name}\n**ᴜsᴇʀɴᴀᴍᴇ :** @{m.chat.username}\n**ɪᴅ :** {m.chat.id}\n\n**ᴛᴏᴛᴀʟ ᴜsᴇʀs :** {users}", reply_markup=keyboard)
