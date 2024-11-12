@@ -56,7 +56,7 @@ async def clone_txt(client, message):
                 API_ID,
                 API_HASH,
                 bot_token=bot_token,
-                plugins=dict(root="nexichat.cplugin"),
+                plugins=dict(root="nexichat.mplugin"),
             )
             
             await ai.start()
@@ -166,7 +166,7 @@ async def restart_bots():
                 API_ID,
                 API_HASH,
                 bot_token=bot_token,
-                plugins=dict(root="nexichat.cplugin"),
+                plugins=dict(root="nexichat.mplugin"),
             )
             
             await ai.start()
