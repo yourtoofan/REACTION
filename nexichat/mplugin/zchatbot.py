@@ -1,6 +1,6 @@
 import random
 from pymongo import MongoClient
-from pyrogram import Client as shizuchat
+from pyrogram import Client 
 from pyrogram import filters
 from pyrogram.errors import MessageEmpty
 from pyrogram.enums import ChatAction
@@ -42,7 +42,7 @@ async def get_chat_language(chat_id):
 
 
         
-@shizuchat.on_message(filters.incoming)
+@Client.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     global blocklist, message_counts
     try:
@@ -81,7 +81,7 @@ async def chatbot_response(client: Client, message: Message):
             else:
                 return await add_served_user(message.chat.id)
         
-        if (message.reply_to_message and message.reply_to_message.from_user.id == shizuchat.id) or not message.reply_to_message:
+        if (message.reply_to_message and message.reply_to_message.from_user.id == client.id) or not message.reply_to_message:
             
             reply_data = await get_reply(message.text)
 
