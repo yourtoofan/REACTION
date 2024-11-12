@@ -28,6 +28,7 @@ async def anony_boot():
             commands=[
                 BotCommand("start", "Start the bot"),
                 BotCommand("help", "Get the help menu"),
+                BotCommand("clone", "Make your own chatbot"),
                 BotCommand("ping", "Check if the bot is alive or dead"),
                 BotCommand("lang", "Select bot reply language"),
                 BotCommand("resetlang", "Reset to default bot reply lang"),
