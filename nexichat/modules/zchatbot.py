@@ -18,25 +18,6 @@ from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
 import asyncio
 import config
 from nexichat import LOGGER
-from nexichat.modules.helpers import (
-    ABOUT_BTN,
-    ABOUT_READ,
-    OWNER,
-    ADMIN_READ,
-    ADMIN_READ2,
-    BACK,
-    NEXT,
-    CHATBOT_BACK,
-    CHATBOT_READ,
-    DEV_OP,
-    HELP_BTN,
-    HELP_READ,
-    MUSIC_BACK_BTN,
-    SOURCE_READ,
-    START,
-    TOOLS_DATA_READ,
-    AIBOT_READ,
-)
 
 translator = GoogleTranslator()  
 from nexichat import db
@@ -114,72 +95,24 @@ languages = {
 
 
 
-def generate_language_buttons(languages):
-    buttons = []
-    current_row = []
-    for lang, code in languages.items():
-        current_row.append(InlineKeyboardButton(lang.capitalize(), callback_data=f'setlang_{code}'))
-        if len(current_row) == 4:
-            buttons.append(current_row)
-            current_row = []
-    if current_row:
-        buttons.append(current_row)
-    return InlineKeyboardMarkup(buttons)
+
+
 
 async def get_chat_language(chat_id):
     # Await the async call to find_one
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
     
-@shizuchat.on_message(filters.command(["lang", "language", "setlang"]))
-async def set_language(client: Client, message: Message):
-    await message.reply_text(
-        "Please select your chat language:",
-        reply_markup=generate_language_buttons(languages)
-    )
-
-
-@shizuchat.on_callback_query(filters.regex(r"setlang_"))
-async def language_selection_callback(client: Client, callback_query: CallbackQuery):
-    lang_code = callback_query.data.split("_")[1]
-    chat_id = callback_query.message.chat.id
-    if lang_code in languages.values():
-        lang_db.update_one({"chat_id": chat_id}, {"$set": {"language": lang_code}}, upsert=True)
-        await callback_query.answer(f"Your chat language has been set to {lang_code.title()}.", show_alert=True)
-        await callback_query.message.edit_text(f"Chat language has been set to {lang_code.title()}.")
-    else:
-        await callback_query.answer("Invalid language selection.", show_alert=True)
 
 
 
-@shizuchat.on_message(filters.command("status"))
-async def status_command(client: Client, message: Message):
-    chat_id = message.chat.id
-
-    # Retrieve the status for the given chat_id
-    chat_status = await status_db.find_one({"chat_id": chat_id})
-
-    # Check if a status was found
-    if chat_status:
-        current_status = chat_status.get("status", "not found")
-        await message.reply(f"Chatbot status for this chat: **{current_status}**")
-    else:
-        await message.reply("No status found for this chat.")
 
 
-@shizuchat.on_message(filters.command(["lang", "language", "setlang"]))
-async def set_language(client: Client, message: Message):
-    await message.reply_text(
-        "Please select your chat language:",
-        reply_markup=generate_language_buttons(languages)
-    )
 
 
-@shizuchat.on_message(filters.command(["resetlang", "nolang"]))
-async def reset_language(client: Client, message: Message):
-    chat_id = message.chat.id
-    lang_db.update_one({"chat_id": chat_id}, {"$set": {"language": "nolang"}}, upsert=True)
-    await message.reply_text("**Bot language has been reset in this chat to mix language.**")
+
+
+
 
 
 @shizuchat.on_message(filters.command("chatbot"))
@@ -189,6 +122,7 @@ async def chatbot_command(client: Client, message: Message):
         reply_markup=InlineKeyboardMarkup(CHATBOT_ON),
     )
 
+'''
 @shizuchat.on_callback_query()
 async def cb_handler(client: Client, query: CallbackQuery):
     LOGGER.info(query.data)
@@ -316,7 +250,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             reply_markup=generate_language_buttons(languages)
         )
 
-
+'''
 
         
 @shizuchat.on_message(filters.incoming)
