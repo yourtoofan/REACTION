@@ -1,6 +1,6 @@
 import random
 from nexichat.database import get_served_chats
-from pyrogram import Client as nexichat
+from pyrogram import Client
 from pyrogram import filters
 import os
 from nexichat import nexichat
@@ -65,7 +65,7 @@ morning_shayari = [ "🌅 ɢᴏᴏᴅ ᴍᴏʀɴɪɴɢ! ᴍᴀʏ ʏᴏᴜʀ ᴅ�
 SHAYRI_COMMAND = ["gf", "bf", "shayri", "sari", "shari", "love"]
 
 
-@nexichat.on_message(filters.command(SHAYRI_COMMAND))
+@Client.on_message(filters.command(SHAYRI_COMMAND))
 async def shayri(client: Client, message: Message):
     await message.reply_text(
         text=random.choice(SHAYRI),
@@ -107,7 +107,7 @@ async def send_good_night():
     for chat_id in chats:
         try:
             shayari = random.choice(night_shayari)
-            await nexichat.send_photo(
+            await client.send_photo(
                 chat_id,
                 photo="https://telegra.ph//file/06649d4d0bbf4285238ee.jpg",
                 caption=f"**{shayari}**",
@@ -126,7 +126,7 @@ async def send_good_morning():
     for chat_id in chats:
         try:
             shayari = random.choice(morning_shayari)
-            await nexichat.send_photo(
+            await client.send_photo(
                 chat_id,
                 photo="https://telegra.ph//file/14ec9c3ff42b59867040a.jpg",
                 caption=f"**{shayari}**",
