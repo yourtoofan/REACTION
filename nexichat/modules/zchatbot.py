@@ -200,7 +200,7 @@ async def chatbot_response(client: Client, message: Message):
         
         chat_lang = await get_chat_language(chat_id)
         message_text = message.text
-        if not chat_lang and message.text:
+        if not chat_lang and message_text:
             await collect_and_detect_language(chat_id, message_text)
             chat_lang = await get_chat_language(chat_id)
 
