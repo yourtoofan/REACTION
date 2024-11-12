@@ -179,7 +179,7 @@ async def restart_bots():
         logging.exception("Error while restarting bots.")
 
 
-@app.on_message(filters.command("cloned") & SUDOERS)
+@app.on_message(filters.command("cloned"))
 async def list_cloned_bots(client, message):
     try:
         cloned_bots = clonebotdb.find()
@@ -203,7 +203,7 @@ async def list_cloned_bots(client, message):
         await message.reply_text("**An error occurred while listing cloned bots.**")
 
 
-@app.on_message(filters.command("delallclone") & SUDOERS)
+@app.on_message(filters.command("delallclone") & filters.user(int(OWNER_ID)))
 async def delete_all_cloned_bots(client, message):
     try:
         a = await message.reply_text("**Deleting all cloned bots...**")
