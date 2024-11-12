@@ -176,8 +176,8 @@ import os
 import time
 import io
 
-@nexichat.on_cmd(["ls"])
-async def ls(_, m: Message):
+@Client.on_message(filters.command(["ls"]))
+async def ls(client: Client, m: Message):
     "To list all files and folders."
 
     cat = "".join(m.text.split(maxsplit=1)[1:])
