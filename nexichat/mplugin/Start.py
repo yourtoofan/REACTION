@@ -112,7 +112,7 @@ async def welcomejej(client, message: Message):
             if member.id == client.id:
                 try:
                     reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
-                    await message.reply_photo(photo=random.choice(IMG), caption=START.format(nexichat.mention or "can't mention", users, chats), reply_markup=reply_markup)
+                    await message.reply_photo(photo=random.choice(IMG), caption=START.format(client.mention or "can't mention", users, chats), reply_markup=reply_markup)
                     
                 except Exception as e:
                     print(f"{e}")
