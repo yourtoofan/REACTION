@@ -57,9 +57,9 @@ async def clone_txt(client, message):
                 lang_code="en",
                 bot_token,
                 in_memory=True,
-                parse_mode=ParseMode.DEFAULT,
+                parse_mode=ParseMode.DEFAULT)
         
-            )
+            
             await ai.start()
             bot = await ai.get_me()
             bot_users = await ai.get_users(bot.username)
@@ -171,9 +171,9 @@ async def restart_bots():
                 lang_code="en",
                 bot_token,
                 in_memory=True,
-                parse_mode=ParseMode.DEFAULT,
+                parse_mode=ParseMode.DEFAULT)
         
-            )
+            
             await ai.start()
             bot = await ai.get_me()
             if bot.id not in CLONES:
