@@ -40,46 +40,7 @@ async def get_chat_language(chat_id):
     return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
     
 
-from langdetect import detect
-from collections import Counter
 
-MIN_MESSAGES_FOR_LANGUAGE_DETECTION = 10
-chat_history = {}
-
-async def collect_and_detect_language(chat_id, message_text):
-    if chat_id not in chat_history:
-        chat_history[chat_id] = []
-
-    chat_history[chat_id].append(message_text)
-
-    if len(chat_history[chat_id]) >= MIN_MESSAGES_FOR_LANGUAGE_DETECTION:
-        detected_languages = []
-
-        for text in chat_history[chat_id]:
-            try:
-                detected_lang = detect(text)
-                detected_languages.append(detected_lang)
-            except Exception:
-                continue
-
-        if detected_languages:
-            most_common_lang = Counter(detected_languages).most_common(1)[0][0]
-
-            await lang_db.update_one(
-                {"chat_id": chat_id},
-                {"$set": {"language": most_common_lang}},
-                upsert=True
-            )
-
-            del chat_history[chat_id]
-
-            await shizuchat.send_message(chat_id, f"**Automatic language detection complete!**\nThe language for this group has been set to **{most_common_lang.upper()}**.")
-
-
-        
-
-
-'''      
         
 @shizuchat.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
@@ -157,89 +118,7 @@ async def chatbot_response(client: Client, message: Message):
         return await message.reply_text("🙄🙄")
     except Exception as e:
         return
-'''
 
-@shizuchat.on_message(filters.incoming)
-async def chatbot_response(client: Client, message: Message):
-    global blocklist, message_counts
-    try:
-        user_id = message.from_user.id
-        chat_id = message.chat.id
-        current_time = datetime.now()
-        
-        blocklist = {uid: time for uid, time in blocklist.items() if time > current_time}
-
-        if user_id in blocklist:
-            return
-
-        if user_id not in message_counts:
-            message_counts[user_id] = {"count": 1, "last_time": current_time}
-        else:
-            time_diff = (current_time - message_counts[user_id]["last_time"]).total_seconds()
-            if time_diff <= 3:
-                message_counts[user_id]["count"] += 1
-            else:
-                message_counts[user_id] = {"count": 1, "last_time": current_time}
-            
-            if message_counts[user_id]["count"] >= 4:
-                blocklist[user_id] = current_time + timedelta(minutes=1)
-                message_counts.pop(user_id, None)
-                await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You are blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
-                return
-        
-        chat_status = await status_db.find_one({"chat_id": chat_id})
-        
-        if chat_status and chat_status.get("status") == "disabled":
-            return
-
-        if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
-            if message.chat.type in ["group", "supergroup"]:
-                return await add_served_chat(message.chat.id)
-            else:
-                return await add_served_user(message.chat.id)
-        
-        chat_lang = await get_chat_language(chat_id)
-        message_text = message.text
-        if not chat_lang:
-            await collect_and_detect_language(chat_id, message_text)
-            chat_lang = await get_chat_language(chat_id)
-
-        if (message.reply_to_message and message.reply_to_message.from_user.id == shizuchat.id) or not message.reply_to_message:
-            reply_data = await get_reply(message.text)
-
-            if reply_data:
-                response_text = reply_data["text"]
-
-                if not chat_lang or chat_lang == "nolang":
-                    translated_text = response_text
-                else:
-                    translated_text = GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
-                
-                if reply_data["check"] == "sticker":
-                    await message.reply_sticker(reply_data["text"])
-                elif reply_data["check"] == "photo":
-                    await message.reply_photo(reply_data["text"])
-                elif reply_data["check"] == "video":
-                    await message.reply_video(reply_data["text"])
-                elif reply_data["check"] == "audio":
-                    await message.reply_audio(reply_data["text"])
-                elif reply_data["check"] == "voice":
-                    await message.reply_voice(reply_data["text"])
-                elif reply_data["check"] == "gif":
-                    await message.reply_animation(reply_data["text"]) 
-                else:
-                    await message.reply_text(translated_text)
-                    await client.send_chat_action(message.chat.id, ChatAction.TYPING)
-            else:
-                await message.reply_text("**I don't understand. what are you saying??**")
-        
-        if message.reply_to_message:
-            await save_reply(message.reply_to_message, message)
-    except MessageEmpty:
-        return await message.reply_text("🙄🙄")
-    except Exception as e:
-        print(f"Error: {e}")
-        return
 
 
 async def reload_cache():
