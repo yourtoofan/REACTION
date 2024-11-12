@@ -39,23 +39,31 @@ async def get_chat_language(chat_id):
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
     
+
 from langdetect import detect
 from collections import Counter
 
 MIN_MESSAGES_FOR_LANGUAGE_DETECTION = 10
-group_language_data = {}
+chat_history = {}
 
-async def detect_and_set_language(chat_id, message_text):
-    try:
-        detected_lang = detect(message_text)
+async def collect_and_detect_language(chat_id, message_text):
+    if chat_id not in chat_history:
+        chat_history[chat_id] = []
 
-        if chat_id not in group_language_data:
-            group_language_data[chat_id] = []
+    chat_history[chat_id].append(message_text)
 
-        group_language_data[chat_id].append(detected_lang)
+    if len(chat_history[chat_id]) >= MIN_MESSAGES_FOR_LANGUAGE_DETECTION:
+        detected_languages = []
 
-        if len(group_language_data[chat_id]) >= MIN_MESSAGES_FOR_LANGUAGE_DETECTION:
-            most_common_lang = Counter(group_language_data[chat_id]).most_common(1)[0][0]
+        for text in chat_history[chat_id]:
+            try:
+                detected_lang = detect(text)
+                detected_languages.append(detected_lang)
+            except Exception:
+                continue
+
+        if detected_languages:
+            most_common_lang = Counter(detected_languages).most_common(1)[0][0]
 
             await lang_db.update_one(
                 {"chat_id": chat_id},
@@ -63,13 +71,12 @@ async def detect_and_set_language(chat_id, message_text):
                 upsert=True
             )
 
-            del group_language_data[chat_id]
-            print(f"Language set to {most_common_lang} for chat_id {chat_id}")
+            del chat_history[chat_id]
+
             await shizuchat.send_message(chat_id, f"**Automatic language detection complete!**\nThe language for this group has been set to **{most_common_lang.upper()}**.")
 
 
-    except Exception as e:
-        print(f"Error in language detection: {e}")
+        
 
 
 '''      
@@ -193,7 +200,7 @@ async def chatbot_response(client: Client, message: Message):
         
         chat_lang = await get_chat_language(chat_id)
         if not chat_lang and message.text:
-            await detect_and_set_language(chat_id, message.text)
+            await collect_and_detect_language(chat_id, message.text)
             chat_lang = await get_chat_language(chat_id)
 
         if (message.reply_to_message and message.reply_to_message.from_user.id == shizuchat.id) or not message.reply_to_message:
