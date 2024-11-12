@@ -70,7 +70,7 @@ async def detect_and_set_language(chat_id, message_text):
     except Exception as e:
         print(f"Error in language detection: {e}")
 
-@shizuchat.on_message(filters.group & filters.incoming)
+@shizuchat.on_message(filters.incoming, group=1)
 async def on_group_message(client: Client, message: Message):
     chat_id = message.chat.id
     message_text = message.text
@@ -81,7 +81,7 @@ async def on_group_message(client: Client, message: Message):
             await detect_and_set_language(chat_id, message_text)
         
         
-@shizuchat.on_message(filters.incoming)
+@shizuchat.on_message(filters.incoming, group=0)
 async def chatbot_response(client: Client, message: Message):
     global blocklist, message_counts
     try:
