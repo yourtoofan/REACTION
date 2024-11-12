@@ -123,26 +123,22 @@ async def chatbot_response(client: Client, message: Message):
 async def reload_cache():
     global replies_cache
     try:
-        # Load all entries from the database into the cache
         replies_cache = await chatai.find().to_list(length=None)
+        print("Reloaded replies_cache")
     except Exception as e:
         print(f"Error in reload_cache: {e}")
 
 async def get_reply(word: str):
     try:
-        # First, check the cache for replies matching the word
         is_chat = [reply for reply in replies_cache if reply.get("word") == word]
 
-        # If no match found in the cache, reload it and search again
         if not is_chat:
             await reload_cache()
             is_chat = [reply for reply in replies_cache if reply.get("word") == word]
-
-        # If still not found, return a random reply from the cache
+         
         if not is_chat:
             return random.choice(replies_cache) if replies_cache else None
-
-        # Otherwise, return a random match for the word
+        print("Random reply sending.. ")
         return random.choice(is_chat)
     except Exception as e:
         print(f"Error in get_reply: {e}")
