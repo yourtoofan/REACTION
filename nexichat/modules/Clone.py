@@ -1,6 +1,7 @@
 import logging
 import os
 from pyrogram.enums import ParseMode
+
 from pyrogram import Client, filters
 from pyrogram.errors.exceptions.bad_request_400 import (
     AccessTokenExpired,
@@ -43,22 +44,21 @@ async def get_clonebot_username(bot_id):
 CLONES = set()
 
 
+
 @app.on_message(filters.command(["clone", "host", "deploy"]))
 async def clone_txt(client, message):
-    
     if len(message.command) > 1:
         bot_token = message.text.split("/clone", 1)[1].strip()
-        mi = await message.reply_text("Please wait while I checking the bot token.")
+        mi = await message.reply_text("Please wait while I check the bot token.")
         try:
             ai = Client(
                 name="nexichat",
                 api_id=config.API_ID,
                 api_hash=config.API_HASH,
-                lang_code="en",
-                bot_token,
+                bot_token=bot_token,  # Explicitly specify bot_token
                 in_memory=True,
-                parse_mode=ParseMode.DEFAULT)
-        
+                parse_mode=ParseMode.DEFAULT
+            )
             
             await ai.start()
             bot = await ai.get_me()
@@ -79,7 +79,7 @@ async def clone_txt(client, message):
 
         # Proceed with the cloning process
         await mi.edit_text(
-            "**Cloning process started. Please wait for the bot to be start.**"
+            "**Cloning process started. Please wait for the bot to start.**"
         )
         try:
             details = {
@@ -95,8 +95,6 @@ async def clone_txt(client, message):
                 int(OWNER_ID), f"**#New_Clones**\n\n**Bot:- @{bot.username}**\n**Details:-**\n{details}"
             )
             
-
-            
             clonebotdb.insert_one(details)
             CLONES.add(bot.id)
             await mi.edit_text(
@@ -105,13 +103,12 @@ async def clone_txt(client, message):
         except BaseException as e:
             logging.exception("**Error while cloning bot.**")
             await mi.edit_text(
-                f"⚠️ <b>ᴇʀʀᴏʀ:</b>\n\n<code>{e}</code>\n\n**ᴋɪɴᴅʟʏ ғᴏᴡᴀʀᴅ ᴛʜɪs ᴍᴇssᴀɢᴇ ᴛᴏ @vk_zone ᴛᴏ ɢᴇᴛ ᴀssɪsᴛᴀɴᴄᴇ**"
+                f"⚠️ <b>Error:</b>\n\n<code>{e}</code>\n\n**Kindly forward this message to @vk_zone to get assistance**"
             )
     else:
         await message.reply_text(
             "**Give Bot Token After /clone Command From @Botfather.**"
         )
-
 
 @app.on_message(
     filters.command(
