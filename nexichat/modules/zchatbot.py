@@ -18,7 +18,7 @@ from pyrogram.types import CallbackQuery, InlineKeyboardMarkup
 import asyncio
 import config
 from nexichat import LOGGER
-from shizuchat.modules.helpers import (
+from nexichat.modules.helpers import (
     ABOUT_BTN,
     ABOUT_READ,
     OWNER,
