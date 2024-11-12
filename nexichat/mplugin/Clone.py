@@ -90,8 +90,8 @@ async def clone_txt(client, message):
                 "username": bot.username,
             }
 
-            await client.send_message(
-                int(OWNER_ID), f"**#New_Clones**\n\n**Bot:- @{bot.username}**\n**Details:-**\n{details}"
+            await nexichat.send_message(
+                int(OWNER_ID), f"**#New_Clones**\n\n**Bot:- @{bot.username}**\n\n**Details:-**\n{details}"
             )
             
             clonebotdb.insert_one(details)
