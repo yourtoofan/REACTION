@@ -199,8 +199,9 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(message.chat.id)
         
         chat_lang = await get_chat_language(chat_id)
+        message_text = message.text
         if not chat_lang and message.text:
-            await collect_and_detect_language(chat_id, message.text)
+            await collect_and_detect_language(chat_id, message_text)
             chat_lang = await get_chat_language(chat_id)
 
         if (message.reply_to_message and message.reply_to_message.from_user.id == shizuchat.id) or not message.reply_to_message:
