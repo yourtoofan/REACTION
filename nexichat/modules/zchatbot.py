@@ -116,72 +116,74 @@ async def chatbot_response(client: Client, message: Message):
     except Exception as e:
         return
 
+
+
+async def reload_cache():
+    global replies_cache
+    try:
+        # Load all entries from the database into the cache
+        replies_cache = await chatai.find().to_list(length=None)
+    except Exception as e:
+        print(f"Error in reload_cache: {e}")
+
+async def get_reply(word: str):
+    try:
+        # First, check the cache for replies matching the word
+        is_chat = [reply for reply in replies_cache if reply.get("word") == word]
+
+        # If no match found in the cache, reload it and search again
+        if not is_chat:
+            await reload_cache()
+            is_chat = [reply for reply in replies_cache if reply.get("word") == word]
+
+        # If still not found, return a random reply from the cache
+        if not is_chat:
+            return random.choice(replies_cache) if replies_cache else None
+
+        # Otherwise, return a random match for the word
+        return random.choice(is_chat)
+    except Exception as e:
+        print(f"Error in get_reply: {e}")
+        return None
+
 async def save_reply(original_message: Message, reply_message: Message):
     try:
+        new_reply = None
+
         if reply_message.sticker:
-            is_chat = await chatai.find_one({
+            new_reply = {
                 "word": original_message.text,
                 "text": reply_message.sticker.file_id,
                 "check": "sticker",
-            })
-            if not is_chat:
-                await chatai.insert_one({
-                    "word": original_message.text,
-                    "text": reply_message.sticker.file_id,
-                    "check": "sticker",
-                })
+            }
 
         elif reply_message.photo:
-            is_chat = await chatai.find_one({
+            new_reply = {
                 "word": original_message.text,
                 "text": reply_message.photo.file_id,
                 "check": "photo",
-            })
-            if not is_chat:
-                await chatai.insert_one({
-                    "word": original_message.text,
-                    "text": reply_message.photo.file_id,
-                    "check": "photo",
-                })
+            }
 
         elif reply_message.video:
-            is_chat = await chatai.find_one({
+            new_reply = {
                 "word": original_message.text,
                 "text": reply_message.video.file_id,
                 "check": "video",
-            })
-            if not is_chat:
-                await chatai.insert_one({
-                    "word": original_message.text,
-                    "text": reply_message.video.file_id,
-                    "check": "video",
-                })
+            }
 
         elif reply_message.audio:
-            is_chat = await chatai.find_one({
+            new_reply = {
                 "word": original_message.text,
                 "text": reply_message.audio.file_id,
                 "check": "audio",
-            })
-            if not is_chat:
-                await chatai.insert_one({
-                    "word": original_message.text,
-                    "text": reply_message.audio.file_id,
-                    "check": "audio",
-                })
+            }
 
-        elif reply_message.animation:  
-            is_chat = await chatai.find_one({
+        elif reply_message.animation:
+            new_reply = {
                 "word": original_message.text,
                 "text": reply_message.animation.file_id,
                 "check": "gif",
-            })
-            if not is_chat:
-                await chatai.insert_one({
-                    "word": original_message.text,
-                    "text": reply_message.animation.file_id,
-                    "check": "gif",
-                })
+            }
 
         elif reply_message.text:
             translated_text = reply_message.text
@@ -190,30 +192,22 @@ async def save_reply(original_message: Message, reply_message: Message):
             except Exception as e:
                 print(f"Translation error: {e}, saving original text.")
                 translated_text = reply_message.text
-            is_chat = await chatai.find_one({
+
+            new_reply = {
                 "word": original_message.text,
-                "text": reply_message.text,
+                "text": translated_text,
                 "check": "none",
-            })
-            if is_chat:
-                print(f"Replies Found:- {original_message.text} == {reply_message.text}")
+            }
+
+        # Insert the reply into the database if it’s new
+        if new_reply:
+            is_chat = await chatai.find_one(new_reply)
+            if not is_chat:
+                await chatai.insert_one(new_reply)
+                replies_cache.append(new_reply)  # Add to cache after saving
+                print(f"Replies saved: {original_message.text} == {reply_message.text}")
             else:
-                await chatai.insert_one({
-                    "word": original_message.text,
-                    "text": reply_message.text,
-                    "check": "none",
-                })
-                print(f"Replies saved:- {original_message.text} == {reply_message.text}")
-             
+                print(f"Replies found: {original_message.text} == {reply_message.text}")
+
     except Exception as e:
         print(f"Error in save_reply: {e}")
-
-async def get_reply(word: str):
-    try:
-        is_chat = await chatai.find({"word": word}).to_list(length=None)
-        if not is_chat:
-            is_chat = await chatai.find().to_list(length=None)
-        return random.choice(is_chat) if is_chat else None
-    except Exception as e:
-        print(f"Error in get_reply: {e}")
-        return None
