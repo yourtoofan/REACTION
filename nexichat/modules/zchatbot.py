@@ -74,9 +74,11 @@ async def detect_and_set_language(chat_id, message_text):
 async def on_group_message(client: Client, message: Message):
     chat_id = message.chat.id
     message_text = message.text
+    chat_lang = await get_chat_language(chat_id)
 
-    if message_text:
-        await detect_and_set_language(chat_id, message_text)
+    if not chat_lang:
+        if message_text:
+            await detect_and_set_language(chat_id, message_text)
         
         
 @shizuchat.on_message(filters.incoming)
