@@ -250,8 +250,8 @@ async def ls(client: Client, m: Message):
         await m.reply_text(msg)
 
 
-@Client.on_cmd(["start", "aistart"])
-async def start(_, m: Message):
+@Client.on_message(filters.command(["start", "aistart"])
+async def start(client: Client, m: Message):
     users = len(await get_served_users())
     chats = len(await get_served_chats())
     if m.chat.type == ChatType.PRIVATE:
