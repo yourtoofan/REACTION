@@ -154,6 +154,7 @@ async def delete_cloned_bot(client, message):
         logging.exception(e)
 
 
+
 async def restart_bots():
     global CLONES
     try:
@@ -165,19 +166,16 @@ async def restart_bots():
                 name="nexichat",
                 api_id=config.API_ID,
                 api_hash=config.API_HASH,
-                lang_code="en",
-                bot_token,
+                bot_token=bot_token,  # Specify bot_token explicitly
                 in_memory=True,
-                parse_mode=ParseMode.DEFAULT)
-        
+                parse_mode=ParseMode.DEFAULT
+            )
             
             await ai.start()
-            bot = await ai.get_me()
-            if bot.id not in CLONES:
-                try:
-                    CLONES.add(bot.id)
-                except Exception:
-                    pass
+            bot_instance = await ai.get_me()  # Renaming to avoid overwriting bot in loop
+            if bot_instance.id not in CLONES:
+                CLONES.add(bot_instance.id)
+                
     except Exception as e:
         logging.exception("Error while restarting bots.")
 
