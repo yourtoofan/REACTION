@@ -50,6 +50,8 @@ async def clone_txt(client, message):
     if len(message.command) > 1:
         bot_token = message.text.split("/clone", 1)[1].strip()
         mi = await message.reply_text("Please wait while I check the bot token.")
+        bot = None  # Initialize `bot` here
+        
         try:
             ai = Client(
                 bot_token,
@@ -75,6 +77,10 @@ async def clone_txt(client, message):
             if cloned_bot:
                 await mi.edit_text("**🤖 Your bot is already cloned ✅**")
                 return
+
+        if bot is None:
+            await mi.edit_text("**Failed to retrieve bot information.**")
+            return
 
         # Proceed with the cloning process
         await mi.edit_text(
@@ -108,7 +114,6 @@ async def clone_txt(client, message):
         await message.reply_text(
             "**Give Bot Token After /clone Command From @Botfather.**"
         )
-
 @app.on_message(
     filters.command(
         [
