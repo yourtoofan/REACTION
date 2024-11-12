@@ -82,7 +82,7 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_user(message.chat.id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == shizuchat.id) or not message.reply_to_message:
-            await client.send_chat_action(message.chat.id, ChatAction.TYPING)
+            
             reply_data = await get_reply(message.text)
 
             if reply_data:
@@ -108,6 +108,7 @@ async def chatbot_response(client: Client, message: Message):
                     await message.reply_animation(reply_data["text"]) 
                 else:
                     await message.reply_text(translated_text)
+                    await client.send_chat_action(message.chat.id, ChatAction.TYPING)
             else:
                 await message.reply_text("**I don't understand. what are you saying??**")
         
