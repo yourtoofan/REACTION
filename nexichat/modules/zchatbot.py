@@ -39,8 +39,45 @@ async def get_chat_language(chat_id):
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
     
+from langdetect import detect
+from collections import Counter
 
+MIN_MESSAGES_FOR_LANGUAGE_DETECTION = 10
+group_language_data = {}
 
+async def detect_and_set_language(chat_id, message_text):
+    try:
+        detected_lang = detect(message_text)
+
+        if chat_id not in group_language_data:
+            group_language_data[chat_id] = []
+
+        group_language_data[chat_id].append(detected_lang)
+
+        if len(group_language_data[chat_id]) >= MIN_MESSAGES_FOR_LANGUAGE_DETECTION:
+            most_common_lang = Counter(group_language_data[chat_id]).most_common(1)[0][0]
+
+            await lang_db.update_one(
+                {"chat_id": chat_id},
+                {"$set": {"language": most_common_lang}},
+                upsert=True
+            )
+
+            del group_language_data[chat_id]
+            print(f"Language set to {most_common_lang} for chat_id {chat_id}")
+            await client.send_message(chat_id, f"Lang set for this chat:- {most_common_lang}")
+
+    except Exception as e:
+        print(f"Error in language detection: {e}")
+
+@shizuchat.on_message(filters.group & filters.incoming)
+async def on_group_message(client: Client, message: Message):
+    chat_id = message.chat.id
+    message_text = message.text
+
+    if message_text:
+        await detect_and_set_language(chat_id, message_text)
+        
         
 @shizuchat.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
