@@ -124,7 +124,7 @@ async def reload_cache():
     global replies_cache
     try:
         replies_cache = await chatai.find().to_list(length=None)
-        print("Reloaded replies_cache")
+        
     except Exception as e:
         print(f"Error in reload_cache: {e}")
 
