@@ -52,12 +52,11 @@ async def clone_txt(client, message):
         mi = await message.reply_text("Please wait while I check the bot token.")
         try:
             ai = Client(
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                bot_token=bot_token,  # Explicitly specify bot_token
-                in_memory=True,
-                parse_mode=ParseMode.DEFAULT,
-                plugins=dict(root="nexichat/cplugin")
+                bot_token,
+                API_ID,
+                API_HASH,
+                bot_token=bot_token,
+                plugins=dict(root="nexichat/cplugin"),
             )
             
             await ai.start()
@@ -163,12 +162,11 @@ async def restart_bots():
         async for bot in bots:
             bot_token = bot["token"]
             ai = Client(
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                bot_token=bot_token,  # Specify bot_token explicitly
-                in_memory=True,
-                parse_mode=ParseMode.DEFAULT,
-                plugins=dict(root="nexichat/cplugin")
+                bot_token,
+                API_ID,
+                API_HASH,
+                bot_token=bot_token,
+                plugins=dict(root="nexichat/cplugin"),
             )
             
             await ai.start()
