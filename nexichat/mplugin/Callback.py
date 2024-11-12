@@ -14,8 +14,8 @@ from pyrogram.types import CallbackQuery
 import asyncio
 import config
 from nexichat import LOGGER, nexichat, db
-from nexichat.modules.helpers import chatai
-from nexichat.modules.helpers import (
+from nexichat.mplugin.helpers import chatai
+from nexichat.mplugin.helpers import (
     ABOUT_BTN,
     ABOUT_READ,
     ADMIN_READ,
