@@ -138,7 +138,7 @@ async def get_reply(word: str):
          
         if not is_chat:
             return random.choice(replies_cache) if replies_cache else None
-        print("Random reply sending.. ")
+        
         return random.choice(is_chat)
     except Exception as e:
         print(f"Error in get_reply: {e}")
@@ -204,12 +204,12 @@ async def save_reply(original_message: Message, reply_message: Message):
                 "check": "none",
             }
 
-        # Insert the reply into the database if it’s new
+        
         if new_reply:
             is_chat = await chatai.find_one(new_reply)
             if not is_chat:
                 await chatai.insert_one(new_reply)
-                replies_cache.append(new_reply)  # Add to cache after saving
+                replies_cache.append(new_reply)  
                 print(f"Replies saved: {original_message.text} == {reply_message.text}")
             else:
                 print(f"Replies found: {original_message.text} == {reply_message.text}")
