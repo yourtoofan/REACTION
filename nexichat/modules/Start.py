@@ -375,8 +375,8 @@ async def help(client: nexichat, m: Message):
         await add_served_chat(m.chat.id)
 
 
-@Client.on_message(filters.command("repo"))
-async def repo(client, m: Message):
+@nexichat.on_cmd("repo")
+async def repo(_, m: Message):
     await m.reply_text(
         text=SOURCE_READ,
         reply_markup=InlineKeyboardMarkup(CLOSE_BTN),
@@ -626,5 +626,4 @@ async def broadcast_message(client, message):
 
 
     
-
 
