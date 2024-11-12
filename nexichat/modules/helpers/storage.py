@@ -23,7 +23,7 @@ CHAT_STORAGE = [
 ]
 
 
-VIPBOY = MongoCli(random.choice(CHAAT_STORAGE))
+VIPBOY = MongoCli(random.choice(CHAT_STORAGE))
 chatdb = VIPBOY.Anonymous
 chatai = chatdb.Word.WordDb
 storeai = VIPBOY.Anonymous.Word.NewWordDb  
