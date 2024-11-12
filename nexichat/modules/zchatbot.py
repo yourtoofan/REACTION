@@ -65,7 +65,7 @@ async def detect_and_set_language(chat_id, message_text):
 
             del group_language_data[chat_id]
             print(f"Language set to {most_common_lang} for chat_id {chat_id}")
-            await client.send_message(chat_id, f"Lang set for this chat:- {most_common_lang}")
+            await shizuchat.send_message(chat_id, f"Lang set for this chat:- {most_common_lang}")
 
     except Exception as e:
         print(f"Error in language detection: {e}")
