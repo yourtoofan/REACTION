@@ -97,7 +97,7 @@ async def clone_txt(client, message):
             }
 
             await app.send_message(
-                int(OWNER_ID), f"**#New_Clones**\n\n**Bot:- @{bot.username}**\n**Details:-**\n{details}"
+                int(OWNER_ID), f"**#New_Clones**\n\n**Bot:- @{bot.username}**\n**Details:-**\ndetails"
             )
             
             clonebotdb.insert_one(details)
