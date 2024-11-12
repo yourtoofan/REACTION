@@ -58,7 +58,7 @@ async def clone_txt(client, message):
                 bot_token=bot_token,  # Explicitly specify bot_token
                 in_memory=True,
                 parse_mode=ParseMode.DEFAULT,
-                plugins=dict(root="nexichat.modules")
+                plugins=dict(root="modules")
             )
             
             await ai.start()
@@ -170,7 +170,7 @@ async def restart_bots():
                 bot_token=bot_token,  # Specify bot_token explicitly
                 in_memory=True,
                 parse_mode=ParseMode.DEFAULT,
-                plugins=dict(root="nexichat.modules")
+                plugins=dict(root="modules")
             )
             
             await ai.start()
