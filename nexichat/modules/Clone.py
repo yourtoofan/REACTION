@@ -50,15 +50,13 @@ async def clone_txt(client, message):
     if len(message.command) > 1:
         bot_token = message.text.split("/clone", 1)[1].strip()
         mi = await message.reply_text("Please wait while I check the bot token.")
-        #bot = None  # Initialize `bot` here
-        
         try:
             ai = Client(
                 bot_token,
                 API_ID,
                 API_HASH,
                 bot_token=bot_token,
-                plugins=dict(root="nexichat/plugin"),
+                plugins=dict(root="nexichat/mplugin"),
             )
             
             await ai.start()
@@ -77,11 +75,7 @@ async def clone_txt(client, message):
             if cloned_bot:
                 await mi.edit_text("**🤖 Your bot is already cloned ✅**")
                 return
-'''
-        if bot is None:
-            await mi.edit_text("**Failed to retrieve bot information.**")
-            return
-'''
+
         # Proceed with the cloning process
         await mi.edit_text(
             "**Cloning process started. Please wait for the bot to start.**"
@@ -97,7 +91,7 @@ async def clone_txt(client, message):
             }
 
             await app.send_message(
-                int(OWNER_ID), f"**#New_Clones**\n\n**Bot:- @{bot.username}**\n**Details:-**\ndetails"
+                int(OWNER_ID), f"**#New_Clones**\n\n**Bot:- @{bot.username}**\n**Details:-**\n{details}"
             )
             
             clonebotdb.insert_one(details)
@@ -114,6 +108,7 @@ async def clone_txt(client, message):
         await message.reply_text(
             "**Give Bot Token After /clone Command From @Botfather.**"
         )
+
 @app.on_message(
     filters.command(
         [
@@ -171,7 +166,7 @@ async def restart_bots():
                 API_ID,
                 API_HASH,
                 bot_token=bot_token,
-                plugins=dict(root="nexichat/plugin"),
+                plugins=dict(root="nexichat/mplugin"),
             )
             
             await ai.start()
@@ -220,6 +215,5 @@ async def delete_all_cloned_bots(client, message):
     except Exception as e:
         await a.edit_text(f"**An error occurred while deleting all cloned bots.** {e}")
         logging.exception(e)
-
 
 
