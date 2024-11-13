@@ -8,7 +8,7 @@ from pyrogram.enums import ParseMode
 import config
 import uvloop
 import time
-
+OWNER_ID = None
 uvloop.install()
 
 logging.basicConfig(
@@ -32,7 +32,17 @@ def dbb():
     global clonedb
     clonedb = {}
     db = {}
-    
+
+async def get_clonebot_owner(bot_id):
+    from nexichat import db as mongodb
+    cloneownerdb = mongodb.cloneownerdb
+    result = await cloneownerdb.find_one({"bot_id": bot_id})
+    if result:
+        return result.get("user_id")
+    else:
+        return False
+
+
 class nexichat(Client):
     def __init__(self):
         super().__init__(
@@ -51,7 +61,8 @@ class nexichat(Client):
         self.name = self.me.first_name + " " + (self.me.last_name or "")
         self.username = self.me.username
         self.mention = self.me.mention
-
+        OWNER_ID = await get_clonebot_owner(bot_id)
+        
     async def stop(self):
         await super().stop()
 
