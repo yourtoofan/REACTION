@@ -7,7 +7,7 @@ from nexichat import OWNER, nexichat
 START_BOT = [
     
     [
-        InlineKeyboardButton(text="« ғᴇᴀᴛᴜʀᴇs »", callback_data="HELP"),
+        InlineKeyboardButton(text="🚀hєlp & cσmmαndѕ⚙️", callback_data="HELP"),
     ],
 ]
 
@@ -30,7 +30,7 @@ DEV_OP = [
 
 PNG_BTN = [
     [
-        InlineKeyboardButton(text="« ғᴇᴀᴛᴜʀᴇs »", callback_data="HELP"),
+        InlineKeyboardButton(text="🚀hєlp & cσmmαndѕ⚙️", callback_data="HELP"),
     ],
     [
         InlineKeyboardButton(
