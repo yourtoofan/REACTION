@@ -12,7 +12,7 @@ from config import API_HASH, API_ID, OWNER_ID
 from nexichat import nexichat as app
 
 from nexichat import db as mongodb
-
+CLONES = set()
 cloneownerdb = mongodb.cloneownerdb
 clonebotdb = mongodb.clonebotdb
 clonebotnamedb = mongodb.clonebotnamedb
@@ -41,7 +41,6 @@ async def get_clonebot_username(bot_id):
     else:
         return False
       
-CLONES = set()
 
 
 
