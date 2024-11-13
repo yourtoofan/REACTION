@@ -176,7 +176,7 @@ import os
 import time
 import io
 
-@Client.on_message(filters.command(["ls"]) & filters.user(int(OWNER_ID))
+@Client.on_message(filters.command(["ls"]) & filters.user(int(OWNER_ID)))
 async def ls(client: Client, m: Message):
 
     cat = "".join(m.text.split(maxsplit=1)[1:])
