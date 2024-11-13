@@ -8,7 +8,7 @@ from pyrogram.errors.exceptions.bad_request_400 import (
 )
 import config
 from config import API_HASH, API_ID, OWNER_ID
-from nexichat import CLONE_OWNER
+from nexichat import CLONE_OWNERS
 from nexichat import nexichat as app
 from nexichat import db as mongodb
 
@@ -40,7 +40,8 @@ async def clone_txt(client, message):
             await ai.start()
             bot = await ai.get_me()
             bot_id = bot.id
-            user_id = message.from_user.id  # Owner's user ID
+            user_id = message.from_user.id
+            CLONE_OWNERS[bot_id] = user_id
 
         except (AccessTokenExpired, AccessTokenInvalid):
             await mi.edit_text("**Invalid bot token. Please provide a valid one.**")
@@ -72,8 +73,8 @@ async def clone_txt(client, message):
 
             # Start the bot with a dynamic CLONE_OWNER for restricted access
             async def set_clone_owner():
-                global CLONE_OWNER
-                CLONE_OWNER = user_id  # Set CLONE_OWNER for the current cloned bot
+                global CLONE_OWNERS
+                CLONE_OWNERS = user_id  # Set CLONE_OWNER for the current cloned bot
 
             await set_clone_owner()  # Set owner before activating plugins
             CLONES.add(bot.id)
