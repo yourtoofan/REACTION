@@ -30,8 +30,8 @@ status_db = db.chatbot_status_db.status
 replies_cache = []
 new_replies_cache = []
 
-blocklist = {}
-message_counts = {}
+cblocklist = {}
+cmessage_counts = {}
 
 
 async def get_chat_language(chat_id):
@@ -42,47 +42,36 @@ async def get_chat_language(chat_id):
 
 
         
-from collections import defaultdict
-
-bot_blocklists = defaultdict(dict)
-bot_message_counts = defaultdict(dict)
-
 @Client.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
+    global cblocklist, cmessage_counts
     try:
         bot_user = await client.get_me()
         bot_user_id = bot_user.id
-
-        blocklist = bot_blocklists[bot_user_id]
-        message_counts = bot_message_counts[bot_user_id]
 
         user_id = message.from_user.id
         chat_id = message.chat.id
         current_time = datetime.now()
 
-        blocklist = {uid: time for uid, time in blocklist.items() if time > current_time}
+        cblocklist = {uid: time for uid, time in cblocklist.items() if time > current_time}
 
-        if user_id in blocklist:
+        if user_id in cblocklist:
             return
 
-        if user_id not in message_counts:
+        if user_id not in cmessage_counts:
             message_counts[user_id] = {"count": 1, "last_time": current_time}
         else:
-            time_diff = (current_time - message_counts[user_id]["last_time"]).total_seconds()
+            time_diff = (current_time - cmessage_counts[user_id]["last_time"]).total_seconds()
             if time_diff <= 3:
-                message_counts[user_id]["count"] += 1
+                cmessage_counts[user_id]["count"] += 1
             else:
-                message_counts[user_id] = {"count": 1, "last_time": current_time}
+                cmessage_counts[user_id] = {"count": 1, "last_time": current_time}
 
-            if message_counts[user_id]["count"] >= 4:
-                blocklist[user_id] = current_time + timedelta(minutes=5)
-                message_counts.pop(user_id, None)
+            if cmessage_counts[user_id]["count"] >= 5:
+                cblocklist[user_id] = current_time + timedelta(minutes=1)
+                cmessage_counts.pop(user_id, None)
                 await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You are blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
                 return
-        
-        bot_blocklists[bot_user_id] = blocklist
-        bot_message_counts[bot_user_id] = message_counts
-
         chat_id = message.chat.id
         chat_status = await status_db.find_one({"chat_id": chat_id})
 
@@ -95,7 +84,9 @@ async def chatbot_response(client: Client, message: Message):
             else:
                 return await add_served_user(message.chat.id)
 
+      
         if (message.reply_to_message and message.reply_to_message.from_user.id == bot_user_id) or not message.reply_to_message:
+            
             reply_data = await get_reply(message.text)
 
             if reply_data:
