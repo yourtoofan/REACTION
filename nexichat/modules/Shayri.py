@@ -66,8 +66,7 @@ SHAYRI_COMMAND = ["gf", "bf", "shayri", "sari", "shari", "love"]
 
 @nexichat.on_message(filters.command(SHAYRI_COMMAND))
 async def shayri(client: Client, message: Message):
-    from nexichat import CLONE_OWNER
-    print(f"{CLONE_OWNER}")
+    
     await message.reply_text(
         text=random.choice(SHAYRI),
         reply_markup=InlineKeyboardMarkup(
