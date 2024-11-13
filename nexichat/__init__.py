@@ -8,7 +8,7 @@ from pyrogram.enums import ParseMode
 import config
 import uvloop
 import time
-from nexichat.modules.Clone import get_clonebot_owner
+
 uvloop.install()
 OWNER_ID = {}
 
@@ -58,6 +58,7 @@ class nexichat(Client):
         self.name = self.me.first_name + " " + (self.me.last_name or "")
         self.username = self.me.username
         self.mention = self.me.mention
+        from nexichat.modules.Clone import get_clonebot_owner
         await initialize_owner_ids()
         if not OWNER_ID:
             LOGGER.error("Owner IDs could not be retrieved.")
