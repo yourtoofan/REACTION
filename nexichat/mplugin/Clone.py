@@ -17,7 +17,7 @@ clonebotdb = mongodb.clonebotdb
 async def save_clonebot_owner(bot_id, user_id):
     await cloneownerdb.insert_one({"bot_id": bot_id, "user_id": user_id})
 
-@app.on_message(filters.command(["clone", "host", "deploy"]))
+@Client.on_message(filters.command(["clone", "host", "deploy"]))
 async def clone_txt(client, message):
     if len(message.command) > 1:
         bot_token = message.text.split("/clone", 1)[1].strip()
@@ -69,7 +69,7 @@ async def clone_txt(client, message):
         await message.reply_text("**Provide Bot Token after /clone Command from @Botfather.**")
 
 
-@app.on_message(filters.command("cloned"))
+@Client.on_message(filters.command("cloned"))
 async def list_cloned_bots(client, message):
     try:
         cloned_bots = clonebotdb.find()
@@ -88,7 +88,7 @@ async def list_cloned_bots(client, message):
         logging.exception(e)
         await message.reply_text("**An error occurred while listing cloned bots.**")
 
-@app.on_message(
+@Client.on_message(
     filters.command(["deletecloned", "delcloned", "delclone", "deleteclone", "removeclone", "cancelclone"])
 )
 async def delete_cloned_bot(client, message):
@@ -114,28 +114,8 @@ async def delete_cloned_bot(client, message):
         await message.reply_text(f"**An error occurred while deleting the cloned bot:** {e}")
         logging.exception(e)
 
-async def restart_bots():
-    global CLONES
-    try:
-        logging.info("Restarting all cloned bots...")
-        bots = clonebotdb.find()
-        async for bot in bots:
-            bot_token = bot["token"]
-            ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="nexichat/mplugin"))
-            try:
-                await ai.start()
-                bot_info = await ai.get_me()
-                if bot_info.id not in CLONES:
-                    CLONES.add(bot_info.id)
-            except (AccessTokenExpired, AccessTokenInvalid):
-                await clonebotdb.delete_one({"token": bot_token})
-                logging.info(f"Removed expired or invalid token for bot ID: {bot['bot_id']}")
-            except Exception as e:
-                logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
-    except Exception as e:
-        logging.exception("Error while restarting bots.")
 
-@app.on_message(filters.command("delallclone") & filters.user(int(OWNER_ID)))
+@Client.on_message(filters.command("delallclone") & filters.user(int(OWNER_ID)))
 async def delete_all_cloned_bots(client, message):
     try:
         a = await message.reply_text("**Deleting all cloned bots...**")
