@@ -13,7 +13,7 @@ async def anony_boot():
     try:
         await nexichat.start()
         await restart_bots()
-        OWNER_ID = await get_clonebot_owner()
+        CLONE_OWNER = await get_clonebot_owner()
     except Exception as ex:
         LOGGER.error(ex)
         
