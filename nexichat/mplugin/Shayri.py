@@ -65,7 +65,7 @@ morning_shayari = [ "🌅 ɢᴏᴏᴅ ᴍᴏʀɴɪɴɢ! ᴍᴀʏ ʏᴏᴜʀ ᴅ�
 SHAYRI_COMMAND = ["gf", "bf", "shayri", "sari", "shari", "love"]
 
 
-@Client.on_message(filters.command(SHAYRI_COMMAND) & filters.user(int(CLONE_OWNER)))
+@Client.on_message(filters.command(SHAYRI_COMMAND) & filters.user(CLONE_OWNER))
 async def shayri(client: Client, message: Message):
     await message.reply_text(
         text=random.choice(SHAYRI),
