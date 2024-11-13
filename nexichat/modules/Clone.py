@@ -190,6 +190,7 @@ async def get_clonebot_owner():
         result = await cloneownerdb.find_one({"bot_id": bot_id})
         if result:
             owners[bot_id] = result.get("user_id")
+            print(f"results:- {result} == userid - {owners[bot_id]}")
         else:
             owners[bot_id] = False
 
