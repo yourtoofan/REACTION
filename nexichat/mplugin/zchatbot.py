@@ -107,7 +107,6 @@ async def chatbot_response(client: Client, message: Message):
                 elif reply_data["check"] == "gif":
                     await message.reply_animation(reply_data["text"]) 
                 else:
-                    print("replying...")
                     await message.reply_text(translated_text)
                     await client.send_chat_action(message.chat.id, ChatAction.TYPING)
             else:
@@ -118,8 +117,10 @@ async def chatbot_response(client: Client, message: Message):
             await save_reply(message.reply_to_message, message)
             print("saved.")
     except MessageEmpty as e:
+        print(f"err{e}")
         return await message.reply_text("🙄🙄")
     except Exception as e:
+        print(f"errors {e}")
         return
 
 
