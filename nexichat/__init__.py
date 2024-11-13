@@ -31,10 +31,6 @@ OWNER = config.OWNER_ID
 clonedb = None
 OWNER_ID = None
 
-async def save_clonebot_owner(bot_id, user_id):
-    await cloneownerdb.insert_one({"bot_id": bot_id, "user_id": user_id})
-
-
 async def get_clonebot_owner(bot_id):
     result = await cloneownerdb.find_one({"bot_id": bot_id})
     if result:
@@ -43,7 +39,7 @@ async def get_clonebot_owner(bot_id):
         return False
         
 def get_clonebot_owner(bot_id):
-    cloneownerdb = mongo.cloneownerdb
+    
     result = cloneownerdb.find_one({"bot_id": bot_id})
     if result:
         return result.get("user_id")
