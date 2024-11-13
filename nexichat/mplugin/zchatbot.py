@@ -31,7 +31,7 @@ replies_cache = []
 new_replies_cache = []
 
 cblocklist = {}
-cmessage_counts = {}
+message_counts = {}
 
 
 async def get_chat_language(chat_id):
@@ -44,7 +44,7 @@ async def get_chat_language(chat_id):
         
 @Client.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
-    global cblocklist, cmessage_counts
+    global cblocklist, message_counts
     try:
         bot_user = await client.get_me()
         bot_user_id = bot_user.id
@@ -58,18 +58,18 @@ async def chatbot_response(client: Client, message: Message):
         if user_id in cblocklist:
             return
 
-        if user_id not in cmessage_counts:
+        if user_id not in message_counts:
             message_counts[user_id] = {"count": 1, "last_time": current_time}
         else:
-            time_diff = (current_time - cmessage_counts[user_id]["last_time"]).total_seconds()
+            time_diff = (current_time - message_counts[user_id]["last_time"]).total_seconds()
             if time_diff <= 3:
-                cmessage_counts[user_id]["count"] += 1
+                message_counts[user_id]["count"] += 1
             else:
-                cmessage_counts[user_id] = {"count": 1, "last_time": current_time}
+                message_counts[user_id] = {"count": 1, "last_time": current_time}
 
-            if cmessage_counts[user_id]["count"] >= 5:
+            if message_counts[user_id]["count"] >= 4:
                 cblocklist[user_id] = current_time + timedelta(minutes=1)
-                cmessage_counts.pop(user_id, None)
+                message_counts.pop(user_id, None)
                 await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You are blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
                 return
         chat_id = message.chat.id
