@@ -100,6 +100,8 @@ async def set_default_status(chat_id):
 
 
 
+from nexichat import CLONE_OWNERS
+
 @Client.on_message(filters.new_chat_members)
 async def welcomejej(client, message: Message):
     chat = message.chat
@@ -109,21 +111,19 @@ async def welcomejej(client, message: Message):
     chats = len(await get_served_chats())
     try:
         for member in message.new_chat_members:
-            
             if member.id == (await client.get_me()).id:
                 try:
-                    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
+                    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
                     await message.reply_photo(photo=random.choice(IMG), caption=START.format(users, chats), reply_markup=reply_markup)
                 except Exception as e:
                     print(f"{e}")
                     pass
                 try:
                     invitelink = await client.export_chat_invite_link(message.chat.id)
-                                                                        
                     link = f"[ɢᴇᴛ ʟɪɴᴋ]({invitelink})"
                 except ChatAdminRequired:
                     link = "No Link"
-                    
+                
                 try:
                     groups_photo = await client.download_media(
                         chat.photo.big_file_id, file_name=f"chatpp{chat.id}.png"
@@ -137,7 +137,6 @@ async def welcomejej(client, message: Message):
                     pass
 
                 count = await client.get_chat_members_count(chat.id)
-                chats = len(await get_served_chats())
                 username = chat.username if chat.username else "𝐏ʀɪᴠᴀᴛᴇ 𝐆ʀᴏᴜᴘ"
                 msg = (
                     f"**📝𝐌ᴜsɪᴄ 𝐁ᴏᴛ 𝐀ᴅᴅᴇᴅ 𝐈ɴ 𝐀 #𝐍ᴇᴡ_𝐆ʀᴏᴜᴘ**\n\n"
@@ -151,22 +150,20 @@ async def welcomejej(client, message: Message):
                 )
 
                 try:
-                    OWNER = config.OWNER_ID
-                    if OWNER:
+                    bot_id = client.me.id
+                    owner_id = CLONE_OWNERS.get(bot_id)  # Get bot-specific owner ID
+                    
+                    if owner_id:  # Ensure owner ID exists
                         await client.send_photo(
-                            int(OWNER_ID),
+                            int(owner_id),
                             photo=chat_photo,
                             caption=msg,
-                            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"{message.from_user.first_name}", user_id=message.from_user.id)]]))
-                                
-                    
+                            reply_markup=InlineKeyboardMarkup(
+                                [[InlineKeyboardButton(f"{message.from_user.first_name}", user_id=message.from_user.id)]]
+                            )
+                        )
                 except Exception as e:
-                    print(f"Please Provide me correct owner id for send logs")
-                    await client.send_photo(
-                        int(OWNER_ID),
-                        photo=chat_photo,
-                        caption=msg,
-                        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"{message.from_user.first_name}", user_id=message.from_user.id)]]))
+                    print(f"Err: {e}")
     except Exception as e:
         print(f"Err: {e}")
 
