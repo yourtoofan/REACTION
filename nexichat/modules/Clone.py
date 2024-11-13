@@ -170,6 +170,7 @@ async def restart_bots():
             )
             
             await ai.start()
+            
             bot = await ai.get_me()
             if bot.id not in CLONES:
                 try:
@@ -179,6 +180,20 @@ async def restart_bots():
     except Exception as e:
         logging.exception("Error while restarting bots.")
 
+async def get_clonebot_owner():
+    global CLONES
+    from nexichat import db as mongodb
+    cloneownerdb = mongodb.cloneownerdb
+    owners = {}
+
+    for bot_id in CLONES:
+        result = await cloneownerdb.find_one({"bot_id": bot_id})
+        if result:
+            owners[bot_id] = result.get("user_id")
+        else:
+            owners[bot_id] = False
+
+    return owners
 
 @app.on_message(filters.command("cloned"))
 async def list_cloned_bots(client, message):
