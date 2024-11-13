@@ -46,10 +46,14 @@ async def get_chat_language(chat_id):
 async def chatbot_response(client: Client, message: Message):
     global blocklist, message_counts
     try:
+        # Fetch the bot's user ID
+        bot_user = await client.get_me()
+        bot_user_id = bot_user.id
+
         user_id = message.from_user.id
         chat_id = message.chat.id
         current_time = datetime.now()
-        
+
         blocklist = {uid: time for uid, time in blocklist.items() if time > current_time}
 
         if user_id in blocklist:
@@ -63,7 +67,7 @@ async def chatbot_response(client: Client, message: Message):
                 message_counts[user_id]["count"] += 1
             else:
                 message_counts[user_id] = {"count": 1, "last_time": current_time}
-            
+
             if message_counts[user_id]["count"] >= 4:
                 blocklist[user_id] = current_time + timedelta(minutes=1)
                 message_counts.pop(user_id, None)
@@ -71,7 +75,7 @@ async def chatbot_response(client: Client, message: Message):
                 return
         chat_id = message.chat.id
         chat_status = await status_db.find_one({"chat_id": chat_id})
-        
+
         if chat_status and chat_status.get("status") == "disabled":
             return
 
@@ -80,8 +84,9 @@ async def chatbot_response(client: Client, message: Message):
                 return await add_served_chat(message.chat.id)
             else:
                 return await add_served_user(message.chat.id)
-        
-        if (message.reply_to_message and message.reply_to_message.from_user.id == client.id) or not message.reply_to_message:
+
+        # Update this line to compare with bot_user_id instead of client.id
+        if (message.reply_to_message and message.reply_to_message.from_user.id == bot_user_id) or not message.reply_to_message:
             
             reply_data = await get_reply(message.text)
 
@@ -122,7 +127,6 @@ async def chatbot_response(client: Client, message: Message):
     except Exception as e:
         print(f"errors {e}")
         return
-
 
 
 async def reload_cache():
