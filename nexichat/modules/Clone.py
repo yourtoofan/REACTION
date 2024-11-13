@@ -140,14 +140,12 @@ async def delete_cloned_bot(client, message):
 
         cloned_bot = await clonebotdb.find_one({"token": bot_token})
         if cloned_bot:
-            clonebotdb.delete_one({"token": bot_token})
+            await clonebotdb.delete_one({"token": bot_token})
             CLONES.remove(cloned_bot["bot_id"])
             await ok.edit_text(
                 "**🤖 your cloned bot has been disconnected from my server ☠️**\n**Clone by :- /clone**"
             )
             os.system(f"kill -9 {os.getpid()} && bash start")
-
-
         else:
             await message.reply_text(
                 "**⚠️ The provided bot token is not in the cloned list.**"
@@ -157,8 +155,6 @@ async def delete_cloned_bot(client, message):
             f"**An error occurred while deleting the cloned bot:** {e}"
         )
         logging.exception(e)
-
-
 
 async def restart_bots():
     global CLONES
@@ -185,7 +181,6 @@ async def restart_bots():
                     pass
     except Exception as e:
         logging.exception("Error while restarting bots.")
-
 
 @app.on_message(filters.command("delallclone") & filters.user(int(OWNER_ID)))
 async def delete_all_cloned_bots(client, message):
