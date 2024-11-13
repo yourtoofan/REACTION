@@ -184,7 +184,7 @@ async def load_clonebot_owner():
     from nexichat import db as mongodb
     cloneownerdb = mongodb.cloneownerdb
     owners = {}
-
+    details = {}
     bots = clonebotdb.find()
     async for details[bot_id] in bots:
         print(f"{details[bot_id]} == {bots}")
