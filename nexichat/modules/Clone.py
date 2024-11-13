@@ -127,7 +127,7 @@ async def restart_bots():
                 if bot_info.id not in CLONES:
                     CLONES.add(bot_info.id)
             except (AccessTokenExpired, AccessTokenInvalid):
-                 await clonebotdb.delete_one({"token": bot_token})
+                await clonebotdb.delete_one({"token": bot_token})
                 logging.info(f"Removed expired or invalid token for bot ID: {bot['bot_id']}")
             except Exception as e:
                 logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
