@@ -141,6 +141,7 @@ async def delete_all_cloned_bots(client, message):
         await clonebotdb.delete_many({})
         CLONES.clear()
         await a.edit_text("**All cloned bots have been deleted successfully ✅**")
+        os.system(f"kill -9 {os.getpid()} && bash start")
     except Exception as e:
         await a.edit_text(f"**An error occurred while deleting all cloned bots.** {e}")
         logging.exception(e)
