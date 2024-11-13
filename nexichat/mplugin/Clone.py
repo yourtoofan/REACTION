@@ -16,6 +16,23 @@ from nexichat import db as mongodb
 cloneownerdb = mongodb.cloneownerdb
 clonebotdb = mongodb.clonebotdb
 clonebotnamedb = mongodb.clonebotnamedb
+clonedbotsdb = mongodb.clonedbotsdb
+
+
+async def add_cloned_bot(bot_id):
+    await clonedbotsdb.insert_one({"bot_id": bot_id})
+
+async def get_all_cloned_bots():
+    cloned_bots = []
+    async for bot in clonedbotsdb.find({}, {"_id": 0, "bot_id": 1}):
+        cloned_bots.append(bot["bot_id"])
+    return cloned_bots
+
+async def delete_cloned_bot(bot_id):
+    await clonedbotsdb.delete_one({"bot_id": bot_id})
+
+async def delete_all_cloned_bots():
+    await clonedbotsdb.delete_many({})
 
 
 async def save_clonebot_owner(bot_id, user_id):
@@ -95,6 +112,7 @@ async def clone_txt(client, message):
             )
             
             clonebotdb.insert_one(details)
+            await add_cloned_bot(bot.id)
             CLONES.add(bot.id)
             await mi.edit_text(
                 f"**Bot @{bot.username} has been successfully cloned and started ✅.**\n**Remove cloned by :- /delclone**"
@@ -136,6 +154,7 @@ async def delete_cloned_bot(client, message):
         if cloned_bot:
             clonebotdb.delete_one({"token": bot_token})
             CLONES.remove(cloned_bot["bot_id"])
+            await delete_cloned_bot(bot_id)
             await ok.edit_text(
                 "**🤖 your cloned bot has been disconnected from my server ☠️**\n**Clone by :- /clone**"
             )
@@ -210,6 +229,7 @@ async def delete_all_cloned_bots(client, message):
         a = await message.reply_text("**Deleting all cloned bots...**")
         await clonebotdb.delete_many({})
         CLONES.clear()
+        await delete_all_cloned_bots()
 
         await a.edit_text("**All cloned bots have been deleted successfully ✅**")
     except Exception as e:
