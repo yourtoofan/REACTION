@@ -135,15 +135,12 @@ async def reload_cache():
 
 async def get_reply(word: str):
     try:
-        is_chat = [reply for reply in replies_cache if reply.get("word") == word]
-
-        if not is_chat:
-            await reload_cache()
-            is_chat = [reply for reply in replies_cache if reply.get("word") == word]
-         
-        if not is_chat:
-            return random.choice(replies_cache) if replies_cache else None
+        is_chat = await chatai.find({"word": word}).to_list(length=None)
         
+        if not is_chat:
+            is_chat = await chatai.aggregate([{"$sample": {"size": 1}}]).to_list(length=None)
+            return is_chat[0] if is_chat else None
+
         return random.choice(is_chat)
     except Exception as e:
         print(f"Error in get_reply: {e}")
