@@ -110,7 +110,7 @@ async def welcomejej(client, message: Message):
     try:
         for member in message.new_chat_members:
             
-            if member.id == client.id:
+            if member.id == (await client.get_me()).id:
                 try:
                     reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
                     await message.reply_photo(photo=random.choice(IMG), caption=START.format(users, chats), reply_markup=reply_markup)
@@ -178,7 +178,7 @@ import io
 
 @Client.on_message(filters.command(["ls"]))
 async def ls(client: Client, m: Message):
-    bot_id = client.me.id
+    bot_id = (await client.get_me()).id
     user_id = m.from_user.id
     owner_check = is_owner(client, user_id)
 
@@ -466,7 +466,7 @@ broadcast_lock = asyncio.Lock()
 @Client.on_message(filters.command(["broadcast", "gcast"]))
 async def broadcast_message(client, message):
     global IS_BROADCASTING
-    bot_id = client.me.id
+    bot_id = (await client.get_me()).id
     user_id = message.from_user.id
     owner_check = is_owner(client, user_id)
 
