@@ -10,6 +10,7 @@ from nexichat import LOGGER, nexichat, CLONE_OWNER
 from nexichat.modules import ALL_MODULES
 from nexichat.modules.Clone import restart_bots, load_clonebot_owner
 async def anony_boot():
+    global CLONE_OWNER
     try:
         await nexichat.start()
         await restart_bots()
