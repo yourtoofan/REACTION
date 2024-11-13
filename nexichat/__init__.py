@@ -8,7 +8,7 @@ from pyrogram.enums import ParseMode
 import config
 import uvloop
 import time
-
+CLONE_OWNER = None
 uvloop.install()
 
 logging.basicConfig(
