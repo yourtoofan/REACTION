@@ -42,12 +42,19 @@ async def get_chat_language(chat_id):
 
 
         
+from collections import defaultdict
+
+bot_blocklists = defaultdict(dict)
+bot_message_counts = defaultdict(dict)
+
 @Client.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
-    global blocklist, message_counts
     try:
         bot_user = await client.get_me()
         bot_user_id = bot_user.id
+
+        blocklist = bot_blocklists[bot_user_id]
+        message_counts = bot_message_counts[bot_user_id]
 
         user_id = message.from_user.id
         chat_id = message.chat.id
@@ -72,6 +79,10 @@ async def chatbot_response(client: Client, message: Message):
                 message_counts.pop(user_id, None)
                 await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You are blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
                 return
+        
+        bot_blocklists[bot_user_id] = blocklist
+        bot_message_counts[bot_user_id] = message_counts
+
         chat_id = message.chat.id
         chat_status = await status_db.find_one({"chat_id": chat_id})
 
@@ -84,9 +95,7 @@ async def chatbot_response(client: Client, message: Message):
             else:
                 return await add_served_user(message.chat.id)
 
-      
         if (message.reply_to_message and message.reply_to_message.from_user.id == bot_user_id) or not message.reply_to_message:
-            
             reply_data = await get_reply(message.text)
 
             if reply_data:
