@@ -10,11 +10,6 @@ import uvloop
 import time
 
 uvloop.install()
-OWNER_ID = {}
-
-async def initialize_owner_ids():
-    global OWNER_ID
-    OWNER_ID = await get_clonebot_owner()
 
 logging.basicConfig(
     format="[%(asctime)s - %(levelname)s] - %(name)s - %(message)s",
@@ -58,12 +53,6 @@ class nexichat(Client):
         self.name = self.me.first_name + " " + (self.me.last_name or "")
         self.username = self.me.username
         self.mention = self.me.mention
-        from nexichat.modules.Clone import get_clonebot_owner
-        await initialize_owner_ids()
-        if not OWNER_ID:
-            LOGGER.error("Owner IDs could not be retrieved.")
-        else:
-            LOGGER.info(f"OWNER_IDs initialized: {OWNER_ID}")
         
     async def stop(self):
         await super().stop()
