@@ -179,7 +179,7 @@ async def restart_bots():
     except Exception as e:
         logging.exception("Error while restarting bots.")
 
-async def get_clonebot_owner():
+async def load_clonebot_owner():
     global CLONES
     from nexichat import db as mongodb
     cloneownerdb = mongodb.cloneownerdb
