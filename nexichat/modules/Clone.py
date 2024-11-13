@@ -186,8 +186,8 @@ async def load_clonebot_owner():
     owners = {}
 
     bots = clonebotdb.find()
-    async for bot_id in bots:
-        print(f"{bot_id}")
+    async for details[bot_id] in bots:
+        print(f"{details[bot_id]} == {bots}")
         result = await cloneownerdb.find_one({"bot_id": bot_id})
         if result:
             owners[bot_id] = result.get("user_id")
