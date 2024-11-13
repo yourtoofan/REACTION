@@ -185,11 +185,13 @@ async def load_clonebot_owner():
     cloneownerdb = mongodb.cloneownerdb
     owners = {}
 
-    for bot_id in CLONES:
+    bots = clonebotdb.find()
+    async for bot_id in bots:
+        print(f"{bot_id}")
         result = await cloneownerdb.find_one({"bot_id": bot_id})
         if result:
             owners[bot_id] = result.get("user_id")
-            print(f"results:- {result} == userid - {owners[bot_id]}")
+            
         else:
             owners[bot_id] = False
 
