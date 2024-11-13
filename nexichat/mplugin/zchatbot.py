@@ -107,6 +107,7 @@ async def chatbot_response(client: Client, message: Message):
                 elif reply_data["check"] == "gif":
                     await message.reply_animation(reply_data["text"]) 
                 else:
+                    print("replying...")
                     await message.reply_text(translated_text)
                     await client.send_chat_action(message.chat.id, ChatAction.TYPING)
             else:
