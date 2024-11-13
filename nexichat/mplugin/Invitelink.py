@@ -3,7 +3,7 @@ import os
 from pyrogram import Client, filters
 from pyrogram.errors import FloodWait
 from pyrogram.types import Message
-
+from nexichat.mplugin.helpers import is_owner
 from nexichat import nexichat
 from config import OWNER_ID
 
@@ -11,12 +11,26 @@ from config import OWNER_ID
 @Client.on_message(filters.command("givelink") & filters.user(int(OWNER_ID)))
 async def give_link_command(client, message):
     chat = message.chat.id
+    bot_id = client.me.id
+    user_id = message.from_user.id
+    owner_check = is_owner(client, user_id)
+
+    if owner_check is not True:
+        await message.reply_text(owner_check)
+        return
     link = await client.export_chat_invite_link(chat)
     await message.reply_text(f"**Here's the invite link for this chat:**\n\n{link}")
 
 
 @Client.on_message(filters.command(["link", "invitelink"], prefixes=["/", "!", "%", ",", ".", "@", "#"]) & filters.user(int(OWNER_ID)))
 async def link_command_handler(client: Client, message: Message):
+    bot_id = client.me.id
+    user_id = message.from_user.id
+    owner_check = is_owner(client, user_id)
+
+    if owner_check is not True:
+        await message.reply_text(owner_check)
+        return
     if len(message.command) != 2:
         await message.reply("**Invalid usage. Correct format: /link group_id**")
         return
