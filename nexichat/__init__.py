@@ -8,8 +8,13 @@ from pyrogram.enums import ParseMode
 import config
 import uvloop
 import time
-OWNER_ID = None
+from nexichat.modules.Clone import get_clonebot_owner
 uvloop.install()
+OWNER_ID = {}
+
+async def initialize_owner_ids():
+    global OWNER_ID
+    OWNER_ID = await get_clonebot_owner()
 
 logging.basicConfig(
     format="[%(asctime)s - %(levelname)s] - %(name)s - %(message)s",
@@ -33,14 +38,6 @@ def dbb():
     clonedb = {}
     db = {}
 
-async def get_clonebot_owner(bot_id):
-    from nexichat import db as mongodb
-    cloneownerdb = mongodb.cloneownerdb
-    result = await cloneownerdb.find_one({"bot_id": bot_id})
-    if result:
-        return result.get("user_id")
-    else:
-        return False
 
 
 class nexichat(Client):
@@ -61,7 +58,11 @@ class nexichat(Client):
         self.name = self.me.first_name + " " + (self.me.last_name or "")
         self.username = self.me.username
         self.mention = self.me.mention
-        OWNER_ID = await get_clonebot_owner(bot_id)
+        await initialize_owner_ids()
+        if not OWNER_ID:
+            LOGGER.error("Owner IDs could not be retrieved.")
+        else:
+            LOGGER.info(f"OWNER_IDs initialized: {OWNER_ID}")
         
     async def stop(self):
         await super().stop()
