@@ -46,7 +46,6 @@ async def get_chat_language(chat_id):
 async def chatbot_response(client: Client, message: Message):
     global blocklist, message_counts
     try:
-        # Fetch the bot's user ID
         bot_user = await client.get_me()
         bot_user_id = bot_user.id
 
@@ -85,7 +84,7 @@ async def chatbot_response(client: Client, message: Message):
             else:
                 return await add_served_user(message.chat.id)
 
-        # Update this line to compare with bot_user_id instead of client.id
+      
         if (message.reply_to_message and message.reply_to_message.from_user.id == bot_user_id) or not message.reply_to_message:
             
             reply_data = await get_reply(message.text)
@@ -123,7 +122,6 @@ async def chatbot_response(client: Client, message: Message):
         print(f"err{e}")
         return await message.reply_text("🙄🙄")
     except Exception as e:
-        print(f"errors {e}")
         return
 
 
@@ -218,8 +216,6 @@ async def save_reply(original_message: Message, reply_message: Message):
                 await chatai.insert_one(new_reply)
                 replies_cache.append(new_reply)  
                 print(f"New Replies saved: {original_message.text} == {reply_message.text}")
-            else:
-                print(f"New Replies found: {original_message.text} == {reply_message.text}")
-
+                
     except Exception as e:
         print(f"Error in save_reply: {e}")
