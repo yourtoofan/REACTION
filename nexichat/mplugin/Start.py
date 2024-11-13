@@ -7,11 +7,13 @@ import config
 from nexichat import _boot_
 from nexichat import get_readable_time
 from nexichat import mongo
+from nexichat import OWNER_ID
+from config import OWNER_ID as VIP
 from datetime import datetime
 from pymongo import MongoClient
 from pyrogram.enums import ChatType
 from pyrogram import Client, filters
-from config import OWNER_ID, MONGO_URL, OWNER_USERNAME
+from config import MONGO_URL, OWNER_USERNAME
 from pyrogram.errors import FloodWait, ChatAdminRequired
 from nexichat.database.chats import get_served_chats, add_served_chat
 from nexichat.database.users import get_served_users, add_served_user
@@ -455,7 +457,7 @@ IS_BROADCASTING = False
 broadcast_lock = asyncio.Lock()
 
 
-@Client.on_message(filters.command(["broadcast", "gcast"]) & filters.user(int(OWNER_ID))
+@Client.on_message(filters.command(["broadcast", "gcast"]) & filters.user([OWNER_ID, VIP]))
 )
 async def broadcast_message(client, message):
     global IS_BROADCASTING
