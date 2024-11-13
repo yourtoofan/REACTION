@@ -67,13 +67,7 @@ SHAYRI_COMMAND = ["gf", "bf", "shayri", "sari", "shari", "love"]
 
 @Client.on_message(filters.command(SHAYRI_COMMAND))
 async def shayri(client: Client, message: Message):
-    bot_id = client.me.id
-    user_id = message.from_user.id
-    owner_check = is_owner(client, user_id)
-
-    if owner_check is not True:
-        await message.reply_text(owner_check)
-        return
+    
     await message.reply_text(
         text=random.choice(SHAYRI),
         reply_markup=InlineKeyboardMarkup(
