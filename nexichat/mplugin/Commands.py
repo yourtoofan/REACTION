@@ -34,18 +34,6 @@ translator = GoogleTranslator()
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 
-@Client.on_message(filters.command("status"))
-async def status_command(client: Client, message: Message):
-    chat_id = message.chat.id
-    chat_status = await status_db.find_one({"chat_id": chat_id})
-    if chat_status:
-        current_status = chat_status.get("status", "not found")
-        await message.reply(f"Chatbot status for this chat: **{current_status}**")
-    else:
-        await message.reply("No status found for this chat.")
-
-
-
 
 def generate_language_buttons(languages):
     buttons = []
@@ -62,13 +50,7 @@ def generate_language_buttons(languages):
 async def get_chat_language(chat_id):
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
-    
-@Client.on_message(filters.command(["lang", "language", "setlang"]))
-async def set_language(client: Client, message: Message):
-    await message.reply_text(
-        "Please select your chat language:",
-        reply_markup=generate_language_buttons(languages)
-    )
+   
 
 
 @Client.on_message(filters.command("status"))
