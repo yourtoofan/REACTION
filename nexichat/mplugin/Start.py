@@ -12,6 +12,7 @@ from datetime import datetime
 from pymongo import MongoClient
 from pyrogram.enums import ChatType
 from pyrogram import Client, filters
+from nexichat import CLONE_OWNERS
 from config import OWNER_ID, MONGO_URL, OWNER_USERNAME
 from pyrogram.errors import FloodWait, ChatAdminRequired
 from nexichat.database.chats import get_served_chats, add_served_chat
@@ -100,7 +101,7 @@ async def set_default_status(chat_id):
 
 
 
-from nexichat import CLONE_OWNERS
+
 
 @Client.on_message(filters.new_chat_members)
 async def welcomejej(client, message: Message):
@@ -151,9 +152,9 @@ async def welcomejej(client, message: Message):
 
                 try:
                     bot_id = client.me.id
-                    owner_id = CLONE_OWNERS.get(bot_id)  # Get bot-specific owner ID
+                    owner_id = CLONE_OWNERS.get(bot_id)
                     
-                    if owner_id:  # Ensure owner ID exists
+                    if owner_id:
                         await client.send_photo(
                             int(owner_id),
                             photo=chat_photo,
@@ -317,7 +318,16 @@ async def start(client: Client, m: Message):
         
         await add_served_user(m.chat.id)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(f"{m.chat.first_name}", user_id=m.chat.id)]])
-        await client.send_photo(int(OWNER_ID), photo=chat_photo, caption=f"{m.from_user.mention} ʜᴀs sᴛᴀʀᴛᴇᴅ ʙᴏᴛ. \n\n**ɴᴀᴍᴇ :** {m.chat.first_name}\n**ᴜsᴇʀɴᴀᴍᴇ :** @{m.chat.username}\n**ɪᴅ :** {m.chat.id}\n\n**ᴛᴏᴛᴀʟ ᴜsᴇʀs :** {users}", reply_markup=keyboard)
+
+        bot_id = client.me.id
+        owner_id = CLONE_OWNERS.get(bot_id) 
+        if owner_id:
+            await client.send_photo(
+                int(owner_id),
+                photo=chat_photo,
+                caption=f"{m.from_user.mention} ʜᴀs sᴛᴀʀᴛᴇᴅ ʙᴏᴛ. \n\n**ɴᴀᴍᴇ :** {m.chat.first_name}\n**ᴜsᴇʀɴᴀᴍᴇ :** @{m.chat.username}\n**ɪᴅ :** {m.chat.id}\n\n**ᴛᴏᴛᴀʟ ᴜsᴇʀs :** {users}",
+                reply_markup=keyboard
+            )
         
     else:
         await m.reply_photo(
