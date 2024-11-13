@@ -8,6 +8,7 @@ from pyrogram.errors.exceptions.bad_request_400 import (
 )
 import config
 from config import API_HASH, API_ID, OWNER_ID
+from nexichat import CLONE_OWNER
 from nexichat import nexichat as app
 from nexichat import db as mongodb
 
