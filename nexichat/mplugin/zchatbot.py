@@ -12,7 +12,7 @@ from nexichat.database.users import add_served_user
 from config import MONGO_URL
 from nexichat import mongo, db
 from pyrogram.types import Message
-from nexichat.modules.helpers import CHATBOT_ON, chatai, languages
+from nexichat.mplugin.helpers import CHATBOT_ON, chatai, languages
 from pymongo import MongoClient
 from nexichat import mongo
 from pyrogram.enums import ChatMemberStatus as CMS
