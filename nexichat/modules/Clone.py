@@ -180,23 +180,13 @@ async def restart_bots():
         logging.exception("Error while restarting bots.")
 
 async def load_clonebot_owner():
-    global CLONES
-    from nexichat import db as mongodb
-    cloneownerdb = mongodb.cloneownerdb
     owners = {}
-    details = {}
-    bots = clonebotdb.find()
-    async for details[bot_id] in bots:
-        print(f"{details[bot_id]} == {bots}")
+    async for bot in clonebotdb.find():
+        bot_id = bot["bot_id"]
         result = await cloneownerdb.find_one({"bot_id": bot_id})
-        if result:
-            owners[bot_id] = result.get("user_id")
-            
-        else:
-            owners[bot_id] = False
-
+        owners[bot_id] = result["user_id"] if result else False
     return owners
-
+    
 @app.on_message(filters.command("cloned"))
 async def list_cloned_bots(client, message):
     try:
