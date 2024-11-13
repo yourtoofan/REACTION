@@ -67,13 +67,6 @@ async def clone_txt(client, message):
     else:
         await message.reply_text("**Provide Bot Token after /clone Command from @Botfather.**")
 
-async def load_clonebot_owner():
-    owners = {}
-    async for bot in clonebotdb.find():
-        bot_id = bot["bot_id"]
-        result = await cloneownerdb.find_one({"bot_id": bot_id})
-        owners[bot_id] = result["user_id"] if result else False
-    return owners
 
 @app.on_message(filters.command("cloned"))
 async def list_cloned_bots(client, message):
@@ -123,15 +116,21 @@ async def delete_cloned_bot(client, message):
 async def restart_bots():
     global CLONES
     try:
-        logging.info("Restarting all cloned bots........")
+        logging.info("Restarting all cloned bots...")
         bots = clonebotdb.find()
         async for bot in bots:
             bot_token = bot["token"]
             ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="nexichat/mplugin"))
-            await ai.start()
-            bot = await ai.get_me()
-            if bot.id not in CLONES:
-                CLONES.add(bot.id)
+            try:
+                await ai.start()
+                bot_info = await ai.get_me()
+                if bot_info.id not in CLONES:
+                    CLONES.add(bot_info.id)
+            except (AccessTokenExpired, AccessTokenInvalid):
+                 await clonebotdb.delete_one({"token": bot_token})
+                logging.info(f"Removed expired or invalid token for bot ID: {bot['bot_id']}")
+            except Exception as e:
+                logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
     except Exception as e:
         logging.exception("Error while restarting bots.")
 
