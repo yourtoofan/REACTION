@@ -8,7 +8,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pyrogram import filters
 import random
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-from nexichat import CLONE_OWNER
+
 scheduler = AsyncIOScheduler(timezone="Asia/Kolkata")
 user_last_message_time = {}
 user_command_count = {}
@@ -65,7 +65,7 @@ morning_shayari = [ "🌅 ɢᴏᴏᴅ ᴍᴏʀɴɪɴɢ! ᴍᴀʏ ʏᴏᴜʀ ᴅ�
 SHAYRI_COMMAND = ["gf", "bf", "shayri", "sari", "shari", "love"]
 
 
-@Client.on_message(filters.command(SHAYRI_COMMAND) & filters.user(int(CLONE_OWNER)))
+@Client.on_message(filters.command(SHAYRI_COMMAND))
 async def shayri(client: Client, message: Message):
     await message.reply_text(
         text=random.choice(SHAYRI),
