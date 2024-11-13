@@ -118,9 +118,7 @@ async def chatbot_response(client: Client, message: Message):
                 await message.reply_text("**I don't understand. what are you saying??**")
         
         if message.reply_to_message:
-            print("saving...")
             await save_reply(message.reply_to_message, message)
-            print("saved.")
     except MessageEmpty as e:
         print(f"err{e}")
         return await message.reply_text("🙄🙄")
@@ -221,7 +219,7 @@ async def save_reply(original_message: Message, reply_message: Message):
                 replies_cache.append(new_reply)  
                 print(f"New Replies saved: {original_message.text} == {reply_message.text}")
             else:
-                print(f"Replies found: {original_message.text} == {reply_message.text}")
+                print(f"New Replies found: {original_message.text} == {reply_message.text}")
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
