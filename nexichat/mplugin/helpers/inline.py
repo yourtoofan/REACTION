@@ -5,16 +5,7 @@ from nexichat import OWNER, nexichat
 
 
 START_BOT = [
-    [
-        InlineKeyboardButton(
-            text="😍 ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ 😍",
-            url=f"https://t.me/{nexichat.username}?startgroup=true",
-        ),
-    ],
-    [
-        InlineKeyboardButton(text="🥀 ᴏᴡɴᴇʀ 🥀", user_id=OWNER),
-        InlineKeyboardButton(text="✨ ꜱᴜᴘᴘᴏʀᴛ ✨", url=f"https://t.me/{SUPPORT_GRP}"),
-    ],
+    
     [
         InlineKeyboardButton(text="« ғᴇᴀᴛᴜʀᴇs »", callback_data="HELP"),
     ],
@@ -22,10 +13,6 @@ START_BOT = [
 
 
 DEV_OP = [
-    [
-        InlineKeyboardButton(text="🥀 ᴏᴡɴᴇʀ 🥀", user_id=OWNER),
-        InlineKeyboardButton(text="✨ ꜱᴜᴘᴘᴏʀᴛ ✨", url=f"https://t.me/{SUPPORT_GRP}"),
-    ],
     [
         InlineKeyboardButton(
             text="✦ ᴀᴅᴅ ᴍᴇ ʙᴀʙʏ ✦",
@@ -43,10 +30,7 @@ DEV_OP = [
 
 PNG_BTN = [
     [
-        InlineKeyboardButton(
-            text="😍 ᴀᴅᴅ ᴍᴇ ʙᴀʙʏ 😍",
-            url=f"https://t.me/{nexichat.username}?startgroup=true",
-        ),
+        InlineKeyboardButton(text="« ғᴇᴀᴛᴜʀᴇs »", callback_data="HELP"),
     ],
     [
         InlineKeyboardButton(
@@ -122,9 +106,9 @@ HELP_START = [
 
 HELP_BUTN = [
     [
-        InlineKeyboardButton(
-            text="« ʜᴇʟᴘ »", url=f"https://t.me/{nexichat.username}?start=help"
-        ),
+        InlineKeyboardButton(text="« ғᴇᴀᴛᴜʀᴇs »", callback_data="HELP"),
+    ],
+    [
         InlineKeyboardButton(text="⦿ ᴄʟᴏsᴇ ⦿", callback_data="CLOSE"),
     ],
 ]
