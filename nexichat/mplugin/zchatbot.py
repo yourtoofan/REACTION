@@ -113,7 +113,9 @@ async def chatbot_response(client: Client, message: Message):
                 await message.reply_text("**I don't understand. what are you saying??**")
         
         if message.reply_to_message:
+            print("saving...")
             await save_reply(message.reply_to_message, message)
+            print("saved.")
     except MessageEmpty as e:
         return await message.reply_text("🙄🙄")
     except Exception as e:
