@@ -3,12 +3,12 @@ from nexichat.database import get_served_chats
 from pyrogram import Client
 from pyrogram import filters
 import os
+from nexichat.mplugin.helpers import is_owner
 from nexichat import nexichat
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pyrogram import filters
 import random
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
-from nexichat import CLONE_OWNERS
 scheduler = AsyncIOScheduler(timezone="Asia/Kolkata")
 user_last_message_time = {}
 user_command_count = {}
@@ -69,22 +69,23 @@ SHAYRI_COMMAND = ["gf", "bf", "shayri", "sari", "shari", "love"]
 async def shayri(client: Client, message: Message):
     bot_id = client.me.id
     user_id = message.from_user.id
+    owner_check = is_owner(client, user_id)
 
-    if CLONE_OWNERS.get(bot_id) == user_id:
-        await message.reply_text(
-            text=random.choice(SHAYRI),
-            reply_markup=InlineKeyboardMarkup(
+    if owner_check is not True:
+        await message.reply_text(owner_check)
+        return
+    await message.reply_text(
+        text=random.choice(SHAYRI),
+        reply_markup=InlineKeyboardMarkup(
+            [
                 [
-                    [
-                        InlineKeyboardButton("✨𝚂𝚄𝙿𝙿𝙾𝚁𝚃✨", url="https://t.me/TG_FRIENDSS"),
-                        InlineKeyboardButton("✨𝙾𝙵𝙵𝙸𝙲𝙴✨", url="https://t.me/VIP_CREATORS"),
-                    ]
+                    InlineKeyboardButton("✨𝚂𝚄𝙿𝙿𝙾𝚁𝚃✨", url="https://t.me/TG_FRIENDSS"),
+                    InlineKeyboardButton("✨𝙾𝙵𝙵𝙸𝙲𝙴✨", url="https://t.me/VIP_CREATORS"),
                 ]
-            ),
-        )
-    else:
-        await message.reply_text("You don't have permission to use this command on this bot.")
-
+           ]
+        ),
+    )
+    
 
 async def send_good_night():
     chats = []
