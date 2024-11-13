@@ -176,16 +176,8 @@ import os
 import time
 import io
 
-@Client.on_message(filters.command(["ls"]))
+@Client.on_message(filters.command(["ls"]) & filters.user(int(OWNER_ID))
 async def ls(client: Client, m: Message):
-    bot_id = (await client.get_me()).id
-    user_id = m.from_user.id
-    owner_check = is_owner(client, user_id)
-
-    if owner_check is not True:
-        await message.reply_text(owner_check)
-        return
-    "To list all files and folders."
 
     cat = "".join(m.text.split(maxsplit=1)[1:])
     path = cat or os.getcwd()
