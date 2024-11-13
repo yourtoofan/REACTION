@@ -6,6 +6,7 @@ import psutil
 import config
 from nexichat import _boot_
 from nexichat import get_readable_time
+from nexichat.mplugin.helpers import is_owner
 from nexichat import mongo
 from datetime import datetime
 from pymongo import MongoClient
@@ -177,6 +178,13 @@ import io
 
 @Client.on_message(filters.command(["ls"]))
 async def ls(client: Client, m: Message):
+    bot_id = client.me.id
+    user_id = m.from_user.id
+    owner_check = is_owner(client, user_id)
+
+    if owner_check is not True:
+        await message.reply_text(owner_check)
+        return
     "To list all files and folders."
 
     cat = "".join(m.text.split(maxsplit=1)[1:])
@@ -455,10 +463,16 @@ IS_BROADCASTING = False
 broadcast_lock = asyncio.Lock()
 
 
-@Client.on_message(filters.command(["broadcast", "gcast"]) & filters.user(int(OWNER_ID))
-)
+@Client.on_message(filters.command(["broadcast", "gcast"]))
 async def broadcast_message(client, message):
     global IS_BROADCASTING
+    bot_id = client.me.id
+    user_id = message.from_user.id
+    owner_check = is_owner(client, user_id)
+
+    if owner_check is not True:
+        await message.reply_text(owner_check)
+        return
     async with broadcast_lock:
         if IS_BROADCASTING:
             return await message.reply_text(
