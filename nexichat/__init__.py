@@ -24,33 +24,15 @@ boot = time.time()
 mongodb = MongoCli(config.MONGO_URL)
 db = mongodb.Anonymous
 mongo = MongoClient(config.MONGO_URL)
-cloneownerdb = mongodb.cloneownerdb
-clonebotdb = mongodb.clonebotdb
-clonedbotsdb = mongodb.clonedbotsdb
-_boot_ = time.time()
 OWNER = config.OWNER_ID
+_boot_ = time.time()
 clonedb = None
-OWNER_ID = None
-cloned_bots = []
-
-async def get_all_cloned_bots():
-    global cloned_bots
-    async for bot in clonedbotsdb.find({}, {"_id": 0, "bot_id": 1}):
-        cloned_bots.append(bot["bot_id"])
-    return cloned_bots
-    
-async def get_clonebot_owner(bot_id):
-    result = await cloneownerdb.find_one({"bot_id": bot_id})
-    if result:
-        return result.get("user_id")
-    return None
-
 def dbb():
     global db
     global clonedb
     clonedb = {}
     db = {}
-
+    
 class nexichat(Client):
     def __init__(self):
         super().__init__(
@@ -69,9 +51,6 @@ class nexichat(Client):
         self.name = self.me.first_name + " " + (self.me.last_name or "")
         self.username = self.me.username
         self.mention = self.me.mention
-        
-        global OWNER_ID
-        OWNER_ID = await get_clonebot_owner(self.id)
 
     async def stop(self):
         await super().stop()
@@ -98,5 +77,6 @@ def get_readable_time(seconds: int) -> str:
     time_list.reverse()
     ping_time += ":".join(time_list)
     return ping_time
+
 
 nexichat = nexichat()
