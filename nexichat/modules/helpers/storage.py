@@ -5,7 +5,7 @@ CHAAT_STORAGE = [
 ]
 
 CHAT_STORAGE = [
-    "mongodb+srv://chutiyapa:bihar@cluster0.bph5t.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    "mongodb+srv://chatbot1:a@cluster0.pxbu0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
     "mongodb+srv://bikash:bikash@bikash.3jkvhp7.mongodb.net/?retryWrites=true&w=majority",
     "mongodb+srv://Bikash:Bikash@bikash.yl2nhcy.mongodb.net/?retryWrites=true&w=majority",
     "mongodb+srv://hnyx:wywyw2@cluster0.9dxlslv.mongodb.net/?retryWrites=true&w=majority",
