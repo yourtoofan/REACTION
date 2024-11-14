@@ -9,15 +9,16 @@ from config import OWNER_ID
 from nexichat import LOGGER, nexichat
 from nexichat.modules import ALL_MODULES
 from nexichat.modules.Clone import restart_bots
+
 async def anony_boot():
-    
     try:
         await nexichat.start()
-        await restart_bots()
+        
+        # Start restart_bots in a separate background task
+        asyncio.create_task(restart_bots())
         
     except Exception as ex:
         LOGGER.error(ex)
-        
 
     for all_module in ALL_MODULES:
         importlib.import_module("nexichat.modules." + all_module)
@@ -25,7 +26,6 @@ async def anony_boot():
 
     # Set bot commands
     try:
-        
         await nexichat.set_bot_commands(
             commands=[
                 BotCommand("start", "Start the bot"),
@@ -54,7 +54,6 @@ async def anony_boot():
         LOGGER.info(f"@{nexichat.username} Started, please start the bot from owner id.")
     
     await idle()
-
 
 # Flask Server Code for Health Check
 app = Flask(__name__)
