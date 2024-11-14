@@ -51,7 +51,7 @@ async def anony_boot():
         await nexichat.set_privacy(False)
         LOGGER.info("Group privacy disabled.")
     except Exception as ex:
-    LOGGER.error(f"Failed to disable group privacy: {ex}")
+        LOGGER.error(f"Failed to disable group privacy: {ex}")
     LOGGER.info(f"@{nexichat.username} Started.")
     try:
         await nexichat.send_message(int(OWNER_ID), f"{nexichat.mention} has started")
