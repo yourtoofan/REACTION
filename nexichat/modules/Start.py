@@ -629,6 +629,8 @@ from pyrogram.types import Message
 from nexichat.modules.helpers import languages
 DetectorFactory.seed = 0  
 
+from deep_translator import GoogleTranslator
+
 @nexichat.on_message(filters.command("check") & filters.reply)
 async def check_language(client: Client, message: Message):
     reply_text = message.reply_to_message.text
@@ -637,12 +639,10 @@ async def check_language(client: Client, message: Message):
         return
 
     try:
-        lang_code = detect(reply_text)
-        lang_name = lang_code_to_name(lang_code)
-        await message.reply(f"Language: {lang_name}\nCode: {lang_code}")
-    except LangDetectException:
+        # Try translating to English; this will help in identifying the language.
+        translator = GoogleTranslator(source='auto', target='en')
+        translated_text = translator.translate(reply_text)
+        detected_lang = translator.source
+        await message.reply(f"Detected Language: {detected_lang}\nTranslated Text: {translated_text}")
+    except Exception as e:
         await message.reply("Couldn't detect the language.")
-
-def lang_code_to_name(code):
-    global languages
-    return languages.get(code, "Unknown")
