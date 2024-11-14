@@ -12,28 +12,28 @@ def get_bot_users_collection(bot_id):
 def get_bot_chats_collection(bot_id):
     return mongodb[f"{bot_id}_chats"]
 
-async def is_served_user(bot_id, user_id: int) -> bool:
+async def is_served_cuser(bot_id, user_id: int) -> bool:
     usersdb = get_bot_users_collection(bot_id)
     return await usersdb.find_one({"user_id": user_id}) is not None
 
-async def add_served_user(bot_id, user_id: int):
+async def add_served_cuser(bot_id, user_id: int):
     usersdb = get_bot_users_collection(bot_id)
     if not await is_served_user(bot_id, user_id):
         await usersdb.insert_one({"user_id": user_id})
 
-async def get_served_users(bot_id) -> list:
+async def get_served_cusers(bot_id) -> list:
     usersdb = get_bot_users_collection(bot_id)
     return await usersdb.find({"user_id": {"$gt": 0}}).to_list(length=None)
 
-async def is_served_chat(bot_id, chat_id: int) -> bool:
+async def is_served_cchat(bot_id, chat_id: int) -> bool:
     chatsdb = get_bot_chats_collection(bot_id)
     return await chatsdb.find_one({"chat_id": chat_id}) is not None
 
-async def add_served_chat(bot_id, chat_id: int):
+async def add_served_cchat(bot_id, chat_id: int):
     chatsdb = get_bot_chats_collection(bot_id)
     if not await is_served_chat(bot_id, chat_id):
         await chatsdb.insert_one({"chat_id": chat_id})
 
-async def get_served_chats(bot_id) -> list:
+async def get_served_cchats(bot_id) -> list:
     chatsdb = get_bot_chats_collection(bot_id)
     return await chatsdb.find({"chat_id": {"$lt": 0}}).to_list(length=None)
