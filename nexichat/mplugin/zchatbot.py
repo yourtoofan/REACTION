@@ -11,6 +11,7 @@ from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
 from config import MONGO_URL
 from nexichat import mongo, db
+from nexichat.database import add_served_cchat, add_served_cuser
 from pyrogram.types import Message
 from nexichat.mplugin.helpers import CHATBOT_ON, chatai, languages
 from pymongo import MongoClient
@@ -81,9 +82,9 @@ async def chatbot_response(client: Client, message: Message):
 
         if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
             if message.chat.type == "group" or message.chat.type == "supergroup":
-                return await add_served_chat(message.chat.id)
+                return await add_served_cchat(bot_user_id, message.chat.id)
             else:
-                return await add_served_user(message.chat.id)
+                return await add_served_cuser(bot_user_id, message.chat.id)
 
       
         if (message.reply_to_message and message.reply_to_message.from_user.id == bot_user_id) or not message.reply_to_message:
