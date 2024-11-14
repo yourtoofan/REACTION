@@ -103,20 +103,19 @@ from pyrogram.types import Chat
 
 async def set_group_language(chat: Chat):
     messages = []
-    # Get the recent chat history for language detection
+    
     async for message in nexichat.get_chat_history(chat.id, limit=50):
         if message.text and not message.from_user.is_bot:
             messages.append(message.text)
 
     if not messages:
-        return  # If there are no valid messages, exit the function
-
-    # Detect language for each message
+        return  
+        
     lang_counts = Counter(detect(text) for text in messages if text)
     most_common_lang, max_count = lang_counts.most_common(1)[0]
     max_lang_percentage = (max_count / len(messages)) * 100
 
-    # If a single language is dominant, set it as chat language
+    
     if max_lang_percentage > 50:
         await lang_db.update_one({"chat_id": chat.id}, {"$set": {"language": most_common_lang}}, upsert=True)
         await nexichat.send_message(
@@ -136,10 +135,8 @@ async def welcomejej(client, message: Message):
             
             if member.id == nexichat.id:
                 try:
-                    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
-                    await message.reply_photo(photo=random.choice(IMG), caption=START.format(nexichat.mention or "can't mention", users, chats), reply_markup=reply_markup)
-                    chat = message.chat
-                    await set_group_language(chat)
+                    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
+                    await message.reply_text(text="**тнαикѕ ꜰᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ ɪɴ ᴛʜɪꜱ ɢʀᴏᴜᴩ.**\n\n**ᴋɪɴᴅʟʏ  ꜱᴇʟᴇᴄᴛ  ʙᴏᴛ  ʟᴀɴɢᴜᴀɢᴇ  ꜰᴏʀ  ᴛʜɪꜱ  ɢʀᴏᴜᴩ  ʙʏ  ᴛʏᴩᴇ  ☞  /lang**", reply_markup=reply_markup)
                 except Exception as e:
                     print(f"{e}")
                     pass
