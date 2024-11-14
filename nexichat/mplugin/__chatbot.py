@@ -127,7 +127,8 @@ async def chatbot_response(client: Client, message: Message):
                     translated_text = response_text
                 else:
                     translated_text = GoogleTranslator(source='auto', target=chat_lang).translate(response_text)
-                
+                    if not translated_text:
+                        translated_text = response_text
                 if reply_data["check"] == "sticker":
                     await message.reply_sticker(reply_data["text"])
                 elif reply_data["check"] == "photo":
