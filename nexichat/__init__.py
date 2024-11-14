@@ -21,8 +21,8 @@ logging.basicConfig(
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 LOGGER = logging.getLogger(__name__)
 boot = time.time()
-mongodb = MongoClient(config.MONGO_URL)
-db = mongodb.VIPMUSIC
+mongodb = MongoCli(config.MONGO_URL)
+db = mongodb.Anonymous
 mongo = MongoClient(config.MONGO_URL)
 OWNER = config.OWNER_ID
 _boot_ = time.time()
