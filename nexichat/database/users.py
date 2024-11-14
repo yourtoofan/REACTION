@@ -1,6 +1,6 @@
 from nexichat import db
 
-usersdb = db.users
+usersdb = db.tgusersdb
 
 
 async def is_served_user(user_id: int) -> bool:
