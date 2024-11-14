@@ -118,7 +118,8 @@ async def restart_bots():
     try:
         logging.info("Restarting all cloned bots...")
         bots = clonebotdb.find()
-        async for bot in bots:
+        
+        async def restart_bot(bot):
             bot_token = bot["token"]
             ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="nexichat/mplugin"))
             try:
@@ -131,6 +132,9 @@ async def restart_bots():
                 logging.info(f"Removed expired or invalid token for bot ID: {bot['bot_id']}")
             except Exception as e:
                 logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
+        
+        await asyncio.gather(*(restart_bot(bot) async for bot in bots))
+        
     except Exception as e:
         logging.exception("Error while restarting bots.")
 
