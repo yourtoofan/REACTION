@@ -118,7 +118,7 @@ async def restart_bots():
     global CLONES
     try:
         logging.info("Restarting all cloned bots...")
-        bots = clonebotdb.find()
+        bots = [bot async for bot in clonebotdb.find()]
         
         async def restart_bot(bot):
             bot_token = bot["token"]
@@ -134,11 +134,10 @@ async def restart_bots():
             except Exception as e:
                 logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
         
-        await asyncio.gather(*(restart_bot(bot) async for bot in bots))
+        await asyncio.gather(*(restart_bot(bot) for bot in bots))
         
     except Exception as e:
         logging.exception("Error while restarting bots.")
-
 @app.on_message(filters.command("delallclone") & filters.user(int(OWNER_ID)))
 async def delete_all_cloned_bots(client, message):
     try:
