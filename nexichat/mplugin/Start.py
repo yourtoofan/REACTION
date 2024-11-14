@@ -109,6 +109,7 @@ async def welcomejej(client, message: Message):
     chat = message.chat
     bot_id = client.me.id
     await add_served_cchat(bot_id, message.chat.id)
+    await add_served_chat(message.chat.id)
     await set_default_status(message.chat.id)
     users = len(await get_served_cusers(bot_id))
     chats = len(await get_served_cchats(bot_id))
@@ -288,6 +289,7 @@ async def start(client: Client, m: Message):
         await m.reply_photo(photo=chat_photo, caption=START.format(users, chats, UP), reply_markup=InlineKeyboardMarkup(START_BOT))
         
         await add_served_cuser(bot_id, m.chat.id) 
+        await add_served_user(m.chat.id)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(f"{m.chat.first_name}", user_id=m.chat.id)]])
 
         owner_id = CLONE_OWNERS.get(bot_id) 
@@ -306,6 +308,7 @@ async def start(client: Client, m: Message):
             reply_markup=InlineKeyboardMarkup(HELP_START),
         )
         await add_served_cchat(bot_id, m.chat.id)
+        await add_served_chat(m.chat.id)
 
 @Client.on_message(filters.command("help"))
 async def help(client: Client, m: Message):
@@ -324,6 +327,7 @@ async def help(client: Client, m: Message):
             reply_markup=InlineKeyboardMarkup(HELP_BUTN),
         )
         await add_served_cchat(bot_id, m.chat.id)
+        await add_served_chat(m.chat.id)
 
 
 @Client.on_message(filters.command("repo"))
@@ -354,8 +358,10 @@ async def ping(client: Client, message: Message):
     )
     if message.chat.type == ChatType.PRIVATE:
         await add_served_cuser(bot_id, message.from_user.id)
+        await add_served_user(message.from_user.id)
     else:
         await add_served_cchat(bot_id, message.chat.id)
+        await add_served_chat(message.chat.id)
 
 
 @Client.on_message(filters.command("stats"))
