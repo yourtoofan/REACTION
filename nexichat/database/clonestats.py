@@ -2,6 +2,8 @@ from nexichat import db as mongodb
 
 cloneownerdb = mongodb.cloneownerdb
 clonebotdb = mongodb.clonebotdb
+chatsdb = mongodb.chats
+usersdb = mongodb.users
 
 async def save_clonebot_owner(bot_id, user_id):
     await cloneownerdb.insert_one({"bot_id": bot_id, "user_id": user_id})
