@@ -17,6 +17,7 @@ from config import OWNER_ID, MONGO_URL, OWNER_USERNAME
 from pyrogram.errors import FloodWait, ChatAdminRequired
 from nexichat.database.chats import get_served_chats, add_served_chat
 from nexichat.database.users import get_served_users, add_served_user
+from nexichat.database import get_served_cchats, get_served_cusers, get_served_cuser, get_served_cchat
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from nexichat.mplugin.helpers import (
     START,
@@ -250,15 +251,17 @@ async def ls(client: Client, m: Message):
 
 @Client.on_message(filters.command(["start", "aistart"]))
 async def start(client: Client, m: Message):
-    users = len(await get_served_users())
-    chats = len(await get_served_chats())
+    bot_id = client.me.id
+    users = len(await get_served_cusers(bot_id))
+    chats = len(await get_served_cchats(bot_id))
+    
     if m.chat.type == ChatType.PRIVATE:
         accha = await m.reply_text(
             text=random.choice(EMOJIOS),
         )
         
         animation_steps = [
-            "ᴅ", "ᴅι", "ᴅιи", "ᴅιиg", "ᴅιиg ᴅ", "ᴅιиg ᴅσ", "ᴅιиg ᴅσи", "ᴅιиg ᴅσиg", "ᴅιиg ᴅσиg ꨄ︎", "sᴛαят"
+            "⚡ᴅ", "⚡ᴅι", "⚡ᴅιи", "⚡ᴅιиg", "⚡ᴅιиg ᴅ", "⚡ᴅιиg ᴅσ", "⚡ᴅιиg ᴅσи", "⚡ᴅιиg ᴅσиg", "⚡ᴅιиg ᴅσиg ꨄ︎", "⚡sᴛαятɪɴɢ..."
         ]
 
         for step in animation_steps:
@@ -278,15 +281,14 @@ async def start(client: Client, m: Message):
             except AttributeError:
                 chat_photo = BOT  
 
-        users = len(await get_served_users())
-        chats = len(await get_served_chats())
+        users = len(await get_served_cusers(bot_id))
+        chats = len(await get_served_cchats(bot_id))
         UP, CPU, RAM, DISK = await bot_sys_stats()
         await m.reply_photo(photo=chat_photo, caption=START.format(users, chats, UP), reply_markup=InlineKeyboardMarkup(START_BOT))
         
-        await add_served_user(m.chat.id)
+        await add_served_cuser(m.chat.id, bot_id) 
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(f"{m.chat.first_name}", user_id=m.chat.id)]])
 
-        bot_id = client.me.id
         owner_id = CLONE_OWNERS.get(bot_id) 
         if owner_id:
             await client.send_photo(
@@ -302,10 +304,11 @@ async def start(client: Client, m: Message):
             caption=GSTART.format(m.from_user.mention or "can't mention"),
             reply_markup=InlineKeyboardMarkup(HELP_START),
         )
-        await add_served_chat(m.chat.id)
+        await add_served_cchat(m.chat.id, bot_id)
 
 @Client.on_message(filters.command("help"))
 async def help(client: Client, m: Message):
+    bot_id = client.me.id
     if m.chat.type == ChatType.PRIVATE:
         hmm = await m.reply_photo(
             photo=random.choice(IMG),
@@ -319,7 +322,7 @@ async def help(client: Client, m: Message):
             caption="**ʜᴇʏ, ᴘᴍ ᴍᴇ ғᴏʀ ʜᴇʟᴘ ᴄᴏᴍᴍᴀɴᴅs!**",
             reply_markup=InlineKeyboardMarkup(HELP_BUTN),
         )
-        await add_served_chat(m.chat.id)
+        await add_served_chat(m.chat.id, bot_id)
 
 
 @Client.on_message(filters.command("repo"))
@@ -355,13 +358,15 @@ async def ping(client: Client, message: Message):
 
 @Client.on_message(filters.command("stats"))
 async def stats(cli: Client, message: Message):
-    users = len(await get_served_users())
-    chats = len(await get_served_chats())
+    bot_id = (await cli.get_me()).id
+    users = len(await get_served_users(bot_id))
+    chats = len(await get_served_chats(bot_id))
+    
     await message.reply_text(
-        f"""{(await cli.get_me()).mention} ᴄʜᴀᴛʙᴏᴛ sᴛᴀᴛs:
+        f"""{(await cli.get_me()).mention} Chatbot Stats:
 
-➻ **ᴄʜᴀᴛs :** {chats}
-➻ **ᴜsᴇʀs :** {users}"""
+➻ **Chats:** {chats}
+➻ **Users:** {users}"""
     )
 
 
