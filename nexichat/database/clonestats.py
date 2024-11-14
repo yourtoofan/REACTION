@@ -18,7 +18,7 @@ async def is_served_cuser(bot_id, user_id: int) -> bool:
 
 async def add_served_cuser(bot_id, user_id: int):
     usersdb = get_bot_users_collection(bot_id)
-    if not await is_served_user(bot_id, user_id):
+    if not await is_served_cuser(bot_id, user_id):
         await usersdb.insert_one({"user_id": user_id})
 
 async def get_served_cusers(bot_id) -> list:
@@ -31,7 +31,7 @@ async def is_served_cchat(bot_id, chat_id: int) -> bool:
 
 async def add_served_cchat(bot_id, chat_id: int):
     chatsdb = get_bot_chats_collection(bot_id)
-    if not await is_served_chat(bot_id, chat_id):
+    if not await is_served_cchat(bot_id, chat_id):
         await chatsdb.insert_one({"chat_id": chat_id})
 
 async def get_served_cchats(bot_id) -> list:
