@@ -67,7 +67,13 @@ async def save_reply(original_message: Message, reply_message: Message):
             reply_data["text"] = reply_message.voice.file_id
             reply_data["check"] = "voice"
         elif reply_message.text:
-            reply_data["text"] = reply_message.text
+            translated_text = reply_message.text
+            try:
+                translated_text = GoogleTranslator(source='auto', target='en').translate(reply_message.text)
+            except Exception as e:
+                print(f"Translation error: {e}, saving original text.")
+                translated_text = reply_message.text
+            reply_data["text"] = translated_text
             reply_data["check"] = "none"
 
         is_chat = await chatai.find_one(reply_data)
@@ -88,28 +94,10 @@ async def get_reply(word: str):
         relevant_replies = replies_cache
     return random.choice(relevant_replies) if relevant_replies else None
 
-
-
-
-def generate_language_buttons(languages):
-    buttons = []
-    current_row = []
-    for lang, code in languages.items():
-        current_row.append(InlineKeyboardButton(lang.capitalize(), callback_data=f'setlang_{code}'))
-        if len(current_row) == 4:
-            buttons.append(current_row)
-            current_row = []
-    if current_row:
-        buttons.append(current_row)
-    return InlineKeyboardMarkup(buttons)
-
 async def get_chat_language(chat_id):
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
     
-
-
-            
 @Client.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     try:
