@@ -107,10 +107,11 @@ async def set_default_status(chat_id):
 @Client.on_message(filters.new_chat_members)
 async def welcomejej(client, message: Message):
     chat = message.chat
-    await add_served_chat(message.chat.id)
+    bot_id = client.me.id
+    await add_served_cchat(bot_id, message.chat.id)
     await set_default_status(message.chat.id)
-    users = len(await get_served_users())
-    chats = len(await get_served_chats())
+    users = len(await get_served_cusers(bot_id))
+    chats = len(await get_served_cchats(bot_id))
     try:
         for member in message.new_chat_members:
             if member.id == (await client.get_me()).id:
@@ -322,7 +323,7 @@ async def help(client: Client, m: Message):
             caption="**ʜᴇʏ, ᴘᴍ ᴍᴇ ғᴏʀ ʜᴇʟᴘ ᴄᴏᴍᴍᴀɴᴅs!**",
             reply_markup=InlineKeyboardMarkup(HELP_BUTN),
         )
-        await add_served_chat(m.chat.id, bot_id)
+        await add_served_cchat(bot_id, m.chat.id)
 
 
 @Client.on_message(filters.command("repo"))
@@ -338,6 +339,7 @@ async def repo(client: Client, m: Message):
 
 @Client.on_message(filters.command("ping"))
 async def ping(client: Client, message: Message):
+    bot_id = client.me.id
     start = datetime.now()
     UP, CPU, RAM, DISK = await bot_sys_stats()
     loda = await message.reply_photo(
@@ -351,9 +353,9 @@ async def ping(client: Client, message: Message):
         reply_markup=InlineKeyboardMarkup(PNG_BTN),
     )
     if message.chat.type == ChatType.PRIVATE:
-        await add_served_user(message.from_user.id)
+        await add_served_cuser(bot_id, message.from_user.id)
     else:
-        await add_served_chat(message.chat.id)
+        await add_served_cchat(bot_id, message.chat.id)
 
 
 @Client.on_message(filters.command("stats"))
@@ -499,7 +501,7 @@ async def broadcast_message(client, message):
             if not flags.get("-nogroup", False):
                 sent = 0
                 pin_count = 0
-                chats = await get_served_chats()
+                chats = await get_served_cchats(bot_id)
 
                 for chat in chats:
                     chat_id = int(chat["chat_id"])
@@ -546,7 +548,7 @@ async def broadcast_message(client, message):
 
             if flags.get("-user", False):
                 susr = 0
-                users = await get_served_users()
+                users = await get_served_cusers(bot_id)
 
                 for user in users:
                     user_id = int(user["user_id"])
