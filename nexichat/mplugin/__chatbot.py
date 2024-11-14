@@ -7,6 +7,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, 
 from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
+from nexichat.database import add_served_cchat, add_served_cuser
 from config import MONGO_URL
 from nexichat import nexichat, mongo, LOGGER, db
 from nexichat.mplugin.helpers import chatai, CHATBOT_ON, languages
@@ -90,9 +91,6 @@ async def get_reply(word: str):
 
 
 
-
-
-
 def generate_language_buttons(languages):
     buttons = []
     current_row = []
@@ -123,9 +121,12 @@ async def chatbot_response(client: Client, message: Message):
 
         if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
             if message.chat.type in ["group", "supergroup"]:
-                return await add_served_chat(chat_id)
+                await add_served_cchat(bot_user_id, message.chat.id)
+                return await add_served_chat(message.chat.id)
             else:
-                return await add_served_user(chat_id)
+                await add_served_cuser(bot_user_id, message.chat.id)
+                return await add_served_user(message.chat.id)
+
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == client.me.id) or not message.reply_to_message:
             reply_data = await get_reply(message.text)
