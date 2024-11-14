@@ -128,22 +128,6 @@ async def restart_bots():
             try:
                 await ai.start()
                 bot_info = await ai.get_me()
-                
-                await ai.set_bot_commands([
-                    BotCommand("start", "Start the bot"),
-                    BotCommand("help", "Get the help menu"),
-                    BotCommand("clone", "Make your own chatbot"),
-                    BotCommand("ping", "Check if the bot is alive or dead"),
-                    BotCommand("lang", "Select bot reply language"),
-                    BotCommand("resetlang", "Reset to default bot reply lang"),
-                    BotCommand("id", "Get users user_id"),
-                    BotCommand("stats", "Check bot stats"),
-                    BotCommand("gcast", "Broadcast any message to groups/users"),
-                    BotCommand("chatbot", "Enable or disable chatbot"),
-                    BotCommand("status", "Check chatbot enable or disable in chat"),
-                    BotCommand("shayri", "Get random shayri for love"),
-                    BotCommand("repo", "Get chatbot source code"),
-                ])
 
                 if bot_info.id not in CLONES:
                     CLONES.add(bot_info.id)
