@@ -115,10 +115,10 @@ async def welcomejej(client, message: Message):
     chats = len(await get_served_cchats(bot_id))
     try:
         for member in message.new_chat_members:
-            if member.id == (await client.get_me()).id:
+            if member.id == client.me.id:
                 try:
                     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
-                    await message.reply_photo(photo=random.choice(IMG), caption=START.format(users, chats), reply_markup=reply_markup)
+                    await message.reply_text(text="**тнαикѕ ꜰᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ ɪɴ ᴛʜɪꜱ ɢʀᴏᴜᴩ.**\n\n**ᴋɪɴᴅʟʏ  ꜱᴇʟᴇᴄᴛ  ʙᴏᴛ  ʟᴀɴɢᴜᴀɢᴇ  ꜰᴏʀ  ᴛʜɪꜱ  ɢʀᴏᴜᴩ  ʙʏ  ᴛʏᴩᴇ  ☞  /lang**", reply_markup=reply_markup)
                 except Exception as e:
                     print(f"{e}")
                     pass
