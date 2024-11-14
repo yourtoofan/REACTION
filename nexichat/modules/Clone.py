@@ -145,8 +145,6 @@ async def restart_bots():
                     BotCommand("repo", "Get chatbot source code"),
                 ])
 
-                await ai.set_privacy(False)
-
                 if bot_info.id not in CLONES:
                     CLONES.add(bot_info.id)
                     
