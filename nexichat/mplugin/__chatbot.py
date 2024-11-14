@@ -7,24 +7,10 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, 
 from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
+from nexichat.database import add_served_cchat, add_served_cuser
 from config import MONGO_URL
 from nexichat import nexichat, mongo, LOGGER, db
 from nexichat.mplugin.helpers import chatai, CHATBOT_ON, languages
-from nexichat.modules.helpers import (
-    ABOUT_BTN,
-    ABOUT_READ,
-    ADMIN_READ,
-    BACK,
-    CHATBOT_BACK,
-    CHATBOT_READ,
-    DEV_OP,
-    HELP_BTN,
-    HELP_READ,
-    MUSIC_BACK_BTN,
-    SOURCE_READ,
-    START,
-    TOOLS_DATA_READ,
-)
 import asyncio
 
 translator = GoogleTranslator()
@@ -66,7 +52,13 @@ async def save_reply(original_message: Message, reply_message: Message):
             reply_data["text"] = reply_message.voice.file_id
             reply_data["check"] = "voice"
         elif reply_message.text:
-            reply_data["text"] = reply_message.text
+            translated_text = reply_message.text
+            try:
+                translated_text = GoogleTranslator(source='auto', target='en').translate(reply_message.text)
+            except Exception as e:
+                print(f"Translation error: {e}, saving original text.")
+                translated_text = reply_message.text
+            reply_data["text"] = translated_text
             reply_data["check"] = "none"
 
         is_chat = await chatai.find_one(reply_data)
@@ -81,40 +73,21 @@ async def get_reply(word: str):
     global replies_cache
     if not replies_cache:
         await load_replies_cache()
-        print("Reloaded Chats")
+        
     relevant_replies = [reply for reply in replies_cache if reply['word'] == word]
     if not relevant_replies:
         relevant_replies = replies_cache
     return random.choice(relevant_replies) if relevant_replies else None
 
-
-
-
-
-
-
-def generate_language_buttons(languages):
-    buttons = []
-    current_row = []
-    for lang, code in languages.items():
-        current_row.append(InlineKeyboardButton(lang.capitalize(), callback_data=f'setlang_{code}'))
-        if len(current_row) == 4:
-            buttons.append(current_row)
-            current_row = []
-    if current_row:
-        buttons.append(current_row)
-    return InlineKeyboardMarkup(buttons)
-
 async def get_chat_language(chat_id):
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
-    
-
-
             
 @Client.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     try:
+        bot_user = await client.get_me()
+        bot_user_id = bot_user.id
         chat_id = message.chat.id
         chat_status = await status_db.find_one({"chat_id": chat_id})
         
@@ -123,9 +96,11 @@ async def chatbot_response(client: Client, message: Message):
 
         if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
             if message.chat.type in ["group", "supergroup"]:
-                return await add_served_chat(chat_id)
+                await add_served_cchat(bot_user_id, message.chat.id)
+                return await add_served_chat(message.chat.id)
             else:
-                return await add_served_user(chat_id)
+                await add_served_cuser(bot_user_id, message.chat.id)
+                return await add_served_user(message.chat.id)
         
         if (message.reply_to_message and message.reply_to_message.from_user.id == client.me.id) or not message.reply_to_message:
             reply_data = await get_reply(message.text)
@@ -153,6 +128,7 @@ async def chatbot_response(client: Client, message: Message):
                     await message.reply_voice(reply_data["text"])
                 else:
                     await message.reply_text(translated_text)
+                    await client.send_chat_action(message.chat.id, ChatAction.TYPING)
             else:
                 await message.reply_text("**I don't understand. What are you saying?**")
 
