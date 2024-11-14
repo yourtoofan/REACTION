@@ -14,7 +14,7 @@ async def anony_boot():
     try:
         await nexichat.start()
         
-        # Start restart_bots in a separate background task
+        
         asyncio.create_task(restart_bots())
         
     except Exception as ex:
@@ -24,7 +24,7 @@ async def anony_boot():
         importlib.import_module("nexichat.modules." + all_module)
         LOGGER.info(f"Successfully imported : {all_module}")
 
-    # Set bot commands
+    
     try:
         await nexichat.set_bot_commands(
             commands=[
@@ -46,7 +46,12 @@ async def anony_boot():
         LOGGER.info("Bot commands set successfully.")
     except Exception as ex:
         LOGGER.error(f"Failed to set bot commands: {ex}")
-
+    
+    try:
+        await nexichat.set_privacy(False)
+        LOGGER.info("Group privacy disabled.")
+    except Exception as ex:
+    LOGGER.error(f"Failed to disable group privacy: {ex}")
     LOGGER.info(f"@{nexichat.username} Started.")
     try:
         await nexichat.send_message(int(OWNER_ID), f"{nexichat.mention} has started")
