@@ -247,6 +247,7 @@ async def ls(client: Client, m: Message):
         await m.reply_text(msg)
 
 
+
 @Client.on_message(filters.command(["start", "aistart"]))
 async def start(client: Client, m: Message):
     users = len(await get_served_users())
@@ -255,49 +256,15 @@ async def start(client: Client, m: Message):
         accha = await m.reply_text(
             text=random.choice(EMOJIOS),
         )
-        await asyncio.sleep(0.5)
         
-        await accha.edit("**__ᴅ__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅι__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιи__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅ__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσ__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσи__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσиg__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ︎__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ︎ ѕ__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ sт__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ︎ ѕтα__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ︎ ѕтαя__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ sтαят__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ︎ sтαятι__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ︎ sтαятιи__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ sтαятιиg__**")
-        await asyncio.sleep(0.01)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ︎ ѕтαятιиg.__**")
-        await asyncio.sleep(0.1)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ sтαятιиg.....__**")
-        await asyncio.sleep(0.1)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ︎ ѕтαятιиg.__**")
-        await asyncio.sleep(0.1)
-        await accha.edit("**__ᴅιиg ᴅσиg ꨄ sтαятιиg.....__**")
+        animation_steps = [
+            "ᴅ", "ᴅι", "ᴅιи", "ᴅιиg", "ᴅιиg ᴅ", "ᴅιиg ᴅσ", "ᴅιиg ᴅσи", "ᴅιиg ᴅσиg", "ᴅιиg ᴅσиg ꨄ︎", "sᴛαят"
+        ]
+
+        for step in animation_steps:
+            await accha.edit(f"**__{step}__**")
+            await asyncio.sleep(0.01)
+
         await accha.delete()
         
         umm = await m.reply_sticker(sticker=random.choice(STICKER))
@@ -336,7 +303,6 @@ async def start(client: Client, m: Message):
             reply_markup=InlineKeyboardMarkup(HELP_START),
         )
         await add_served_chat(m.chat.id)
-
 
 @Client.on_message(filters.command("help"))
 async def help(client: Client, m: Message):
