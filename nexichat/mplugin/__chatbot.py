@@ -88,7 +88,7 @@ async def get_reply(word: str):
     global replies_cache
     if not replies_cache:
         await load_replies_cache()
-        print("Reloaded Chats")
+        
     relevant_replies = [reply for reply in replies_cache if reply['word'] == word]
     if not relevant_replies:
         relevant_replies = replies_cache
