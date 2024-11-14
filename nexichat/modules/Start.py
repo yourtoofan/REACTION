@@ -623,4 +623,26 @@ async def broadcast_message(client, message):
 
 
     
+from langdetect import detect, DetectorFactory, LangDetectException
+from pyrogram import Client, filters
+from pyrogram.types import Message
+from nexichat.modules.helpers import languages
+DetectorFactory.seed = 0  
 
+@nexichat.on_message(filters.command("check") & filters.reply)
+async def check_language(client: Client, message: Message):
+    reply_text = message.reply_to_message.text
+    if not reply_text:
+        await message.reply("Reply to a text message to detect its language.")
+        return
+
+    try:
+        lang_code = detect(reply_text)
+        lang_name = lang_code_to_name(lang_code)
+        await message.reply(f"Language: {lang_name}\nCode: {lang_code}")
+    except LangDetectException:
+        await message.reply("Couldn't detect the language.")
+
+def lang_code_to_name(code):
+    global languages
+    return languages.get(code, "Unknown")
