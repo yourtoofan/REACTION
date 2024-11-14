@@ -82,9 +82,12 @@ async def chatbot_response(client: Client, message: Message):
 
         if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
             if message.chat.type == "group" or message.chat.type == "supergroup":
-                return await add_served_cchat(bot_user_id, message.chat.id)
+                await add_served_cchat(bot_user_id, message.chat.id)
+                return await add_served_chat(message.chat.id)
             else:
-                return await add_served_cuser(bot_user_id, message.chat.id)
+                await add_served_cuser(bot_user_id, message.chat.id)
+                return await add_served_user(message.chat.id)
+
 
       
         if (message.reply_to_message and message.reply_to_message.from_user.id == bot_user_id) or not message.reply_to_message:
@@ -120,6 +123,7 @@ async def chatbot_response(client: Client, message: Message):
         
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
+            
     except MessageEmpty as e:
         print(f"err{e}")
         return await message.reply_text("🙄🙄")
