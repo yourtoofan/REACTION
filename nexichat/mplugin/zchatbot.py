@@ -216,7 +216,6 @@ async def save_reply(original_message: Message, reply_message: Message):
             if not is_chat:
                 await chatai.insert_one(new_reply)
                 replies_cache.append(new_reply)  
-                print(f"New Replies saved: {original_message.text} == {reply_message.text}")
                 
     except Exception as e:
         print(f"Error in save_reply: {e}")
