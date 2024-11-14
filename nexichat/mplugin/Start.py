@@ -286,7 +286,7 @@ async def start(client: Client, m: Message):
         UP, CPU, RAM, DISK = await bot_sys_stats()
         await m.reply_photo(photo=chat_photo, caption=START.format(users, chats, UP), reply_markup=InlineKeyboardMarkup(START_BOT))
         
-        await add_served_cuser(m.chat.id, bot_id) 
+        await add_served_cuser(bot_id, m.chat.id) 
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(f"{m.chat.first_name}", user_id=m.chat.id)]])
 
         owner_id = CLONE_OWNERS.get(bot_id) 
@@ -304,7 +304,7 @@ async def start(client: Client, m: Message):
             caption=GSTART.format(m.from_user.mention or "can't mention"),
             reply_markup=InlineKeyboardMarkup(HELP_START),
         )
-        await add_served_cchat(m.chat.id, bot_id)
+        await add_served_cchat(bot_id, m.chat.id)
 
 @Client.on_message(filters.command("help"))
 async def help(client: Client, m: Message):
@@ -359,8 +359,8 @@ async def ping(client: Client, message: Message):
 @Client.on_message(filters.command("stats"))
 async def stats(cli: Client, message: Message):
     bot_id = (await cli.get_me()).id
-    users = len(await get_served_users(bot_id))
-    chats = len(await get_served_chats(bot_id))
+    users = len(await get_served_cusers(bot_id))
+    chats = len(await get_served_cchats(bot_id))
     
     await message.reply_text(
         f"""{(await cli.get_me()).mention} Chatbot Stats:
