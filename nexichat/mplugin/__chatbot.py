@@ -69,6 +69,7 @@ async def save_reply(original_message: Message, reply_message: Message):
         elif reply_message.text:
             translated_text = reply_message.text
             try:
+                await asyncio.sleep(1)
                 translated_text = GoogleTranslator(source='auto', target='en').translate(reply_message.text)
             except Exception as e:
                 print(f"Translation error: {e}, saving original text.")
