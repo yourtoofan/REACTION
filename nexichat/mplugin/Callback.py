@@ -36,6 +36,18 @@ from nexichat.mplugin.helpers import (
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 
+def generate_language_buttons(languages):
+    buttons = []
+    current_row = []
+    for lang, code in languages.items():
+        current_row.append(InlineKeyboardButton(lang.capitalize(), callback_data=f'setlang_{code}'))
+        if len(current_row) == 4:
+            buttons.append(current_row)
+            current_row = []
+    if current_row:
+        buttons.append(current_row)
+    return InlineKeyboardMarkup(buttons)
+
 
 @Client.on_callback_query()
 async def cb_handler(client: Client, query: CallbackQuery):
