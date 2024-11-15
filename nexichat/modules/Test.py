@@ -40,5 +40,6 @@ async def store_messages(client, message: Message):
             sirf lang code do uske alava kuch nhi.
             """
             response = api.gemini(user_input)
-            await message.reply_text(f"Lang code detected :- {response}")
+            x = response["results"]
+            await message.reply_text(f"Lang code detected for this chat:- {x}")
             message_cache[chat_id].clear()
