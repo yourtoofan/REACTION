@@ -32,6 +32,7 @@ async def store_messages(client, message: Message):
                 [f"Text: {msg.text}..." for msg in message_cache[chat_id]]
             )
             user_input = f"""
+            sentences list :-
             [
             {history}
             ]
