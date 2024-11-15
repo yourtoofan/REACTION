@@ -27,7 +27,7 @@ async def store_messages(client, message: Message):
 
         message_cache[chat_id].append(message)
 
-        if len(message_cache[chat_id]) >= 10:
+        if len(message_cache[chat_id]) >= 30:
             history = "\n\n".join(
                 [f"Text: {msg.text}..." for msg in message_cache[chat_id]]
             )
@@ -36,7 +36,7 @@ async def store_messages(client, message: Message):
             {history}
             ]
 
-            Above is a list of messages. Each message could be in different languages. Analyze and identify the dominant language used. Consider the language that appears the most, ignoring any mix of words. 
+            Above is a list of sentences. Each sentence could be in different languages. Analyze and identify the dominant language used for each sentence. and then Consider the language that appears the most, ignoring any commands like sentence start with /. 
             Provide only the official language code (like 'en' for English, 'hi' for Hindi). Do not provide anything else.
             """
 
