@@ -15,7 +15,7 @@ from pyrogram.errors import (
 
 forcesub_collection = mongo.status_db.status
 
-@app.on_message(filters.command(["fsub", "forcesub"]) & filters.user(int(OWNER_ID))
+@app.on_message(filters.command(["fsub", "forcesub"]) & filters.user(int(OWNER_ID)))
 async def set_forcesub(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
