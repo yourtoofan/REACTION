@@ -1,9 +1,9 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from pymongo import MongoClient
-from VIPMUSIC import app
+from nexichat import nexichat as app, mongo
 import asyncio
-from VIPMUSIC.misc import SUDOERS
+from config import OWNER_ID
 from config import MONGO_DB_URI
 from pyrogram.enums import ChatMembersFilter
 from pyrogram.errors import (
@@ -13,18 +13,13 @@ from pyrogram.errors import (
     UserNotParticipant,
 )
 
-fsubdb = MongoClient(MONGO_DB_URI)
-forcesub_collection = fsubdb.status_db.status
+forcesub_collection = mongo.status_db.status
 
-@app.on_message(filters.command(["fsub", "forcesub"]) & filters.group)
+@app.on_message(filters.command(["fsub", "forcesub"]) & filters.user(int(OWNER_ID))
 async def set_forcesub(client: Client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
-
-    member = await client.get_chat_member(chat_id, user_id)
-    if not (member.status == "creator" or user_id in SUDOERS):
-        return await message.reply_text("**ᴏɴʟʏ ɢʀᴏᴜᴘ ᴏᴡɴᴇʀs ᴏʀ sᴜᴅᴏᴇʀs ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ.**")
-
+    
     if len(message.command) == 2 and message.command[1].lower() in ["off", "disable"]:
         forcesub_collection.delete_one({"chat_id": chat_id})
         return await message.reply_text("**ғᴏʀᴄᴇ sᴜʙsᴄʀɪᴘᴛɪᴏɴ ʜᴀs ʙᴇᴇɴ ᴅɪsᴀʙʟᴇᴅ ғᴏʀ ᴛʜɪs ɢʀᴏᴜᴘ.**")
@@ -139,14 +134,10 @@ async def check_forcesub(client: Client, message: Message):
         return await message.reply_text("**🚫 I'ᴍ ɴᴏ ʟᴏɴɢᴇʀ ᴀɴ ᴀᴅᴍɪɴ ɪɴ ᴛʜᴇ ғᴏʀᴄᴇᴅ sᴜʙsᴄʀɪᴘᴛɪᴏɴ ᴄʜᴀɴɴᴇʟ. ғᴏʀᴄᴇ sᴜʙsᴄʀɪᴘᴛɪᴏɴ ʜᴀs ʙᴇᴇɴ ᴅɪsᴀʙʟᴇᴅ.**")
 
 
-@app.on_message(filters.group, group=30)
+"""@app.on_message(filters.group, group=30)
 async def enforce_forcesub(client: Client, message: Message):
     if not await check_forcesub(client, message):
         return
-
-
-__MODULE__ = "ғsᴜʙ"
-__HELP__ = """**
-/fsub <ᴄʜᴀɴɴᴇʟ ᴜsᴇʀɴᴀᴍᴇ ᴏʀ ɪᴅ> - sᴇᴛ ғᴏʀᴄᴇ sᴜʙsᴄʀɪᴘᴛɪᴏɴ ғᴏʀ ᴛʜɪs ɢʀᴏᴜᴘ.
-/fsub off - ᴅɪsᴀʙʟᴇ ғᴏʀᴄᴇ sᴜʙsᴄʀɪᴘᴛɪᴏɴ ғᴏʀ ᴛʜɪs ɢʀᴏᴜᴘ.**
 """
+
+
