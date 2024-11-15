@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from nexichat import nexichat as app, mongo
 import asyncio
 from config import OWNER_ID
-from config import MONGO_DB_URI
+from config import MONGO_URL
 from pyrogram.enums import ChatMembersFilter
 from pyrogram.errors import (
     ChatAdminRequired,
