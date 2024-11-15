@@ -41,7 +41,7 @@ class nexichat(Client):
             name="nexichat",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
-            lang_code="en",
+            lang_code="nolang",
             bot_token=config.BOT_TOKEN,
             in_memory=True,
             parse_mode=ParseMode.DEFAULT,
