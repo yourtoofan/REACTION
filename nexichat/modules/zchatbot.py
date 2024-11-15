@@ -3,6 +3,8 @@ from pymongo import MongoClient
 from pyrogram import Client, filters
 from pyrogram.errors import MessageEmpty
 from datetime import datetime, timedelta
+from pyrogram.enums import ChatMemberStatus, ChatType
+from pyrogram.errors import UserNotParticipant
 from pyrogram.enums import ChatAction, ChatMemberStatus as CMS
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from deep_translator import GoogleTranslator
@@ -132,7 +134,7 @@ async def chatbot_response(client: Client, message: Message):
                 await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You are blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
                 return
         chat_id = message.chat.id
-        if message.chat.type == "private" and not await check_forcesub(client, message):
+        if message.chat.type == ChatType.PRIVATE and not await check_forcesub(client, message):
             return
         chat_status = await status_db.find_one({"chat_id": chat_id})
         
