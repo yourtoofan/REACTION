@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
-from pyrogram.errors import UserNotParticipant, ChatWriteForbidden, ChatAdminRequired
+from pyrogram.errors import UserNotParticipant, ChatWriteForbidden
 from pymongo import MongoClient
 from nexichat import nexichat as app, mongo
 import asyncio
@@ -30,10 +30,13 @@ async def set_channel(client: Client, message: Message):
     try:
         chat_info = await client.get_chat(channel)
         
-        # Check if the bot is an admin with permission to invite users
+        # Check if the bot is an admin in the channel and has permissions to invite
         bot_member = await client.get_chat_member(channel, client.me.id)
-        if not bot_member.can_invite_users:
-            return await message.reply_text(f"Please promote me to admin in {channel} with 'Invite to Group via Link' permissions.")
+        if bot_member.status != "administrator":
+            return await message.reply_text(f"Please promote me to admin in {channel}.")
+
+        if not bot_member.permissions.can_invite_users:
+            return await message.reply_text(f"Please grant me the 'Invite to Group via Link' permission in {channel}.")
         
         # Updating the force subscription channel in the database
         collection.update_one(
