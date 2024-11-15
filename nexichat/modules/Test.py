@@ -2,13 +2,10 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from nexichat import nexichat as app
 
-from pyrogram import Client, filters
-
-
 message_cache = {}
 
 @app.on_message(filters.text, group=2)
-async def store_messages(client, message):
+async def store_messages(client, message: Message):
     global message_cache
 
     chat_id = message.chat.id
@@ -24,12 +21,17 @@ async def store_messages(client, message):
     if len(message_cache[chat_id]) >= 10:
         # Create a reply with the last 10 messages
         history = "\n\n".join(
-            [f"Message ID: {msg.message_id}\nText: {msg.text}" for msg in message_cache[chat_id]]
+            [
+                f"Message ID: {msg.id}\nText: {msg.text[:50]}..."  # Fixed: Use msg.id
+                for msg in message_cache[chat_id]
+            ]
         )
         
-        # Send the history
-        await message.reply(f"Last 10 messages in this chat:\n\n{history}")
-        
+        try:
+            # Send the history
+            await message.reply(f"Last 10 messages in this chat:\n\n{history}")
+        except Exception as e:
+            print(f"Failed to send reply: {e}")
+
         # Clear the cache for this chat
         message_cache[chat_id].clear()
-
