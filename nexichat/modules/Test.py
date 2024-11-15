@@ -26,7 +26,7 @@ async def store_messages(client, message: Message):
         # Create a reply with the last 10 messages
         history = "\n\n".join(
             [
-                f"Message ID: {msg.id}\nText: {msg.text[:50]}..."  # Truncated for safety
+                f"Text: {msg.text}..."  # Truncated for safety
                 for msg in message_cache[chat_id]
             ]
         )
