@@ -11,7 +11,7 @@ from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
 from config import MONGO_URL
-from nexichat.modules.fsub import check_forcesub
+#from nexichat.modules.fsub import check_forcesub
 from nexichat import nexichat, mongo, LOGGER, db
 from nexichat.mplugin.helpers import chatai, CHATBOT_ON, languages
 from nexichat.modules.helpers import (
@@ -134,8 +134,8 @@ async def chatbot_response(client: Client, message: Message):
                 await message.reply_text(f"**Hey, {message.from_user.mention}**\n\n**You are blocked for 1 minute due to spam messages.**\n**Try again after 1 minute 🤣.**")
                 return
         chat_id = message.chat.id
-        if message.chat.type == ChatType.PRIVATE and not await check_forcesub(client, message):
-            return
+      #  if message.chat.type == ChatType.PRIVATE and not await check_forcesub(client, message):
+           # return
         chat_status = await status_db.find_one({"chat_id": chat_id})
         
         if chat_status and chat_status.get("status") == "disabled":
