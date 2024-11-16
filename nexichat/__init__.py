@@ -33,6 +33,25 @@ def dbb():
     clonedb = {}
     db = {}
 
+cloneownerdb = db.clone_owners
+
+async def load_clone_owners():
+    async for entry in cloneownerdb.find():
+        bot_id = entry["bot_id"]
+        user_id = entry["user_id"]
+        CLONE_OWNERS[bot_id] = user_id
+
+async def save_clone_owner(bot_id, user_id):
+    await cloneownerdb.update_one(
+        {"bot_id": bot_id},
+        {"$set": {"bot_id": bot_id, "user_id": user_id}},
+        upsert=True
+    )
+    CLONE_OWNERS[bot_id] = user_id
+
+async def delete_clone_owner(bot_id):
+    await cloneownerdb.delete_one({"bot_id": bot_id})
+    CLONE_OWNERS.pop(bot_id, None)
 
 
 class nexichat(Client):
