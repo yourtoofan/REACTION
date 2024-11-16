@@ -19,6 +19,10 @@ clonebotdb = mongodb.clonebotdb
 async def save_clonebot_owner(bot_id, user_id):
     await cloneownerdb.insert_one({"bot_id": bot_id, "user_id": user_id})
 
+async def restart(client: Client, message: Message):
+    os.system(f"kill -9 {os.getpid()} && bash start")
+
+
 @app.on_message(filters.command(["clone", "host", "deploy"]))
 async def clone_txt(client, message):
     if len(message.command) > 1:
