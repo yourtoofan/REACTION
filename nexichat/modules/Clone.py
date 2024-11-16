@@ -10,7 +10,7 @@ import config
 from pyrogram.types import BotCommand
 from config import API_HASH, API_ID, OWNER_ID
 from nexichat import CLONE_OWNERS
-from nexichat import nexichat as app
+from nexichat import nexichat as app, save_clone_owner
 from nexichat import db as mongodb
 
 CLONES = set()
@@ -33,6 +33,7 @@ async def clone_txt(client, message):
             bot_id = bot.id
             user_id = message.from_user.id
             CLONE_OWNERS[bot_id] = user_id
+            await save_clone_owner(bot_id, user_id)
             await ai.set_bot_commands([
                     BotCommand("start", "Start the bot"),
                     BotCommand("help", "Get the help menu"),
