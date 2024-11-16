@@ -118,7 +118,7 @@ async def delete_cloned_bot(client, message):
         cloned_bot = await clonebotdb.find_one({"token": bot_token})
         if cloned_bot:
             await clonebotdb.delete_one({"token": bot_token})
-            CLONES.remove(cloned_bot["bot_id"])
+            
             await ok.edit_text(
                 "**🤖 your cloned bot has been disconnected from my server ☠️**\n**Clone by :- /clone**"
             )
