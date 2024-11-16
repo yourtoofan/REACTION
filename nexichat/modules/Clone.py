@@ -128,7 +128,7 @@ async def delete_cloned_bot(client, message):
             await ok.edit_text(
                 "**🤖 your cloned bot has been disconnected from my server ☠️**\n**Clone by :- /clone**"
             )
-            os.system(f"kill -9 {os.getpid()} && bash start")
+            await restart()
         else:
             await message.reply_text("**⚠️ The provided bot token is not in the cloned list.**")
     except Exception as e:
