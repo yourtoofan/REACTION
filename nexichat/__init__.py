@@ -41,12 +41,8 @@ async def load_clone_owners():
         user_id = entry["user_id"]
         CLONE_OWNERS[bot_id] = user_id
 
-async def save_clone_owner(bot_id, user_id):
-    await cloneownerdb.update_one(
-        {"bot_id": bot_id},
-        {"$set": {"bot_id": bot_id, "user_id": user_id}},
-        upsert=True
-    )
+async def save_clonebot_owner(bot_id, user_id):
+    await cloneownerdb.insert_one({"bot_id": bot_id, "user_id": user_id})
     CLONE_OWNERS[bot_id] = user_id
 
 async def delete_clone_owner(bot_id):
