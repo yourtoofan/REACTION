@@ -38,11 +38,11 @@ async def store_messages(client, message: Message):
             {history}
             ]
 
-            Above is a list of sentences. Each sentence could be in different languages. Analyze and identify the dominant language used for each sentence. and then Consider the language that appears the most, ignoring any commands like sentence start with /. 
+            Above is a list of sentences. Each sentence could be in different languages. Analyze the language of each sentence separately and identify the dominant language used for each sentence. and then Consider the language that appears the most, ignoring any commands like sentence start with /. 
             Provide only the official language name with language code (like 'en' for English, 'hi' for Hindi). in this format :-
             Lang Name :- ""
             Lang code :- ""
-            Do not provide anything else.
+            ok so provideo me only overall [ Lang Name and Lang Code ] in above format Do not provide anything else.
             """
 
             response = api.gemini(user_input)
