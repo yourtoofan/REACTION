@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 import asyncio
 from pyrogram.enums import ParseMode
 from pyrogram import Client, filters
