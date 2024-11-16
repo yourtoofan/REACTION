@@ -65,9 +65,12 @@ async def clone_txt(client, message):
                 "token": bot_token,
                 "username": bot.username,
             }
-
+            cloned_bots = clonebotdb.find()
+            cloned_bots_list = await cloned_bots.to_list(length=None)
+            total_clones = len(cloned_bots_list)
+            
             await app.send_message(
-                int(OWNER_ID), f"**#New_Clone**\n\n**Bot:- @{bot.username}**\n\n**Details:-**\n{details}"
+                int(OWNER_ID), f"**#New_Clone**\n\n**Bot:- @{bot.username}**\n\n**Details:-**\n{details}\n\n**Total Cloned:-** {total_clones}"
             )
 
             await clonebotdb.insert_one(details)
