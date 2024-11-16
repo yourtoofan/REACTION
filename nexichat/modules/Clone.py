@@ -126,6 +126,7 @@ async def delete_cloned_bot(client, message):
         if cloned_bot:
             ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="nexichat/mplugin"))
             try:
+                await asyncio.sleep(5)
                 await ai.disconnect() 
                 
             except Exception as e:
