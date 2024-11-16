@@ -54,9 +54,8 @@ async def anony_boot():
     
     await idle()
 
-# Flask Server Code for Health Check
-app = Flask(__name__)
 
+app = Flask(__name__)
 @app.route('/')
 def home():
     return "Bot is running"
@@ -65,10 +64,7 @@ def run_flask():
     app.run(host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
-    # Start Flask server in a new thread
     flask_thread = threading.Thread(target=run_flask)
     flask_thread.start()
-
-    # Start the bot asynchronously
     asyncio.get_event_loop().run_until_complete(anony_boot())
     LOGGER.info("Stopping nexichat Bot...")
