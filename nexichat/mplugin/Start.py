@@ -446,11 +446,10 @@ async def broadcast_message(client, message):
     global IS_BROADCASTING
     bot_id = (await client.get_me()).id
     user_id = message.from_user.id
-    owner_check = is_owner(client, user_id)
-
-    if owner_check is not True:
-        await message.reply_text(owner_check)
+    if not await is_owner(client, user_id):
+        await message.reply_text("You don't have permission to use this command on this bot.")
         return
+        
     async with broadcast_lock:
         if IS_BROADCASTING:
             return await message.reply_text(
