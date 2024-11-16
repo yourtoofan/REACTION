@@ -1,7 +1,6 @@
 import random
 import os
 import sys
-#from TheApi import api
 from MukeshAPI import api
 from pymongo import MongoClient
 from pyrogram import Client, filters
