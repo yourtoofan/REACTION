@@ -126,7 +126,7 @@ async def delete_cloned_bot(client, message):
             CLONES.remove(cloned_bot["bot_id"])
 
             await ok.edit_text(
-                f"**🤖 your cloned bot has been removed from my database**\n**Kindly revoke your bot token from @botfather otherwise your bot will stop when @{app.username} will restart ☠️**"
+                f"**🤖 your cloned bot has been removed from my database ✅**\n**🔄 Kindly revoke your bot token from @botfather otherwise your bot will stop when @{app.username} will restart ☠️**"
             )
         else:
             await message.reply_text("**⚠️ The provided bot token is not in the cloned list.**")
