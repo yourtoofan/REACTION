@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import shutil
 import asyncio
 from pyrogram.enums import ParseMode
@@ -19,10 +20,11 @@ clonebotdb = mongodb.clonebotdb
 async def save_clonebot_owner(bot_id, user_id):
     await cloneownerdb.insert_one({"bot_id": bot_id, "user_id": user_id})
 
+
 async def restart():
-    os.system(f"kill -9 {os.getpid()} && git pull && python3 -m nexichat")
-
-
+    os.system("git pull https://github.com/THE-VIP-BOY-OP/VIP-CHATBOT")  # Latest changes pull kar lo
+    sys.exit(0)  
+    
 @app.on_message(filters.command(["clone", "host", "deploy"]))
 async def clone_txt(client, message):
     if len(message.command) > 1:
