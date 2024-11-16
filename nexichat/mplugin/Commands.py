@@ -1,4 +1,6 @@
 import random
+import os
+import sys
 #from TheApi import api
 from MukeshAPI import api
 from pymongo import MongoClient
@@ -52,7 +54,11 @@ async def get_chat_language(chat_id):
     return chat_lang["language"] if chat_lang and "language" in chat_lang else "en"
    
 
-
+@Client.on_message(filters.command(["restart"]))
+async def restart(client: Client, message: Message):
+    reply = await message.reply_text("**🔁 Rᴇsᴛᴀʀᴛɪɴɢ 🔥 ...**")
+    await client.stop()
+    
 @Client.on_message(filters.command("status"))
 async def status_command(client: Client, message: Message):
     chat_id = message.chat.id
