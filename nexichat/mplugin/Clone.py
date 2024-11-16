@@ -8,7 +8,7 @@ from nexichat.mplugin.helpers import is_owner
 from config import API_HASH, API_ID, OWNER_ID
 from nexichat import CLONE_OWNERS
 from nexichat import nexichat as app
-from nexichat import db as mongodb
+from nexichat import db as mongodb, nexichat
 
 CLONES = set()
 cloneownerdb = mongodb.cloneownerdb
@@ -120,9 +120,9 @@ async def delete_cloned_bot(client, message):
             await clonebotdb.delete_one({"token": bot_token})
             
             await ok.edit_text(
-                "**🤖 your cloned bot has been disconnected from my server ☠️**\n**Clone by :- /clone**"
+                f"**🤖 your cloned bot has been removed from my database**\n**Kindly revoke your bot token from @botfather otherwise your bot will stop when @{nexichat.username} will restart ☠️**"
             )
-            await client.stop()
+            
         else:
             await message.reply_text("**⚠️ The provided bot token is not in the cloned list.**")
     except Exception as e:
