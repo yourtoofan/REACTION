@@ -3,7 +3,7 @@ import os
 import shutil
 import asyncio
 from pyrogram.enums import ParseMode
-from pyrogram import Client, filters, Message
+from pyrogram import Client, filters
 from pyrogram.errors.exceptions.bad_request_400 import AccessTokenExpired, AccessTokenInvalid
 import config
 from pyrogram.types import BotCommand
