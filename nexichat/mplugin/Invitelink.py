@@ -13,10 +13,8 @@ async def give_link_command(client, message):
     chat = message.chat.id
     bot_id = client.me.id
     user_id = message.from_user.id
-    owner_check = is_owner(client, user_id)
-
-    if owner_check is not True:
-        await message.reply_text(owner_check)
+    if not await is_owner(bot_id, user_id):
+        await message.reply_text("You don't have permission to use this command on this bot.")
         return
     link = await client.export_chat_invite_link(chat)
     await message.reply_text(f"**Here's the invite link for this chat:**\n\n{link}")
@@ -26,10 +24,8 @@ async def give_link_command(client, message):
 async def link_command_handler(client: Client, message: Message):
     bot_id = client.me.id
     user_id = message.from_user.id
-    owner_check = is_owner(client, user_id)
-
-    if owner_check is not True:
-        await message.reply_text(owner_check)
+    if not await is_owner(bot_id, user_id):
+        await message.reply_text("You don't have permission to use this command on this bot.")
         return
     if len(message.command) != 2:
         await message.reply("**Invalid usage. Correct format: /link group_id**")
