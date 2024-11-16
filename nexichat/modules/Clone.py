@@ -19,7 +19,7 @@ clonebotdb = mongodb.clonebotdb
 async def save_clonebot_owner(bot_id, user_id):
     await cloneownerdb.insert_one({"bot_id": bot_id, "user_id": user_id})
 
-async def restart(client: Client, message: Message):
+async def restart():
     os.system(f"kill -9 {os.getpid()} && bash start")
 
 
