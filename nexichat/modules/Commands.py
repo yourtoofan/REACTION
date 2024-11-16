@@ -1,5 +1,6 @@
 import random
-#from TheApi import api
+import os
+import shutil
 from MukeshAPI import api
 from pymongo import MongoClient
 from pyrogram import Client, filters
@@ -9,7 +10,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, 
 from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
-from config import MONGO_URL
+from config import MONGO_URL, OWNER_ID
 from nexichat import nexichat, mongo, LOGGER, db
 from nexichat.modules.helpers import chatai, storeai, languages, CHATBOT_ON
 from nexichat.modules.helpers import (
@@ -34,19 +35,16 @@ translator = GoogleTranslator()
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 
-@nexichat.on_message(filters.command("status"))
-async def status_command(client: Client, message: Message):
-    chat_id = message.chat.id
-    chat_status = await status_db.find_one({"chat_id": chat_id})
-    if chat_status:
-        current_status = chat_status.get("status", "not found")
-        await message.reply(f"Chatbot status for this chat: **{current_status}**")
-    else:
-        await message.reply("No status found for this chat.")
 
-
-
-
+@nexichat.on_message(
+    filters.command(["restart"]) & filters.user(int(OWNER_ID))
+)
+async def restart(client: Client, message: Message):
+    reply = await message.reply_text("**🔁 Rᴇsᴛᴀʀᴛɪɴɢ 🔥 ...**")
+    await message.delete()
+    await reply.edit_text("🥀 SᴜᴄᴄᴇssFᴜʟʟʏ RᴇSᴛᴀʀᴛᴇᴅ\n ︎ᴄʜᴀᴛʙᴏᴛ  🔥 ...\n\n💕 Pʟᴇᴀsᴇ Wᴀɪᴛ 1-2 MɪN Fᴏʀ\nLᴏᴀᴅ Usᴇʀ Pʟᴜɢɪɴs ✨ ...</b>")
+    os.system(f"kill -9 {os.getpid()} && bash start")
+    
 def generate_language_buttons(languages):
     buttons = []
     current_row = []
