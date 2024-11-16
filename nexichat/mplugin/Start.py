@@ -12,7 +12,7 @@ from datetime import datetime
 from pymongo import MongoClient
 from pyrogram.enums import ChatType
 from pyrogram import Client, filters
-from nexichat import CLONE_OWNERS
+from nexichat import CLONE_OWNERS, db
 from config import OWNER_ID, MONGO_URL, OWNER_USERNAME
 from pyrogram.errors import FloodWait, ChatAdminRequired
 from nexichat.database.chats import get_served_chats, add_served_chat
@@ -77,8 +77,13 @@ from nexichat import db
 chatai = db.Word.WordDb
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.ChatBotStatusDb.StatusCollection
+cloneownerdb = db.clone_owners
 
-
+async def get_clone_owner(bot_id):
+    data = await cloneownerdb.find_one({"bot_id": bot_id})
+    if data:
+        return data["user_id"]
+    return None
 
 
 async def bot_sys_stats():
@@ -155,7 +160,7 @@ async def welcomejej(client, message: Message):
 
                 try:
                     bot_id = client.me.id
-                    owner_id = CLONE_OWNERS.get(bot_id)
+                    owner_id = await get_clone_owner(bot_id)
                     
                     if owner_id:
                         await client.send_photo(
@@ -292,7 +297,7 @@ async def start(client: Client, m: Message):
         await add_served_user(m.chat.id)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(f"{m.chat.first_name}", user_id=m.chat.id)]])
 
-        owner_id = CLONE_OWNERS.get(bot_id) 
+        owner_id = await get_clone_owner(bot_id) 
         if owner_id:
             await client.send_photo(
                 int(owner_id),
@@ -446,7 +451,7 @@ async def broadcast_message(client, message):
     global IS_BROADCASTING
     bot_id = (await client.get_me()).id
     user_id = message.from_user.id
-    if not await is_owner(client, user_id):
+    if not await is_owner(bot_id, user_id):
         await message.reply_text("You don't have permission to use this command on this bot.")
         return
         
