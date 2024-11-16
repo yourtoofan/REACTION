@@ -1,8 +1,9 @@
-from nexichat import CLONE_OWNERS
+from nexichat import CLONE_OWNERS, get_clone_owner
 from config import OWNER_ID
 
-def is_owner(client, user_id):
+async def is_owner(client, user_id):
     bot_id = client.me.id
-    if CLONE_OWNERS.get(bot_id) == user_id or user_id == OWNER_ID:
+    owner_id = await get_clone_owner(bot_id)
+    if owner_id == user_id or user_id == OWNER_ID:
         return True
     return "You don't have permission to use this command on this bot."
