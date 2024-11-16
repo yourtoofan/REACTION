@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from nexichat import nexichat as app, mongo, db
 from MukeshAPI import api
-from nexichat.modules.helpers import chatai, CHATBOT_ON, languages
+from nexichat.mplugin.helpers import chatai, CHATBOT_ON, languages
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 
 lang_db = db.ChatLangDb.LangCollection
@@ -12,7 +12,7 @@ async def get_chat_language(chat_id):
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else None
 
-@app.on_message(filters.text, group=2)
+@Client.on_message(filters.text, group=3)
 async def store_messages(client, message: Message):
     global message_cache
 
