@@ -22,9 +22,7 @@ async def save_clonebot_owner(bot_id, user_id):
 
 
 async def restart():
-    os.system("git pull https://github.com/THE-VIP-BOY-OP/VIP-CHATBOT")  # Latest changes pull kar lo
-   # sys.exit(0)
-    os.system("bash start")
+    os.system(f"kill -9 {os.getpid()} && apt update && bash start")
     
 @app.on_message(filters.command(["clone", "host", "deploy"]))
 async def clone_txt(client, message):
