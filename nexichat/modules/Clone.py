@@ -32,7 +32,6 @@ async def clone_txt(client, message):
             bot = await ai.get_me()
             bot_id = bot.id
             user_id = message.from_user.id
-            CLONE_OWNERS[bot_id] = user_id
             await save_clone_owner(bot_id, user_id)
             await ai.set_bot_commands([
                     BotCommand("start", "Start the bot"),
