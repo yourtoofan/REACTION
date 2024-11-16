@@ -33,16 +33,11 @@ async def store_messages(client, message: Message):
                 [f"Text: {msg.text}..." for msg in message_cache[chat_id]]
             )
             user_input = f"""
-            sentences list :-
-            [
+            ye sare messages kon sa lang me likha gya hai ho sakta hai kuch sentences ka lang alag hoga tum overall dekhkho to kon sa lang me jyada tar messages hai.
+            overall sare messages ka lang detect krke anylise krke mujhe bas lang name aur sath me ush lang ka code provide kro aur kuch nhi.
+            ye rha niche sara sentences :-
+            
             {history}
-            ]
-
-            Above is a list of sentences. Each sentence could be in different languages. Analyze the language of each sentence separately and identify the dominant language used for each sentence. and then Consider the language that appears the most, ignoring any commands like sentence start with /. 
-            Provide only the official language name with language code (like 'en' for English, 'hi' for Hindi). in this format :-
-            Lang Name :- ""
-            Lang code :- ""
-            ok so provideo me only overall [ Lang Name and Lang Code ] in above format Do not provide anything else.
             """
 
             response = api.gemini(user_input)
