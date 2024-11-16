@@ -17,9 +17,6 @@ CLONES = set()
 cloneownerdb = mongodb.cloneownerdb
 clonebotdb = mongodb.clonebotdb
 
-async def save_clonebot_owner(bot_id, user_id):
-    await cloneownerdb.insert_one({"bot_id": bot_id, "user_id": user_id})
-
     
 @app.on_message(filters.command(["clone", "host", "deploy"]))
 async def clone_txt(client, message):
@@ -73,7 +70,7 @@ async def clone_txt(client, message):
             )
 
             await clonebotdb.insert_one(details)
-            await save_clonebot_owner(bot.id, user_id)
+            
             CLONES.add(bot.id)
 
             await mi.edit_text(
