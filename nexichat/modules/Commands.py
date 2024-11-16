@@ -42,7 +42,7 @@ status_db = db.chatbot_status_db.status
 async def restart(client: Client, message: Message):
     reply = await message.reply_text("**🔁 Rᴇsᴛᴀʀᴛɪɴɢ 🔥 ...**")
     await message.delete()
-    await reply.edit_text("🥀 SᴜᴄᴄᴇssFᴜʟʟʏ RᴇSᴛᴀʀᴛᴇᴅ\n ︎ᴄʜᴀᴛʙᴏᴛ  🔥 ...\n\n💕 Pʟᴇᴀsᴇ Wᴀɪᴛ 1-2 MɪN Fᴏʀ\nLᴏᴀᴅ Usᴇʀ Pʟᴜɢɪɴs ✨ ...</b>")
+    await reply.edit_text("🥀 SᴜᴄᴄᴇssFᴜʟʟʏ RᴇSᴛᴀʀᴛᴇᴅ\n ︎ᴄʜᴀᴛʙᴏᴛ  🔥 ...\n\n💕 Pʟᴇᴀsᴇ Wᴀɪᴛ 5 ꜱᴇᴄ Fᴏʀ\nLᴏᴀᴅ Usᴇʀ Pʟᴜɢɪɴs ✨ ...</b>")
     os.system(f"kill -9 {os.getpid()} && bash start")
     
 def generate_language_buttons(languages):
