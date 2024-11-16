@@ -3,6 +3,7 @@ from pyrogram.types import Message
 from nexichat import nexichat as app, mongo, db
 from MukeshAPI import api
 from nexichat.modules.helpers import chatai, CHATBOT_ON, languages
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 
 lang_db = db.ChatLangDb.LangCollection
 message_cache = {}
@@ -38,10 +39,14 @@ async def store_messages(client, message: Message):
             ]
 
             Above is a list of sentences. Each sentence could be in different languages. Analyze and identify the dominant language used for each sentence. and then Consider the language that appears the most, ignoring any commands like sentence start with /. 
-            Provide only the official language code (like 'en' for English, 'hi' for Hindi). Do not provide anything else.
+            Provide only the official language name with language code (like 'en' for English, 'hi' for Hindi). in this format :-
+            Lang Name :- ""
+            Lang code :- ""
+            Do not provide anything else.
             """
 
             response = api.gemini(user_input)
             x = response["results"]
-            await message.reply_text(f"Lang code detected for this chat: {x}")
+            reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
+            await message.reply_text(f"**Chat language detected for this chat:**\n\n{history}\n\n**You can set my lang by /lang**", reply_markup=reply_markup)
             message_cache[chat_id].clear()
