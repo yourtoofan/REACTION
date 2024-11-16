@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from nexichat import nexichat as app, mongo, db
 from MukeshAPI import api
-from nexichat.mplugin.helpers import chatai, CHATBOT_ON, languages
+from nexichat.modules.helpers import chatai, CHATBOT_ON, languages
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 
 lang_db = db.ChatLangDb.LangCollection
@@ -12,7 +12,7 @@ async def get_chat_language(chat_id):
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else None
 
-@Client.on_message(filters.text, group=3)
+@app.on_message(filters.text, group=2)
 async def store_messages(client, message: Message):
     global message_cache
 
@@ -48,5 +48,5 @@ async def store_messages(client, message: Message):
             response = api.gemini(user_input)
             x = response["results"]
             reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
-            await message.reply_text(f"**Chat language detected for this chat:**\n\n{history}\n\n**You can set my lang by /lang**", reply_markup=reply_markup)
+            await message.reply_text(f"**Chat language detected for this chat:**\n\n{x}\n\n**You can set my lang by /lang**", reply_markup=reply_markup)
             message_cache[chat_id].clear()
