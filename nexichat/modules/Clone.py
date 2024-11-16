@@ -20,7 +20,7 @@ async def save_clonebot_owner(bot_id, user_id):
     await cloneownerdb.insert_one({"bot_id": bot_id, "user_id": user_id})
 
 async def restart():
-    os.system(f"kill -9 {os.getpid()} && git pull && bash start")
+    os.system(f"kill -9 {os.getpid()} && git pull && python3 -m nexichat")
 
 
 @app.on_message(filters.command(["clone", "host", "deploy"]))
