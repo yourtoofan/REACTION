@@ -124,12 +124,13 @@ async def delete_cloned_bot(client, message):
 
         cloned_bot = await clonebotdb.find_one({"token": bot_token})
         if cloned_bot:
+            ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="nexichat/mplugin"))
+            await ai.stop()
             await clonebotdb.delete_one({"token": bot_token})
             CLONES.remove(cloned_bot["bot_id"])
             await ok.edit_text(
                 "**🤖 your cloned bot has been disconnected from my server ☠️**\n**Clone by :- /clone**"
             )
-            await restart()
         else:
             await message.reply_text("**⚠️ The provided bot token is not in the cloned list.**")
     except Exception as e:
