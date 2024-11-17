@@ -44,7 +44,7 @@ async def store_messages(client, message: Message):
             Lang code :- ""
             ok so provideo me only overall [ Lang Name and Lang Code ] in above format Do not provide anything else.
             """
-
+            await asyncio.sleep(60)
             response = api.gemini(user_input)
             x = response["results"]
             reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
