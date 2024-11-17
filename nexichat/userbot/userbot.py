@@ -14,7 +14,7 @@ class Userbot(Client):
             api_hash=config.API_HASH,
             session_string=str(config.STRING1),
             no_updates=False,
-            plugins=dict(root="nexichat.mplugin"),
+            plugins=dict(root="nexichat.idchatbot"),
         )
         
 
