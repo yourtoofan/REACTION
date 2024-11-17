@@ -31,6 +31,7 @@ async def clone_txt(client, message):
                     BotCommand("start", "Start the bot"),
                     BotCommand("help", "Get the help menu"),
                     BotCommand("clone", "Make your own chatbot"),
+                    BotCommand("idclone", "Make your id-chatbot"),
                     BotCommand("ping", "Check if the bot is alive or dead"),
                     BotCommand("lang", "Select bot reply language"),
                     BotCommand("chatlang", "Get current using lang for chat"),
