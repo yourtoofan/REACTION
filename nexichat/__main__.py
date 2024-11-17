@@ -6,7 +6,7 @@ import threading
 from pyrogram import idle
 from pyrogram.types import BotCommand
 from config import OWNER_ID
-from nexichat import LOGGER, nexichat, load_clone_owners
+from nexichat import LOGGER, nexichat, userbot, load_clone_owners
 from nexichat.modules import ALL_MODULES
 from nexichat.modules.Clone import restart_bots
 
@@ -15,6 +15,7 @@ async def anony_boot():
         await nexichat.start()
         asyncio.create_task(restart_bots())
         await load_clone_owners()
+        await userbot.start()
     except Exception as ex:
         LOGGER.error(ex)
 
