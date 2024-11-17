@@ -8,7 +8,7 @@ from nexichat import nexichat as app
 @Client.on_message(filters.command(["gemini", "ai", "ask", "chatgpt"]))
 async def gemini_handler(client, message):
     if (
-        message.text.startswith(f"/gemini@{app.username}")
+        message.text.startswith(f"/gemini@{client.me.username}")
         and len(message.text.split(" ", 1)) > 1
     ):
         user_input = message.text.split(" ", 1)[1]
