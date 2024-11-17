@@ -44,3 +44,40 @@ async def reset_language(client: Client, message: Message):
     await message.reply_text("**Bot language has been reset in this chat to mix language.**")
 
 
+@Client.on_message(filters.command("chatbot"))
+async def chatbot_command(client: Client, message: Message):
+    command = message.text.split()
+    if len(command) > 1:
+        flag = command[1].lower()
+        chat_id = message.chat.id
+        if flag in ["on", "enable"]:
+            status_db.update_one({"chat_id": chat_id}, {"$set": {"status": "enabled"}}, upsert=True)
+            await message.reply_text(f"Chatbot has been **enabled** for this chat ✅.")
+        elif flag in ["off", "disable"]:
+            status_db.update_one({"chat_id": chat_id}, {"$set": {"status": "disabled"}}, upsert=True)
+            await message.reply_text(f"Chatbot has been **disabled** for this chat ❌.")
+        else:
+            await message.reply_text("Invalid option! Use `/chatbot on` or `/chatbot off`.")
+    else:
+        await message.reply_text(
+            "Please specify an option to enable or disable the chatbot.\n\n"
+            "Example: `/chatbot on` or `/chatbot off`"
+        )
+
+
+
+@Client.on_message(filters.command(["lang", "language", "setlang"]))
+async def set_language(client: Client, message: Message):
+    command = message.text.split()
+    if len(command) > 1:
+        lang_code = command[1]
+        chat_id = message.chat.id
+        lang_db.update_one({"chat_id": chat_id}, {"$set": {"language": lang_code}}, upsert=True)
+        await message.reply_text(f"Language has been set to `{lang_code}`.")
+    else:
+        await message.reply_text(
+            "Please provide a language code after the command to set your chat language.\n"
+            "**Example:** `/lang en`\n\n"
+            "**Language code list with names:**"
+            f"{languages}"
+        )
