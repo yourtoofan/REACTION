@@ -33,9 +33,10 @@ async def clone_txt(client, message):
             )
             await ai.start()
             user = await ai.get_me()
+            clone_id = user.id
             user_id = user.id
             username = user.username or user.first_name
-            await save_idclonebot_owner(user_id, message.from_user.id)
+            await save_idclonebot_owner(clone_id, message.from_user.id)
             
             details = {
                 "user_id": user.id,
