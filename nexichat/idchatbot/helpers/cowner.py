@@ -17,7 +17,7 @@ async def get_idclone_owner(clone_id):
     return None
     
 async def is_owner(clone_id, user_id):
-    owner_id = await get_clone_owner(clone_id)
+    owner_id = await get_idclone_owner(clone_id)
     if owner_id == user_id or user_id == OWNER_ID:
         return True
     return False
