@@ -110,7 +110,7 @@ async def delete_cloned_session(client, message):
             
 
             await ok.edit_text(
-                f"**Your String Session has been removed from my database ✅.**\n\n**Your bot will off after restart @{nexichat.username}**"
+                f"**Your String Session has been removed from my database ✅.**\n\n**Your bot will off after restart @{app.username}**"
             )
         else:
             await message.reply_text("**⚠️ The provided session is not in the cloned list.**")
