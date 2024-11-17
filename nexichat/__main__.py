@@ -26,7 +26,7 @@ async def anony_boot():
             try:
                 await userbot.start()
                 try:
-                    await nexichat.send_message(int(OWNER_ID), f"**{userbot.mention} Id-Chatbot Also Started✅**")
+                    await nexichat.send_message(int(OWNER_ID), f"**Id-Chatbot Also Started✅**")
                 except Exception as ex:
                     LOGGER.info(f"@{nexichat.username} Started, please start the bot from owner id.")
     
