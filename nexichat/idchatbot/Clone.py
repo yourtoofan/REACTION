@@ -11,6 +11,7 @@ from config import API_HASH, API_ID, OWNER_ID
 from nexichat import CLONE_OWNERS
 from nexichat import nexichat as app, save_clonebot_owner, save_idclonebot_owner
 from nexichat import db as mongodb
+from nexichat import nexichat as app
 
 IDCLONES = set()
 cloneownerdb = mongodb.cloneownerdb
