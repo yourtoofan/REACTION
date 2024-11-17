@@ -31,12 +31,6 @@ class Userbot(Client):
 
             except:
                 pass
-            
-            try:
-                await self.one.send_message(config.OWNER_ID, "**ɪ'ᴍ sᴛᴀʀᴛᴇᴅ ʙᴀʙʏ !**")
-                
-            except Exception as e:
-                print(f"Error in sendinb messgae to owner id:- {e}")
 
             self.one.id = self.one.me.id
             self.one.name = self.one.me.mention
