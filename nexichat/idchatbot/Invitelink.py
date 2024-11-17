@@ -12,8 +12,9 @@ from config import OWNER_ID
 async def give_link_command(client, message):
     chat = message.chat.id
     bot_id = client.me.id
+    clone_id = (await client.get_me()).id
     user_id = message.from_user.id
-    if not await is_owner(bot_id, user_id):
+    if not await is_owner(clone_id, user_id):
         await message.reply_text("You don't have permission to use this command on this bot.")
         return
     link = await client.export_chat_invite_link(chat)
@@ -23,8 +24,9 @@ async def give_link_command(client, message):
 @Client.on_message(filters.command(["link", "invitelink"], prefixes=["/", "!", "%", ",", ".", "@", "#"]) & filters.user(int(OWNER_ID)))
 async def link_command_handler(client: Client, message: Message):
     bot_id = client.me.id
+    clone_id = (await client.get_me()).id
     user_id = message.from_user.id
-    if not await is_owner(bot_id, user_id):
+    if not await is_owner(clone_id, user_id):
         await message.reply_text("You don't have permission to use this command on this bot.")
         return
     if len(message.command) != 2:
