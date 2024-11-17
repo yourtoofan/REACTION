@@ -56,5 +56,5 @@ async def store_messages(client, message: Message):
 async def fetch_chat_lang(client, message):
     chat_id = message.chat.id
     chat_lang = await get_chat_language(chat_id)
-    await message.reply_text(f"The language using for this chat is: {chat_lang}")
+    await message.reply_text(f"The language code using for this chat is: {chat_lang}")
 
