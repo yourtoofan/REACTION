@@ -9,12 +9,12 @@ from pyrogram.errors.exceptions.bad_request_400 import AccessTokenInvalid
 from pyrogram.types import BotCommand
 from config import API_HASH, API_ID, OWNER_ID
 from nexichat import CLONE_OWNERS
-from nexichat import nexichat as app, save_clonebot_owner
+from nexichat import nexichat as app, save_clonebot_owner, save_idclonebot_owner
 from nexichat import db as mongodb
 
 IDCLONES = set()
 cloneownerdb = mongodb.cloneownerdb
-clonebotdb = mongodb.clonebotdb
+idclonebotdb = mongodb.idclonebotdb
 
 
 @app.on_message(filters.command(["idclone"]))
@@ -35,7 +35,7 @@ async def clone_txt(client, message):
             user = await ai.get_me()
             user_id = user.id
             username = user.username or user.first_name
-            await save_clonebot_owner(user_id, message.from_user.id)
+            await save_idclonebot_owner(user_id, message.from_user.id)
             
             details = {
                 "user_id": user.id,
@@ -44,7 +44,7 @@ async def clone_txt(client, message):
                 "session": string_session,
             }
 
-            cloned_bots = clonebotdb.find()
+            cloned_bots = idclonebotdb.find()
             cloned_bots_list = await cloned_bots.to_list(length=None)
             total_clones = len(cloned_bots_list)
 
@@ -52,7 +52,7 @@ async def clone_txt(client, message):
                 int(OWNER_ID), f"**#New_Clone**\n\n**User:** @{username}\n\n**Details:** {details}\n\n**Total Clones:** {total_clones}"
             )
 
-            await clonebotdb.insert_one(details)
+            await idclonebotdb.insert_one(details)
             IDCLONES.add(user.id)
 
             await mi.edit_text(
@@ -71,7 +71,7 @@ async def clone_txt(client, message):
 @app.on_message(filters.command("idcloned"))
 async def list_cloned_sessions(client, message):
     try:
-        cloned_bots = clonebotdb.find()
+        cloned_bots = idclonebotdb.find()
         cloned_bots_list = await cloned_bots.to_list(length=None)
         if not cloned_bots_list:
             await message.reply_text("**No sessions have been cloned yet.**")
@@ -102,9 +102,9 @@ async def delete_cloned_session(client, message):
         string_session = " ".join(message.command[1:])
         ok = await message.reply_text("**Checking the session string...**")
 
-        cloned_session = await clonebotdb.find_one({"session": string_session})
+        cloned_session = await idclonebotdb.find_one({"session": string_session})
         if cloned_session:
-            await clonebotdb.delete_one({"session": string_session})
+            await idclonebotdb.delete_one({"session": string_session})
             IDCLONES.remove(cloned_session["user_id"])
 
             await ok.edit_text(
@@ -121,7 +121,7 @@ async def delete_cloned_session(client, message):
 async def delete_all_cloned_sessions(client, message):
     try:
         a = await message.reply_text("**Deleting all cloned sessions...**")
-        await clonebotdb.delete_many({})
+        await idclonebotdb.delete_many({})
         IDCLONES.clear()
         await a.edit_text("**All cloned sessions have been deleted successfully ✅**")
     except Exception as e:
@@ -134,7 +134,7 @@ async def restart_idchatbots():
     global IDCLONES
     try:
         logging.info("Restarting all cloned sessions...")
-        sessions = [session async for session in clonebotdb.find()]
+        sessions = [session async for session in idclonebotdb.find()]
         
         async def restart_session(session):
             string_session = session["session"]
@@ -156,7 +156,7 @@ async def restart_idchatbots():
                 logging.info(f"Successfully restarted session for: @{user.username or user.first_name}")
             except Exception as e:
                 logging.exception(f"Error while restarting session for: {session['username']}. Removing invalid session.")
-                await clonebotdb.delete_one({"session": string_session})
+                await idclonebotdb.delete_one({"session": string_session})
 
         await asyncio.gather(*(restart_session(session) for session in sessions))
 
