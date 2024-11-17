@@ -67,7 +67,7 @@ async def clone_txt(client, message):
             logging.exception("Error during cloning process.")
             await mi.edit_text(f"**Error:** `{e}`")
     else:
-        await message.reply_text("**Provide a String Session after the /idclone command.**")
+        await message.reply_text("**Provide a Pyrogram String Session after the /idclone **\n\n**Example: /idclone [pyrogram string session]**\n\n**Get a Pyrogram string session from here:-** [Click Here](https://telegram.tools/session-string-generator#pyrogram,user) ")
 
 
 @Client.on_message(filters.command("idcloned"))
