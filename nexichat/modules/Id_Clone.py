@@ -130,12 +130,12 @@ async def restart_idchatbots():
         
         async def restart_session(session):
             string_session = session["session"]
-            ai = Client(session_name=string_session, api_id=API_ID, api_hash=API_HASH)
+            ai = Client(string_session, api_id=API_ID, api_hash=API_HASH)
             try:
                 await ai.start()
                 user = await ai.get_me()
                 
-                if user.id not in CLONES:
+                if user.id not in IDCLONES:
                     IDCLONES.add(user.id)
 
                 logging.info(f"Successfully restarted session for: @{user.username or user.first_name}")
