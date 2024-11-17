@@ -1,6 +1,6 @@
 import asyncio
 from os import getenv
-from nexichat import nexichat, ID_CHATBOT
+from nexichat import ID_CHATBOT
 from config import OWNER_ID
 from dotenv import load_dotenv
 from pyrogram import Client
