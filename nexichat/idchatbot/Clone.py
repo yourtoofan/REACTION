@@ -89,7 +89,7 @@ async def list_cloned_sessions(client, message):
         await message.reply_text(text)
     except Exception as e:
         logging.exception(e)
-        await message.reply_text("**An error occurred while listing cloned sessions.**")
+        await message.reply_text("**An error occurred while getting list of cloned id-chatbots**")
 
 
 @Client.on_message(
@@ -110,7 +110,7 @@ async def delete_cloned_session(client, message):
             IDCLONES.remove(cloned_session["user_id"])
 
             await ok.edit_text(
-                f"**Session for `{cloned_session['username']}` has been removed from my database ✅.**"
+                f"**Your String Session has been removed from my database ✅.**\n\n**Your bot will off after restart @{nexichat.username}**"
             )
         else:
             await message.reply_text("**⚠️ The provided session is not in the cloned list.**")
