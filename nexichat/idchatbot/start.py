@@ -85,8 +85,8 @@ lang_db = db.ChatLangDb.LangCollection
 status_db = db.ChatBotStatusDb.StatusCollection
 cloneownerdb = db.clone_owners
 
-async def get_clone_owner(bot_id):
-    data = await cloneownerdb.find_one({"bot_id": bot_id})
+async def get_idclone_owner(clone_id):
+    data = await cloneownerdb.find_one({"clone_id": clone_id})
     if data:
         return data["user_id"]
     return None
@@ -360,8 +360,9 @@ broadcast_lock = asyncio.Lock()
 async def broadcast_message(client, message):
     global IS_BROADCASTING
     bot_id = (await client.get_me()).id
+    clone_id = (await client.get_me()).id
     user_id = message.from_user.id
-    if not await is_owner(bot_id, user_id):
+    if not await is_owner(clone_id, user_id):
         await message.reply_text("You don't have permission to use this command on this bot.")
         return
         
