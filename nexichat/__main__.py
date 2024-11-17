@@ -21,7 +21,7 @@ async def anony_boot():
             try:
                 await userbot.start()
                 global ID_CHATBOT
-                ID_CHATBOT = ACTIVE
+                ID_CHATBOT = "ACTIVE"
             except Exception as ex:
                 print(f"Error in starting id-chatbot :- {ex}")
                 pass
