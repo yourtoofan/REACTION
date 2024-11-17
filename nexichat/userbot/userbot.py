@@ -1,5 +1,6 @@
 import asyncio
 from os import getenv
+from nexichat import nexichat
 from config import OWNER_ID
 from dotenv import load_dotenv
 from pyrogram import Client
@@ -37,6 +38,7 @@ class Userbot(Client):
             self.one.username = self.one.me.username
      
             print(f"Id-Chatbot Started as {self.one.me.first_name}")
+            await nexichat.send_message(config.OWNER_ID, f"Id-Chatbot Started as {self.one.me.name}")
 
         
 
