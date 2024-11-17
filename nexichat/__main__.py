@@ -7,7 +7,7 @@ import config
 from pyrogram import idle
 from pyrogram.types import BotCommand
 from config import OWNER_ID
-from nexichat import LOGGER, nexichat, userbot, load_clone_owners
+from nexichat import LOGGER, nexichat, userbot, load_clone_owners, ID_CHATBOT
 from nexichat.modules import ALL_MODULES
 from nexichat.modules.Clone import restart_bots
 
@@ -58,6 +58,8 @@ async def anony_boot():
     LOGGER.info(f"@{nexichat.username} Started.")
     try:
         await nexichat.send_message(int(OWNER_ID), f"{nexichat.mention} has started")
+        if ID_CHATBOT == ACTIVE:
+            await nexichat.send_message(int(OWNER_ID), f"**Id-Chatbot Is Active**")
     except Exception as ex:
         LOGGER.info(f"@{nexichat.username} Started, please start the bot from owner id.")
     
