@@ -39,7 +39,7 @@ class Userbot(Client):
                 print(f"{e}")
 
             self.one.id = self.one.me.id
-            self.one.name = self.one.me.from 
+            self.one.name = self.one.me.mention
             self.one.username = self.one.me.username
      
             print(f"Id-Chatbot Started as {self.one.me.first_name}")
