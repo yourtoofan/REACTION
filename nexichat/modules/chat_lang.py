@@ -50,3 +50,12 @@ async def store_messages(client, message: Message):
             reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
             await message.reply_text(f"**Chat language detected for this chat:**\n\n{x}\n\n**You can set my lang by /lang**", reply_markup=reply_markup)
             message_cache[chat_id].clear()
+
+
+
+@app.on_message(filters.command("chatlang"))
+async def fetch_chat_lang(client, message):
+    chat_id = message.chat.id
+    chat_lang = await get_chat_language(chat_id)
+    await message.reply_text(f"The language for this chat is: {chat_lang}")
+
