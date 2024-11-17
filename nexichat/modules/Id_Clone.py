@@ -92,7 +92,7 @@ async def list_cloned_sessions(client, message):
 
 
 @app.on_message(
-    filters.command(["delclone", "deleteclone", "removeclone"])
+    filters.command(["delidclone", "deleteidclone", "removeidclone"])
 )
 async def delete_cloned_session(client, message):
     try:
@@ -118,7 +118,7 @@ async def delete_cloned_session(client, message):
         logging.exception(e)
 
 
-@app.on_message(filters.command("delallclone") & filters.user(int(OWNER_ID)))
+@app.on_message(filters.command("delallidclone") & filters.user(int(OWNER_ID)))
 async def delete_all_cloned_sessions(client, message):
     try:
         a = await message.reply_text("**Deleting all cloned sessions...**")
