@@ -19,7 +19,7 @@ class Userbot(Client):
         
 
     async def start(self):
-        print(f"Starting Assistants...")
+        print(f"Starting Id chatbot...")
 
         if config.STRING1:
             await self.one.start()
