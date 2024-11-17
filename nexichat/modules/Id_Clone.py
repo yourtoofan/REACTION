@@ -60,7 +60,7 @@ async def clone_txt(client, message):
         await message.reply_text("**Provide a String Session after the /idclone command.**")
 
 
-@app.on_message(filters.command("cloned"))
+@app.on_message(filters.command("idcloned"))
 async def list_cloned_sessions(client, message):
     try:
         cloned_bots = clonebotdb.find()
