@@ -1,6 +1,5 @@
 import asyncio
 from os import getenv
-from nexichat import ID_CHATBOT
 from config import OWNER_ID
 from dotenv import load_dotenv
 from pyrogram import Client
@@ -38,8 +37,7 @@ class Userbot(Client):
             self.one.username = self.one.me.username
      
             print(f"Id-Chatbot Started as {self.one.me.first_name}")
-            global ID_CHATBOT
-            ID_CHATBOT = ACTIVE
+            
         
 
     async def stop(self):
