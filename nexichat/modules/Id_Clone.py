@@ -10,7 +10,7 @@ from pyrogram.types import BotCommand
 from config import API_HASH, API_ID, OWNER_ID
 from nexichat import CLONE_OWNERS
 from nexichat import nexichat as app, save_clonebot_owner, save_idclonebot_owner
-from nexichat import db as mongodb
+from nexichat import nexixhat, db as mongodb
 
 IDCLONES = set()
 cloneownerdb = mongodb.cloneownerdb
@@ -109,7 +109,7 @@ async def delete_cloned_session(client, message):
             IDCLONES.remove(cloned_session["user_id"])
 
             await ok.edit_text(
-                f"**Session for `{cloned_session['username']}` has been removed from my database ✅.**"
+                f"**Your String Session has been removed from my database ✅.**\n\n**Your bot will off after restart @{nexichat.username}**"
             )
         else:
             await message.reply_text("**⚠️ The provided session is not in the cloned list.**")
@@ -156,7 +156,7 @@ async def restart_idchatbots():
 
                 logging.info(f"Successfully restarted session for: @{user.username or user.first_name}")
             except Exception as e:
-                logging.exception(f"Error while restarting session for: {session['username']}. Removing invalid session.")
+                logging.exception(f"Error while restarting session: {string_session}. Removing invalid session.")
                 await idclonebotdb.delete_one({"session": string_session})
 
         await asyncio.gather(*(restart_session(session) for session in sessions))
