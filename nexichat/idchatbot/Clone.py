@@ -59,7 +59,7 @@ async def clone_txt(client, message):
 
             await mi.edit_text(
                 f"**Session for @{username} successfully cloned ✅.**\n"
-                f"**Remove clone by:** /delclone\n**Check all cloned sessions by:** /cloned"
+                f"**Remove clone by:** /delidclone\n**Check all cloned sessions by:** /idcloned"
             )
         except AccessTokenInvalid:
             await mi.edit_text("**Invalid String Session. Please provide a valid one.**")
