@@ -15,12 +15,21 @@ from nexichat.modules.Clone import restart_bots
 async def anony_boot():
     try:
         await nexichat.start()
+        try:
+            await nexichat.send_message(int(OWNER_ID), f"**{nexichat.mention} Is started✅**")
+        except Exception as ex:
+            LOGGER.info(f"@{nexichat.username} Started, please start the bot from owner id.")
+    
         asyncio.create_task(restart_bots())
         await load_clone_owners()
         if config.STRING1:
             try:
                 await userbot.start()
-                await nexichat.send_message(int(OWNER_ID), f"**Id-Chatbot Is Active**")
+                try:
+                    await nexichat.send_message(int(OWNER_ID), f"**Id-Chatbot Also Started✅**")
+                except Exception as ex:
+                    LOGGER.info(f"@{nexichat.username} Started, please start the bot from owner id.")
+    
             except Exception as ex:
                 print(f"Error in starting id-chatbot :- {ex}")
                 pass
@@ -58,11 +67,6 @@ async def anony_boot():
         LOGGER.error(f"Failed to set bot commands: {ex}")
     
     LOGGER.info(f"@{nexichat.username} Started.")
-    try:
-        await nexichat.send_message(int(OWNER_ID), f"{nexichat.mention} has started")
-        
-    except Exception as ex:
-        LOGGER.info(f"@{nexichat.username} Started, please start the bot from owner id.")
     
     await idle()
 
