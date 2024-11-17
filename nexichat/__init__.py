@@ -9,6 +9,7 @@ from pyrogram.enums import ParseMode
 import config
 import uvloop
 import time
+ID_CHATBOT = None
 CLONE_OWNERS = {}
 uvloop.install()
 
