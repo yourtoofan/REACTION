@@ -20,8 +20,8 @@
     },
     "STRING_SESSION": {
       "description": "Fill Here A Pyrogram String Session For Id-Chatbot, Get it from: https://telegram.tools/session-string-generator#pyrogram,user (This is Optional, If you dont want id-chatbot you can skip this variable)",
-      "required": true,
-      "value": "1808943146"
+      "required": false,
+      "value": ""
     },
     "OWNER_ID": {
       "description": "Fill Here Your Owner User Id",
