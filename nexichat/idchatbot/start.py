@@ -436,6 +436,7 @@ async def broadcast_message(client, message):
                                 chat_id, text=broadcast_content
                             )
                         sent += 1
+                        await asyncio.sleep(20)
 
                         if flags.get("-pin", False) or flags.get("-pinloud", False):
                             try:
@@ -479,6 +480,7 @@ async def broadcast_message(client, message):
                                 user_id, text=broadcast_content
                             )
                         susr += 1
+                        await asyncio.sleep(20)
 
                     except FloodWait as e:
                         flood_time = int(e.value)
