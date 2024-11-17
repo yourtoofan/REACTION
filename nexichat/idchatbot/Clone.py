@@ -17,7 +17,7 @@ cloneownerdb = mongodb.cloneownerdb
 idclonebotdb = mongodb.idclonebotdb
 
 
-@app.on_message(filters.command(["idclone"]))
+@Client.on_message(filters.command(["idclone"]))
 async def clone_txt(client, message):
     if len(message.command) > 1:
         string_session = message.text.split("/idclone", 1)[1].strip()
@@ -69,7 +69,7 @@ async def clone_txt(client, message):
         await message.reply_text("**Provide a String Session after the /idclone command.**")
 
 
-@app.on_message(filters.command("idcloned"))
+@Client.on_message(filters.command("idcloned"))
 async def list_cloned_sessions(client, message):
     try:
         cloned_bots = idclonebotdb.find()
@@ -91,7 +91,7 @@ async def list_cloned_sessions(client, message):
         await message.reply_text("**An error occurred while listing cloned sessions.**")
 
 
-@app.on_message(
+@Client.on_message(
     filters.command(["delidclone", "deleteidclone", "removeidclone"])
 )
 async def delete_cloned_session(client, message):
@@ -118,7 +118,7 @@ async def delete_cloned_session(client, message):
         logging.exception(e)
 
 
-@app.on_message(filters.command("delallidclone") & filters.user(int(OWNER_ID)))
+@Client.on_message(filters.command("delallidclone") & filters.user(int(OWNER_ID)))
 async def delete_all_cloned_sessions(client, message):
     try:
         a = await message.reply_text("**Deleting all cloned sessions...**")
@@ -130,37 +130,3 @@ async def delete_all_cloned_sessions(client, message):
         logging.exception(e)
 
 
-
-async def restart_idchatbots():
-    global IDCLONES
-    try:
-        logging.info("Restarting all cloned sessions...")
-        sessions = [session async for session in idclonebotdb.find()]
-        
-        async def restart_session(session):
-            string_session = session["session"]
-            ai = Client(
-                name="VIPIDCHATBOT",
-                api_id=config.API_ID,
-                api_hash=config.API_HASH,
-                session_string=str(string_session),
-                no_updates=False,
-                plugins=dict(root="nexichat.idchatbot"),
-            )
-            try:
-                await ai.start()
-                user = await ai.get_me()
-                
-                if user.id not in IDCLONES:
-                    IDCLONES.add(user.id)
-
-                logging.info(f"Successfully restarted session for: @{user.username or user.first_name}")
-            except Exception as e:
-                logging.exception(f"Error while restarting session for: {session['username']}. Removing invalid session.")
-                await idclonebotdb.delete_one({"session": string_session})
-
-        await asyncio.gather(*(restart_session(session) for session in sessions))
-
-        logging.info("All sessions restarted successfully.")
-    except Exception as e:
-        logging.exception("Error while restarting sessions.")
