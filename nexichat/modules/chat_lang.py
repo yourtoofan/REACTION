@@ -2,6 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from nexichat import nexichat as app, mongo, db
 from MukeshAPI import api
+import asyncio
 from nexichat.modules.helpers import chatai, CHATBOT_ON, languages
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 
@@ -44,7 +45,7 @@ async def store_messages(client, message: Message):
             Lang code :- ""
             ok so provideo me only overall [ Lang Name and Lang Code ] in above format Do not provide anything else.
             """
-
+            await asyncio.sleep(60)
             response = api.gemini(user_input)
             x = response["results"]
             reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
