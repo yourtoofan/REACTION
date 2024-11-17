@@ -22,7 +22,7 @@ async def anony_boot():
             LOGGER.info(f"@{nexichat.username} Started, please start the bot from owner id.")
     
         asyncio.create_task(restart_bots())
-        asyncio.creat_task(restart_idchatbots())
+        asyncio.create_task(restart_idchatbots())
         await load_clone_owners()
         if config.STRING1:
             try:
