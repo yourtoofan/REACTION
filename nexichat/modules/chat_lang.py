@@ -19,7 +19,7 @@ async def store_messages(client, message: Message):
     chat_id = message.chat.id
     chat_lang = await get_chat_language(chat_id)
 
-    if not chat_lang:
+    if not chat_lang or chat_lang = "nolang":
         if message.from_user and message.from_user.is_bot:
             return
 
