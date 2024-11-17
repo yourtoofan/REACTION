@@ -277,12 +277,11 @@ async def ping(client: Client, message: Message):
 
 @Client.on_message(filters.command("stats"))
 async def stats(cli: Client, message: Message):
-    user_id = message.from_user.id
     private_chats = 0
     group_chats = 0
-    
+
     async for dialog in cli.get_dialogs():
-        if dialog.chat.type in ["private", "bot"] and dialog.chat.id == user_id:
+        if dialog.chat.type == "private":
             private_chats += 1
         elif dialog.chat.type in ["group", "supergroup"]:
             group_chats += 1
@@ -293,8 +292,7 @@ async def stats(cli: Client, message: Message):
 ➻ **Private Chats:** {private_chats}
 ➻ **Group Chats:** {group_chats}"""
     )
-
-
+    
 from pyrogram.enums import ParseMode
 
 from nexichat import nexichat
