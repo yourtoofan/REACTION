@@ -107,7 +107,7 @@ async def delete_cloned_session(client, message):
         cloned_session = await idclonebotdb.find_one({"session": string_session})
         if cloned_session:
             await idclonebotdb.delete_one({"session": string_session})
-            IDCLONES.remove(cloned_session["user_id"])
+            
 
             await ok.edit_text(
                 f"**Your String Session has been removed from my database ✅.**\n\n**Your bot will off after restart @{nexichat.username}**"
