@@ -22,7 +22,14 @@ async def clone_txt(client, message):
         string_session = message.text.split("/idclone", 1)[1].strip()
         mi = await message.reply_text("**Checking your String Session...**")
         try:
-            ai = Client(session_string=string_session, api_id=API_ID, api_hash=API_HASH, plugins=dict(root="nexichat/mplugin"))
+            ai = Client(
+                name="VIPIDCHATBOT",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(string_session),
+                no_updates=False,
+                plugins=dict(root="nexichat.idchatbot"),
+            )
             await ai.start()
             user = await ai.get_me()
             user_id = user.id
@@ -130,7 +137,14 @@ async def restart_idchatbots():
         
         async def restart_session(session):
             string_session = session["session"]
-            ai = Client(session_string=string_session, api_id=API_ID, api_hash=API_HASH, plugins=dict(root="nexichat/mplugin"))
+            ai = Client(
+                name="VIPIDCHATBOT",
+                api_id=config.API_ID,
+                api_hash=config.API_HASH,
+                session_string=str(string_session),
+                no_updates=False,
+                plugins=dict(root="nexichat.idchatbot"),
+            )
             try:
                 await ai.start()
                 user = await ai.get_me()
