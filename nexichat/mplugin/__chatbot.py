@@ -11,21 +11,6 @@ from nexichat.database import add_served_cchat, add_served_cuser
 from config import MONGO_URL
 from nexichat import nexichat, mongo, LOGGER, db
 from nexichat.mplugin.helpers import chatai, CHATBOT_ON, languages
-from nexichat.modules.helpers import (
-    ABOUT_BTN,
-    ABOUT_READ,
-    ADMIN_READ,
-    BACK,
-    CHATBOT_BACK,
-    CHATBOT_READ,
-    DEV_OP,
-    HELP_BTN,
-    HELP_READ,
-    MUSIC_BACK_BTN,
-    SOURCE_READ,
-    START,
-    TOOLS_DATA_READ,
-)
 import asyncio
 
 translator = GoogleTranslator()
