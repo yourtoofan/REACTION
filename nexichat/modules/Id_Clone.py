@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 import shutil
+import config
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.errors.exceptions.bad_request_400 import AccessTokenInvalid
