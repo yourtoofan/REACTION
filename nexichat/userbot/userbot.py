@@ -33,7 +33,7 @@ class Userbot(Client):
                 pass
             
             try:
-                await self.one.send_message(config.int(OWNER_ID), "**ɪ'ᴍ sᴛᴀʀᴛᴇᴅ ʙᴀʙʏ !**")
+                await self.one.send_message(config.OWNER_ID, "**ɪ'ᴍ sᴛᴀʀᴛᴇᴅ ʙᴀʙʏ !**")
                 
             except Exception as e:
                 print(f"{e}")
