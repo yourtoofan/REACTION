@@ -4,6 +4,7 @@ import importlib
 from flask import Flask
 import threading
 import config
+from nexichat import ID_CHATBOT
 from pyrogram import idle
 from pyrogram.types import BotCommand
 from config import OWNER_ID
@@ -19,6 +20,8 @@ async def anony_boot():
         if config.STRING1:
             try:
                 await userbot.start()
+                global ID_CHATBOT
+                ID_CHATBOT = ACTIVE
             except Exception as ex:
                 print(f"Error in starting id-chatbot :- {ex}")
                 pass
