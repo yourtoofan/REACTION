@@ -31,6 +31,8 @@ from nexichat.idchatbot.helpers import (
     HELP_BTN,
     HELP_BUTN,
     HELP_READ,
+    CHATBOT_READ,
+    TOOLS_DATA_READ,
     HELP_START,
     SOURCE_READ,
 )
@@ -230,18 +232,12 @@ async def start(client: Client, m: Message):
 async def help(client: Client, m: Message):
     bot_id = client.me.id
     if m.chat.type == ChatType.PRIVATE:
-        hmm = await m.reply_photo(
-            photo=random.choice(IMG),
-            caption=HELP_READ,
-            reply_markup=InlineKeyboardMarkup(HELP_BTN),
-        )
+        hmm = await m.reply_text(CHATBOT_READ)
+        hm = await m.reply_text(TOOLS_DATA_READ)
 
     else:
-        await m.reply_photo(
-            photo=random.choice(IMG),
-            caption=HELP_READ,
-            reply_markup=InlineKeyboardMarkup(HELP_BUTN),
-        )
+        hmm = await m.reply_text(CHATBOT_READ)
+        hm = await m.reply_text(TOOLS_DATA_READ)
         
         await add_served_chat(m.chat.id)
 
