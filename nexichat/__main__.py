@@ -3,6 +3,7 @@ import asyncio
 import importlib
 from flask import Flask
 import threading
+import config
 from pyrogram import idle
 from pyrogram.types import BotCommand
 from config import OWNER_ID
@@ -15,7 +16,12 @@ async def anony_boot():
         await nexichat.start()
         asyncio.create_task(restart_bots())
         await load_clone_owners()
-        await userbot.start()
+        if config.STRING1:
+            try:
+                await userbot.start()
+            except Exception as ex:
+                print(f"Error in starting id-chatbot :- {ex}")
+                pass
     except Exception as ex:
         LOGGER.error(ex)
 
