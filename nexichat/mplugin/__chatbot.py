@@ -111,8 +111,8 @@ async def chatbot_response(client: Client, message: Message):
                 await add_served_cuser(bot_user_id, message.chat.id)
                 return await add_served_user(message.chat.id)
 
-        """if message.from_user.id == nexichat.id or message.reply_to_message.from_user.id == nexichat.id:
-            return"""
+        if message.from_user.id == nexichat.id or message.reply_to_message.from_user.id == nexichat.id:
+            return
         if (message.reply_to_message and message.reply_to_message.from_user.id == client.me.id) or not message.reply_to_message:
             reply_data = await get_reply(message.text)
 
@@ -127,26 +127,53 @@ async def chatbot_response(client: Client, message: Message):
                     if not translated_text:
                         translated_text = response_text
                 if reply_data["check"] == "sticker":
-                    await message.reply_sticker(reply_data["text"])
+                    try:
+                        await message.reply_sticker(reply_data["text"])
+                    except:
+                        pass
                 elif reply_data["check"] == "photo":
-                    await message.reply_photo(reply_data["text"])
+                    try:
+                        await message.reply_photo(reply_data["text"])
+                    except:
+                        pass
                 elif reply_data["check"] == "video":
-                    await message.reply_video(reply_data["text"])
+                    try:
+                        await message.reply_video(reply_data["text"])
+                    except:
+                        pass
                 elif reply_data["check"] == "audio":
-                    await message.reply_audio(reply_data["text"])
+                    try:
+                        await message.reply_audio(reply_data["text"])
+                    except:
+                        pass
                 elif reply_data["check"] == "gif":
-                    await message.reply_animation(reply_data["text"])
+                    try:
+                        await message.reply_animation(reply_data["text"])
+                    except:
+                        pass
                 elif reply_data["check"] == "voice":
-                    await message.reply_voice(reply_data["text"])
+                    try:
+                        await message.reply_voice(reply_data["text"])
+                    except:
+                        pass
                 else:
-                    await message.reply_text(translated_text)
+                    try:
+                        await message.reply_text(translated_text)
+                    except:
+                        pass
             else:
-                await message.reply_text("**I don't understand. What are you saying?**")
+                try:
+                    await message.reply_text("**I don't understand. What are you saying?**")
+                except:
+                    pass
 
         if message.reply_to_message:
             await save_reply(message.reply_to_message, message)
 
     except MessageEmpty:
-        await message.reply_text("🙄🙄")
+        try:
+            await message.reply_text("🙄🙄")
+        except:
+            pass
     except Exception as e:
         return
