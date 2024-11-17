@@ -23,15 +23,7 @@ class Userbot(Client):
 
         if config.STRING1:
             await self.one.start()
-            try:
-                await self.one.join_chat("THE_VIP_BOY")
-                await self.one.join_chat("THE_VIP_BOY_OP")
-                await self.one.join_chat("TG_FRIENDSS")
-                await self.one.join_chat("VIP_CREATORS")
-
-            except:
-                pass
-
+            
             self.one.id = self.one.me.id
             self.one.name = self.one.me.mention
             self.one.username = self.one.me.username
