@@ -13,6 +13,14 @@ async def get_chat_language(chat_id):
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else None
 
+
+@Client.on_message(filters.command("chatlang"))
+async def fetch_chat_lang(client, message):
+    chat_id = message.chat.id
+    chat_lang = await get_chat_language(chat_id)
+    await message.reply_text(f"The language code using for this chat is: {chat_lang}")
+
+
 @Client.on_message(filters.text, group=2)
 async def store_messages(client, message: Message):
     global message_cache
@@ -52,10 +60,4 @@ async def store_messages(client, message: Message):
             await message.reply_text(f"**Chat language detected for this chat:**\n\n{x}\n\n**You can set my lang by /lang**", reply_markup=reply_markup)
             message_cache[chat_id].clear()
 
-
-@Client.on_message(filters.command("chatlang"))
-async def fetch_chat_lang(client, message):
-    chat_id = message.chat.id
-    chat_lang = await get_chat_language(chat_id)
-    await message.reply_text(f"The language code using for this chat is: {chat_lang}")
 
