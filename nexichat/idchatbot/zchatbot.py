@@ -87,7 +87,7 @@ async def get_chat_language(chat_id):
 @Client.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     try:
-        user_id = message.from_user.id
+        user_id = message.from_user.id and not client.me.id
         chat_id = message.chat.id
         current_time = datetime.now()
         
