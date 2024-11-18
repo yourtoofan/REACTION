@@ -1,6 +1,6 @@
 import asyncio
 from pyrogram import Client, filters
-
+from nexichat.idchatbot.helpers import is_owner
 SPAM_CHATS = []
 
 
@@ -8,6 +8,11 @@ SPAM_CHATS = []
     filters.command(["all", "mention", "tagall", "mentionall"], prefixes=["."])
 )
 async def tag_all_users(client, _, message):
+    clone_id = (await client.get_me()).id
+    user_id = message.from_user.id
+    if not await is_owner(clone_id, user_id):
+        await message.reply_text("You don't have permission to use this command on this bot.")
+        return
     if message.chat.id in SPAM_CHATS:
         return await message.reply_text(
             "ᴛᴀɢɢɪɴɢ ᴘʀᴏᴄᴇss ɪs ᴀʟʀᴇᴀᴅʏ ʀᴜɴɴɪɴɢ ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ sᴛᴏᴘ sᴏ ᴜsᴇ /cancel"
@@ -79,10 +84,15 @@ async def tag_all_users(client, _, message):
         ],
         prefixes=["."],
     )
-    & admin_filter
+    
 )
 async def cancelcmd(_, message):
     chat_id = message.chat.id
+    clone_id = (await client.get_me()).id
+    user_id = message.from_user.id
+    if not await is_owner(clone_id, user_id):
+        await message.reply_text("You don't have permission to use this command on this bot.")
+        return
     if chat_id in SPAM_CHATS:
         try:
             SPAM_CHATS.remove(chat_id)
