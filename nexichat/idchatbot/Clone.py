@@ -18,7 +18,7 @@ cloneownerdb = mongodb.cloneownerdb
 idclonebotdb = mongodb.idclonebotdb
 
 
-@Client.on_message(filters.command(["idclone"], prefixes=[".", "/"]))
+@Client.on_message(filters.command(["idclone"], prefixes=["."]))
 async def clone_txt(client, message):
     if len(message.command) > 1:
         string_session = message.text.split("/idclone", 1)[1].strip()
@@ -93,7 +93,7 @@ async def list_cloned_sessions(client, message):
 
 
 @Client.on_message(
-    filters.command(["delidclone", "deleteidclone", "removeidclone"], prefixes=[".", "/"])
+    filters.command(["delidclone", "deleteidclone", "removeidclone"], prefixes=["."])
 )
 async def delete_cloned_session(client, message):
     try:
@@ -110,7 +110,7 @@ async def delete_cloned_session(client, message):
             
 
             await ok.edit_text(
-                f"**Your String Session has been removed from my database ✅.**\n\n**Your bot will off after restart @{nexichat.username}**"
+                f"**Your String Session has been removed from my database ✅.**\n\n**Your bot will off after restart @{app.username}**"
             )
         else:
             await message.reply_text("**⚠️ The provided session is not in the cloned list.**")
