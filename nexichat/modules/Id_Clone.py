@@ -5,6 +5,7 @@ import shutil
 import config
 import asyncio
 from pyrogram import Client, filters
+from pyrogram.errors import PeerIdInvalid
 from pyrogram.errors.exceptions.bad_request_400 import AccessTokenInvalid
 from pyrogram.types import BotCommand
 from config import API_HASH, API_ID, OWNER_ID
