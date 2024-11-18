@@ -148,7 +148,7 @@ async def restart_idchatbots():
                 plugins=dict(root="nexichat.idchatbot"),
             )
             try:
-                await asyncio.sleep(10)
+                await asyncio.sleep(60)
                 await ai.start()
                 user = await ai.get_me()
                 
