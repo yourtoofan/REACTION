@@ -48,21 +48,20 @@ def generate_language_buttons(languages):
         buttons.append(current_row)
     return InlineKeyboardMarkup(buttons)
 
-async def get_chat_language(chat_id):
-    chat_lang = await lang_db.find_one({"chat_id": chat_id})
+async def get_chat_language(chat_id, bot_id):
+    chat_lang = await lang_db.find_one({"chat_id": chat_id, "bot_id": bot_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else None
-   
-    
+
 @Client.on_message(filters.command("status"))
 async def status_command(client: Client, message: Message):
     chat_id = message.chat.id
-    chat_status = await status_db.find_one({"chat_id": chat_id})
+    bot_id = client.me.id
+    chat_status = await status_db.find_one({"chat_id": chat_id, "bot_id": bot_id})
     if chat_status:
         current_status = chat_status.get("status", "not found")
         await message.reply(f"Chatbot status for this chat: **{current_status}**")
     else:
         await message.reply("No status found for this chat.")
-
 
 @Client.on_message(filters.command(["lang", "language", "setlang"]))
 async def set_language(client: Client, message: Message):
@@ -71,17 +70,20 @@ async def set_language(client: Client, message: Message):
         reply_markup=generate_language_buttons(languages)
     )
 
-
 @Client.on_message(filters.command(["resetlang", "nolang"]))
 async def reset_language(client: Client, message: Message):
     chat_id = message.chat.id
-    lang_db.update_one({"chat_id": chat_id}, {"$set": {"language": "nolang"}}, upsert=True)
+    bot_id = client.me.id
+    lang_db.update_one(
+        {"chat_id": chat_id, "bot_id": bot_id},
+        {"$set": {"language": "nolang"}},
+        upsert=True
+    )
     await message.reply_text("**Bot language has been reset in this chat to mix language.**")
-
 
 @Client.on_message(filters.command("chatbot"))
 async def chatbot_command(client: Client, message: Message):
     await message.reply_text(
         f"Chat: {message.chat.title}\n**Choose an option to enable/disable the chatbot.**",
         reply_markup=InlineKeyboardMarkup(CHATBOT_ON),
-)
+    )
