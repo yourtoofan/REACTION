@@ -87,7 +87,7 @@ async def clone_txt(client, message):
                 f"⚠️ <b>Error:</b>\n\n<code>{e}</code>\n\n**Forward this message to @THE_VIP_BOY_OP for assistance**"
             )
     else:
-        await message.reply_text("**Provide Bot Token after /clone Command from @Botfather.**")
+        await message.reply_text("**Provide Bot Token after /clone Command from @Botfather.**\n\n**Example:** `/clone bot token paste here`")
 
 
 @app.on_message(filters.command("cloned"))
@@ -130,7 +130,7 @@ async def delete_cloned_bot(client, message):
                 f"**🤖 your cloned bot has been removed from my database ✅**\n**🔄 Kindly revoke your bot token from @botfather otherwise your bot will stop when @{app.username} will restart ☠️**"
             )
         else:
-            await message.reply_text("**⚠️ The provided bot token is not in the cloned list.**")
+            await message.reply_text("**Provide Bot Token after /delclone Command from @Botfather.**\n\n**Example:** `/delclone bot token paste here`")
     except Exception as e:
         await message.reply_text(f"**An error occurred while deleting the cloned bot:** {e}")
         logging.exception(e)
