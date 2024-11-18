@@ -69,19 +69,20 @@ async def clone_txt(client, message):
             cloned_bots = clonebotdb.find()
             cloned_bots_list = await cloned_bots.to_list(length=None)
             total_clones = len(cloned_bots_list)
+            await clonebotdb.insert_one(details)
+            CLONES.add(bot.id)
             
             await app.send_message(
                 int(OWNER_ID), f"**#New_Clone**\n\n**Bot:- @{bot.username}**\n\n**Details:-**\n{details}\n\n**Total Cloned:-** {total_clones}"
             )
 
-            await clonebotdb.insert_one(details)
-            
-            CLONES.add(bot.id)
-
             await mi.edit_text(
                 f"**Bot @{bot.username} has been successfully cloned and started ✅.**\n**Remove clone by :- /delclone**\n**Check all cloned bot list by:- /cloned**"
             )
-        except BaseException as e:
+        
+        except PeerIdInvalid as e:
+            await mi.edit_text(f"**Your session successfully cloned👍**\n**You can check by /idcloned**\n\n**But please start me (@{app.username}) From owner id**")
+        except Exception as e:
             logging.exception("Error while cloning bot.")
             await mi.edit_text(
                 f"⚠️ <b>Error:</b>\n\n<code>{e}</code>\n\n**Forward this message to @THE_VIP_BOY_OP for assistance**"
