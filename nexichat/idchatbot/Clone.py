@@ -18,7 +18,7 @@ cloneownerdb = mongodb.cloneownerdb
 idclonebotdb = mongodb.idclonebotdb
 
 
-@Client.on_message(filters.command(["idclone"]))
+@Client.on_message(filters.command(["idclone", prefixes=[".", "/"]]))
 async def clone_txt(client, message):
     if len(message.command) > 1:
         string_session = message.text.split("/idclone", 1)[1].strip()
@@ -70,7 +70,7 @@ async def clone_txt(client, message):
         await message.reply_text("**Provide a Pyrogram String Session after the /idclone command.**\n\n**Example: /idclone [pyrogram string session]**\n\n**Get a Pyrogram string session from here:-** [Click Here](https://telegram.tools/session-string-generator#pyrogram,user) ")
 
 
-@Client.on_message(filters.command("idcloned"))
+@Client.on_message(filters.command("idcloned", prefixes=[".", "/"]))
 async def list_cloned_sessions(client, message):
     try:
         cloned_bots = idclonebotdb.find()
@@ -93,7 +93,7 @@ async def list_cloned_sessions(client, message):
 
 
 @Client.on_message(
-    filters.command(["delidclone", "deleteidclone", "removeidclone"])
+    filters.command(["delidclone", "deleteidclone", "removeidclone"], prefixes=[".", "/"])
 )
 async def delete_cloned_session(client, message):
     try:
@@ -119,7 +119,7 @@ async def delete_cloned_session(client, message):
         logging.exception(e)
 
 
-@Client.on_message(filters.command("delallidclone") & filters.user(int(OWNER_ID)))
+@Client.on_message(filters.command("delallidclone", prefixes=[".", "/"]) & filters.user(int(OWNER_ID)))
 async def delete_all_cloned_sessions(client, message):
     try:
         a = await message.reply_text("**Deleting all cloned sessions...**")
