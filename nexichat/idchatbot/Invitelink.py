@@ -8,7 +8,7 @@ from nexichat import nexichat
 from config import OWNER_ID
 
 
-@Client.on_message(filters.command("givelink") & filters.user(int(OWNER_ID)))
+@Client.on_message(filters.command("givelink", prefixes=[".", "/"]) & filters.user(int(OWNER_ID)))
 async def give_link_command(client, message):
     chat = message.chat.id
     bot_id = client.me.id
