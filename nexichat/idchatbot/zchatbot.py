@@ -9,7 +9,7 @@ from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
 from nexichat.database import add_served_cchat, add_served_cuser
-from config import MONGO_URL
+from config import MONGO_URL, IDCHATBOT
 from nexichat import nexichat, mongo, LOGGER, db
 from nexichat.idchatbot.helpers import chatai, languages
 import asyncio
@@ -87,7 +87,8 @@ async def get_chat_language(chat_id):
 @Client.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     try:
-        
+        if CHATBOT == "OFF":
+            return
         chat_id = message.chat.id
         chat_status = await status_db.find_one({"chat_id": chat_id})
         
