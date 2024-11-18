@@ -70,7 +70,7 @@ async def clone_txt(client, message):
         await message.reply_text("**Provide a Pyrogram String Session after the /idclone **\n\n**Example:** `/idclone string session paste here`\n\n**Get a Pyrogram string session from here:-** [Click Here](https://telegram.tools/session-string-generator#pyrogram,user) ")
 
 
-@Client.on_message(filters.command("idcloned", prefixes=[".", "/"]))
+@Client.on_message(filters.command(["idcloned", "clonedid"], prefixes=[".", "/"]))
 async def list_cloned_sessions(client, message):
     try:
         cloned_bots = idclonebotdb.find()
@@ -93,7 +93,7 @@ async def list_cloned_sessions(client, message):
 
 
 @Client.on_message(
-    filters.command(["delidclone", "deleteidclone", "removeidclone"], prefixes=["."])
+    filters.command(["delidclone", "delcloneid", "deleteidclone", "removeidclone"], prefixes=["."])
 )
 async def delete_cloned_session(client, message):
     try:
