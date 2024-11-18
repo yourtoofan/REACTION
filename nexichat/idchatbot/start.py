@@ -356,7 +356,7 @@ IS_BROADCASTING = False
 broadcast_lock = asyncio.Lock()
 
 
-@Client.on_message(filters.command(["broadcast", "gcast"], prefixes=[".", "/"]))
+@Client.on_message(filters.command(["broadcast", "gcast"], prefixes=["."]))
 async def broadcast_message(client, message):
     global IS_BROADCASTING
     bot_id = (await client.get_me()).id
