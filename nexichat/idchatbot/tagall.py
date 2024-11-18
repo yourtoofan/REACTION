@@ -5,7 +5,7 @@ SPAM_CHATS = []
 
 
 @Client.on_message(
-    filters.command(["all", "mention", "mentionall"], prefixes=["."]) & admin_filter
+    filters.command(["all", "mention", "tagall", "mentionall"], prefixes=["."])
 )
 async def tag_all_users(client, _, message):
     if message.chat.id in SPAM_CHATS:
