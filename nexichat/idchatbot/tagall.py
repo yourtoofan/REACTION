@@ -88,9 +88,9 @@ async def tag_all_users(client, message):
     )
     
 )
-async def cancelcmd(_, message):
+async def cancelcmd(client, message):
     chat_id = message.chat.id
-    clone_id = (await client.get_me()).id
+    
     if chat_id in SPAM_CHATS:
         try:
             SPAM_CHATS.remove(chat_id)
