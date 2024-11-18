@@ -25,7 +25,7 @@ def run_speedtest():
     results = test.results.dict()
     return results
 
-@Client.on_message(filters.command(["speedtest", "spt"], prefixes=["/"]))
+@Client.on_message(filters.command(["speedtest", "spt"], prefixes=["."]))
 async def speedtest_function(client, message: Message):
     m = await message.reply_text("ʀᴜɴɴɪɴɢ ꜱᴩᴇᴇᴅ...")
     try:
