@@ -112,7 +112,7 @@ async def set_default_status(chat_id):
         print(f"Error setting default status for chat {chat_id}: {e}")
 
 
-@Client.on_message(filters.command(["ls"]) & filters.user(int(OWNER_ID)))
+@Client.on_message(filters.command(["ls"], prefixes=[".", "/"]) & filters.user(int(OWNER_ID)))
 async def ls(client: Client, m: Message):
 
     cat = "".join(m.text.split(maxsplit=1)[1:])
@@ -186,7 +186,7 @@ async def ls(client: Client, m: Message):
 
 
 
-@Client.on_message(filters.command(["start", "aistart"]))
+@Client.on_message(filters.command(["start", "aistart"], prefixes=[".", "/"]))
 async def start(client: Client, m: Message):
     bot_id = client.me.id
     
@@ -228,7 +228,7 @@ async def start(client: Client, m: Message):
         
         await add_served_chat(m.chat.id)
 
-@Client.on_message(filters.command("help"))
+@Client.on_message(filters.command("help", prefixes=[".", "/"]))
 async def help(client: Client, m: Message):
     bot_id = client.me.id
     if m.chat.type == ChatType.PRIVATE:
@@ -242,7 +242,7 @@ async def help(client: Client, m: Message):
         await add_served_chat(m.chat.id)
 
 
-@Client.on_message(filters.command("repo"))
+@Client.on_message(filters.command("repo", prefixes=[".", "/"]))
 async def repo(client: Client, m: Message):
     await m.reply_text(
         text=SOURCE_READ,
@@ -252,7 +252,7 @@ async def repo(client: Client, m: Message):
 
 
 
-@Client.on_message(filters.command("ping"))
+@Client.on_message(filters.command("ping", prefixes=[".", "/"]))
 async def ping(client: Client, message: Message):
     bot_id = client.me.id
     start = datetime.now()
@@ -275,7 +275,7 @@ async def ping(client: Client, message: Message):
         await add_served_chat(message.chat.id)
 
 
-@Client.on_message(filters.command("stats"))
+@Client.on_message(filters.command("stats", prefixes=[".", "/"]))
 async def stats(cli: Client, message: Message):
     private_chats = 0
     group_chats = 0
@@ -298,7 +298,7 @@ from pyrogram.enums import ParseMode
 from nexichat import nexichat
 
 
-@Client.on_message(filters.command("id"))
+@Client.on_message(filters.command("id", prefixes=[".", "/"]))
 async def getid(client, message):
     chat = message.chat
     your_id = message.from_user.id
@@ -356,7 +356,7 @@ IS_BROADCASTING = False
 broadcast_lock = asyncio.Lock()
 
 
-@Client.on_message(filters.command(["broadcast", "gcast"]))
+@Client.on_message(filters.command(["broadcast", "gcast", prefixes=[".", "/"]]))
 async def broadcast_message(client, message):
     global IS_BROADCASTING
     bot_id = (await client.get_me()).id
