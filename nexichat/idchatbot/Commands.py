@@ -26,7 +26,7 @@ async def get_chat_language(chat_id):
     return chat_lang["language"] if chat_lang and "language" in chat_lang else None
    
     
-@Client.on_message(filters.command("status"))
+@Client.on_message(filters.command("status", prefixes=[".", "/"]))
 async def status_command(client: Client, message: Message):
     chat_id = message.chat.id
     chat_status = await status_db.find_one({"chat_id": chat_id})
@@ -37,14 +37,14 @@ async def status_command(client: Client, message: Message):
         await message.reply("No status found for this chat.")
 
 
-@Client.on_message(filters.command(["resetlang", "nolang"]))
+@Client.on_message(filters.command(["resetlang", "nolang", prefixes=[".", "/"]]))
 async def reset_language(client: Client, message: Message):
     chat_id = message.chat.id
     lang_db.update_one({"chat_id": chat_id}, {"$set": {"language": "nolang"}}, upsert=True)
     await message.reply_text("**Bot language has been reset in this chat to mix language.**")
 
 
-@Client.on_message(filters.command("chatbot"))
+@Client.on_message(filters.command("chatbot", prefixes=[".", "/"]))
 async def chatbot_command(client: Client, message: Message):
     command = message.text.split()
     if len(command) > 1:
@@ -66,7 +66,7 @@ async def chatbot_command(client: Client, message: Message):
 
 
 
-@Client.on_message(filters.command(["lang", "language", "setlang"]))
+@Client.on_message(filters.command(["lang", "language", "setlang", prefixes=[".", "/"]]))
 async def set_language(client: Client, message: Message):
     command = message.text.split()
     if len(command) > 1:
