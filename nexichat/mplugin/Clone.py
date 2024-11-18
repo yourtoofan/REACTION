@@ -83,7 +83,7 @@ async def clone_txt(client, message):
                 f"⚠️ <b>Error:</b>\n\n<code>{e}</code>\n\n**Forward this message to @THE_VIP_BOY_OP for assistance**"
             )
     else:
-        await message.reply_text("**Provide Bot Token after /clone Command from @Botfather.**")
+        await message.reply_text("**Provide Bot Token after /clone Command from @Botfather.**\n\n**Example:** `/clone bot token paste here`")
 
 
 @Client.on_message(filters.command("cloned"))
