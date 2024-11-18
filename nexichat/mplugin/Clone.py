@@ -2,6 +2,7 @@ import logging
 import os
 from pyrogram.enums import ParseMode
 from pyrogram import Client, filters
+from pyrogram.errors import PeerIdInvalid
 from pyrogram.errors.exceptions.bad_request_400 import AccessTokenExpired, AccessTokenInvalid
 import config
 from nexichat.mplugin.helpers import is_owner
@@ -66,17 +67,19 @@ async def clone_txt(client, message):
             cloned_bots = clonebotdb.find()
             cloned_bots_list = await cloned_bots.to_list(length=None)
             total_clones = len(cloned_bots_list)
-
+            await clonebotdb.insert_one(details)
+            CLONES.add(bot.id)
+            
             await app.send_message(
                 int(OWNER_ID), f"**#New_Clone**\n\n**Bot:- @{bot.username}**\n\n**Details:-**\n{details}\n\n**Total Cloned:-** {total_clones}"
             )
 
-            await clonebotdb.insert_one(details)
-            CLONES.add(bot.id)
-
             await mi.edit_text(
                 f"**Bot @{bot.username} has been successfully cloned and started ✅.**\n**Remove clone by :- /delidclone**\n**Check all cloned bot list by:- /idcloned**"
             )
+        except PeerIdInvalid as e:
+            await mi.edit_text(f"**Your bot successfully cloned👍**\n**You can check by /cloned**\n\n**But please start me (@{nexichat.username}) From owner id**")
+        
         except BaseException as e:
             logging.exception("Error while cloning bot.")
             await mi.edit_text(
