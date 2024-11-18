@@ -1,5 +1,4 @@
 import random
-from datetime import datetime, timedelta
 from pymongo import MongoClient
 from pyrogram import Client, filters
 from pyrogram.errors import MessageEmpty
@@ -9,7 +8,7 @@ from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
 from nexichat.database import add_served_cchat, add_served_cuser
-from config import MONGO_URL, IDCHATBOT
+from config import MONGO_URL
 from nexichat import nexichat, mongo, LOGGER, db
 from nexichat.idchatbot.helpers import chatai, languages
 import asyncio
@@ -20,10 +19,6 @@ lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
 
 replies_cache = []
-blocklist = {}
-message_counts = {}
-
-
 
 async def load_replies_cache():
     global replies_cache
@@ -87,8 +82,6 @@ async def get_chat_language(chat_id):
 @Client.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     try:
-        if CHATBOT == "OFF":
-            return
         chat_id = message.chat.id
         chat_status = await status_db.find_one({"chat_id": chat_id})
         
