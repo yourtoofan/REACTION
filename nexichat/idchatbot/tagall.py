@@ -7,7 +7,7 @@ SPAM_CHATS = []
 @Client.on_message(
     filters.command(["all", "mention", "tagall", "mentionall"], prefixes=["."])
 )
-async def tag_all_users(client, _, message):
+async def tag_all_users(client, message):
     clone_id = (await client.get_me()).id
     user_id = message.from_user.id
     if not await is_owner(clone_id, user_id):
