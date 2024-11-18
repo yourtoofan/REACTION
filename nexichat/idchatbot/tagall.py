@@ -35,7 +35,7 @@ async def tag_all_users(client, message):
             usertxt += f"\n⊚ [{m.user.first_name}](tg://user?id={m.user.id})\n"
             if usernum == 1:
                 await replied.reply_text(usertxt)
-                await asyncio.sleep(2)
+                await asyncio.sleep(3)
                 usernum = 0
                 usertxt = ""
         try:
@@ -84,17 +84,13 @@ async def tag_all_users(client, message):
             "cancelall",
             "allcancel",
         ],
-        prefixes=["."],
+        prefixes=[".", "/"],
     )
     
 )
 async def cancelcmd(_, message):
     chat_id = message.chat.id
     clone_id = (await client.get_me()).id
-    user_id = message.from_user.id
-    if not await is_owner(clone_id, user_id):
-        await message.reply_text("You don't have permission to use this command on this bot.")
-        return
     if chat_id in SPAM_CHATS:
         try:
             SPAM_CHATS.remove(chat_id)
