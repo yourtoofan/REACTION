@@ -62,7 +62,7 @@ async def clone_txt(client, message):
                 f"**Remove clone by:** /delclone\n**Check all cloned sessions by:** /cloned"
             )
         except AccessTokenInvalid:
-            await mi.edit_text(f"**Invalid String Session. Please provide a valid pyrogram string session.:**\n\n`{e}`")
+            await mi.edit_text(f"**Invalid String Session. Please provide a valid pyrogram string session.:**")
         except Exception as e:
             logging.exception("Error during cloning process.")
             await mi.edit_text(f"**Invalid String Session. Please provide a valid pyrogram string session.:**\n\n`{e}`")
