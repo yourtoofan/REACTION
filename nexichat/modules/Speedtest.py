@@ -4,18 +4,17 @@ from pyrogram import filters
 from pyrogram.types import Message
 from nexichat import nexichat
 
-
 server_result_template = (
-    "✯ <b>sᴩᴇᴇᴅᴛᴇsᴛ ʀᴇsᴜʟᴛs</b> ✯\n\n"
-    "<u><b>ᴄʟɪᴇɴᴛ :</b></u>\n"
-    "<b>» ɪsᴩ :</b> {isp}\n"
-    "<b>» ᴄᴏᴜɴᴛʀʏ :</b> {country}\n\n"
-    "<u><b>sᴇʀᴠᴇʀ :</b></u>\n"
-    "<b>» ɴᴀᴍᴇ :</b> {server_name}\n"
-    "<b>» ᴄᴏᴜɴᴛʀʏ :</b> {server_country}, {server_cc}\n"
-    "<b>» sᴩᴏɴsᴏʀ :</b> {sponsor}\n"
-    "<b>» ʟᴀᴛᴇɴᴄʏ :</b> {latency} ms\n"
-    "<b>» ᴩɪɴɢ :</b> {ping} ms"
+    "✯ sᴩᴇᴇᴅᴛᴇsᴛ ʀᴇsᴜʟᴛs ✯\n\n"
+    "ᴄʟɪᴇɴᴛ:\n"
+    "» ɪsᴩ: {isp}\n"
+    "» ᴄᴏᴜɴᴛʀʏ: {country}\n\n"
+    "sᴇʀᴠᴇʀ:\n"
+    "» ɴᴀᴍᴇ: {server_name}\n"
+    "» ᴄᴏᴜɴᴛʀʏ: {server_country}, {server_cc}\n"
+    "» sᴩᴏɴsᴏʀ: {sponsor}\n"
+    "» ʟᴀᴛᴇɴᴄʏ: {latency} ms\n"
+    "» ᴩɪɴɢ: {ping} ms"
 )
 
 def run_speedtest():
@@ -28,7 +27,7 @@ def run_speedtest():
 
 @nexichat.on_message(filters.command(["speedtest", "spt"], prefixes=["/"]))
 async def speedtest_function(client, message: Message):
-    m = await message.reply_text("**ʀᴜɴɴɪɴɢ ꜱᴩᴇᴇᴅ...**")
+    m = await message.reply_text("ʀᴜɴɴɪɴɢ ꜱᴩᴇᴇᴅ...")
     try:
         loop = asyncio.get_event_loop()
         result = await loop.run_in_executor(None, run_speedtest)
@@ -44,10 +43,9 @@ async def speedtest_function(client, message: Message):
             ping=result["ping"],
         )
 
-        # Send result with photo
         msg = await message.reply_photo(
-            photo=result["share"], caption=output, parse_mode="html"
+            photo=result["share"], caption=output
         )
         await m.delete()
     except Exception as e:
-        await m.edit_text(f"**Error:** `{e}`")
+        await m.edit_text(f"Error: {e}")
