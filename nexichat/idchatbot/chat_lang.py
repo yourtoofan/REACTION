@@ -52,7 +52,7 @@ async def store_messages(client, message: Message):
             message_cache[chat_id].clear()
 
 
-@Client.on_message(filters.command("chatlang"))
+@Client.on_message(filters.command("chatlang", prefixes=[".", "/"]))
 async def fetch_chat_lang(client, message):
     chat_id = message.chat.id
     chat_lang = await get_chat_language(chat_id)
