@@ -63,7 +63,7 @@ async def clone_txt(client, message):
             )
         except AccessTokenInvalid:
             await mi.edit_text("**Invalid String Session. Please provide a valid one.**")
-       except PeerIdInvalid as e:
+        except PeerIdInvalid as e:
             await mi.edit_text(f"**Your session successfully cloned👍**\n**You can check by /idcloned**\n\n**But please start me (@{app.username}) From owner id**")
         except Exception as e:
             logging.exception("Error during cloning process.")
