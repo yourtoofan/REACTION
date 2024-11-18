@@ -111,7 +111,7 @@ async def list_cloned_bots(client, message):
 async def delete_cloned_bot(client, message):
     try:
         if len(message.command) < 2:
-            await message.reply_text("**⚠️ Please provide the bot token after the command.**")
+            await message.reply_text("**Provide Bot Token after /clone Command from @Botfather.**\n\n**Example:** `/delclone bot token paste here`")
             return
 
         bot_token = " ".join(message.command[1:])
