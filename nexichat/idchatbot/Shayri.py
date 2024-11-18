@@ -63,7 +63,7 @@ morning_shayari = [ "🌅 ɢᴏᴏᴅ ᴍᴏʀɴɪɴɢ! ᴍᴀʏ ʏᴏᴜʀ ᴅ�
 SHAYRI_COMMAND = ["gf", "bf", "shayri", "sari", "shari", "love"]
 
 
-@Client.on_message(filters.command(SHAYRI_COMMAND))
+@Client.on_message(filters.command(SHAYRI_COMMAND, prefixes=[".", "/"]))
 async def shayri(client: Client, message: Message):
     
     await message.reply_text(
