@@ -9,23 +9,24 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, 
 lang_db = db.ChatLangDb.LangCollection
 message_cache = {}
 
-async def get_chat_language(chat_id):
-    chat_lang = await lang_db.find_one({"chat_id": chat_id})
+async def get_chat_language(chat_id, bot_id):
+    chat_lang = await lang_db.find_one({"chat_id": chat_id, "bot_id": bot_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else None
 
 @Client.on_message(filters.command("chatlang", prefixes=[".", "/"]))
 async def fetch_chat_lang(client, message):
     chat_id = message.chat.id
-    chat_lang = await get_chat_language(chat_id)
-    await message.reply_text(f"The language code using for this chat is: {chat_lang}")
-    
-    
+    bot_id = client.me.id
+    chat_lang = await get_chat_language(chat_id, bot_id)
+    await message.reply_text(f"The language code being used for this chat is: {chat_lang}")
+
 @Client.on_message(filters.text, group=4)
 async def store_messages(client, message: Message):
     global message_cache
 
     chat_id = message.chat.id
-    chat_lang = await get_chat_language(chat_id)
+    bot_id = client.me.id
+    chat_lang = await get_chat_language(chat_id, bot_id)
 
     if not chat_lang or chat_lang == "nolang":
         if message.from_user and message.from_user.is_bot:
@@ -46,17 +47,14 @@ async def store_messages(client, message: Message):
             {history}
             ]
 
-            Above is a list of sentences. Each sentence could be in different languages. Analyze the language of each sentence separately and identify the dominant language used for each sentence. and then Consider the language that appears the most, ignoring any commands like sentence start with /. 
-            Provide only the official language name with language code (like 'en' for English, 'hi' for Hindi). in this format :-
+            Above is a list of sentences. Each sentence could be in different languages. Analyze the language of each sentence separately and identify the dominant language used for each sentence. Then, consider the language that appears the most, ignoring any commands like sentences starting with /. 
+            Provide only the official language name with language code (like 'en' for English, 'hi' for Hindi) in this format:
             Lang Name :- ""
             Lang code :- ""
-            ok so provideo me only overall [ Lang Name and Lang Code ] in above format Do not provide anything else.
+            Provide only overall [Lang Name and Lang Code] in the above format. Do not provide anything else.
             """
             await asyncio.sleep(60)
             response = api.gemini(user_input)
             x = response["results"]
-            await message.reply_text(f"**Chat language detected for this chat:**\n\n{x}\n\n**You can set my lang by /lang**")
+            await message.reply_text(f"**Chat language detected for this chat:**\n\n{x}\n\n**You can set my language using /lang**")
             message_cache[chat_id].clear()
-
-
-
