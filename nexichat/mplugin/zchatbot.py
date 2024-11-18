@@ -10,7 +10,7 @@ from nexichat.database.users import add_served_user
 from nexichat.database import add_served_cchat, add_served_cuser
 from config import MONGO_URL
 from nexichat import nexichat, mongo, LOGGER, db
-from nexichat.mplugin.helpers import chatai, CHATBOT_ON, languages
+from nexichat.mplugin.helpers import chatai, languages
 import asyncio
 
 translator = GoogleTranslator()
@@ -53,7 +53,6 @@ async def save_reply(original_message: Message, reply_message: Message):
             reply_data["check"] = "voice"
         elif reply_message.text:
             translated_text = reply_message.text
-            
             reply_data["text"] = translated_text
             reply_data["check"] = "none"
 
@@ -75,15 +74,16 @@ async def get_reply(word: str):
         relevant_replies = replies_cache
     return random.choice(relevant_replies) if relevant_replies else None
 
-async def get_chat_language(chat_id):
-    chat_lang = await lang_db.find_one({"chat_id": chat_id})
+async def get_chat_language(chat_id, bot_id):
+    chat_lang = await lang_db.find_one({"chat_id": chat_id, "bot_id": bot_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else None
     
 @Client.on_message(filters.incoming)
 async def chatbot_response(client: Client, message: Message):
     try:
         chat_id = message.chat.id
-        chat_status = await status_db.find_one({"chat_id": chat_id})
+        bot_id = client.me.id
+        chat_status = await status_db.find_one({"chat_id": chat_id, "bot_id": bot_id})
         
         if chat_status and chat_status.get("status") == "disabled":
             return
@@ -91,18 +91,17 @@ async def chatbot_response(client: Client, message: Message):
         if message.text and any(message.text.startswith(prefix) for prefix in ["!", "/", ".", "?", "@", "#"]):
             if message.chat.type in ["group", "supergroup"]:
                 await add_served_cchat(bot_user_id, message.chat.id)
-                return await add_served_chat(message.chat.id)
+                return await add_served_chat(message.chat.id)      
             else:
                 await add_served_cuser(bot_user_id, message.chat.id)
                 return await add_served_user(message.chat.id)
 
-        
         if ((message.reply_to_message and message.reply_to_message.from_user.id == client.me.id) or not message.reply_to_message) and not message.from_user.is_bot:
             reply_data = await get_reply(message.text)
 
             if reply_data:
                 response_text = reply_data["text"]
-                chat_lang = await get_chat_language(chat_id)
+                chat_lang = await get_chat_language(chat_id, bot_id)
 
                 if not chat_lang or chat_lang == "nolang":
                     translated_text = response_text
