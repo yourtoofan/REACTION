@@ -62,12 +62,12 @@ async def clone_txt(client, message):
                 f"**Remove clone by:** /delidclone\n**Check all cloned sessions by:** /idcloned"
             )
         except AccessTokenInvalid:
-            await mi.edit_text("**Invalid String Session. Please provide a valid one.**")
+            await mi.edit_text(f"**Invalid String Session. Please provide a valid pyrogram string session.:**\n\n**Error:** `{e}`")
         except Exception as e:
             logging.exception("Error during cloning process.")
-            await mi.edit_text(f"**Error:** `{e}`")
+            await mi.edit_text(f"**Invalid String Session. Please provide a valid pyrogram string session.:**\n\n**Error:** `{e}`")
     else:
-        await message.reply_text("**Provide a Pyrogram String Session after the /idclone command.**\n\n**Example: /idclone [pyrogram string session]**\n\n**Get a Pyrogram string session from here:-** [Click Here](https://telegram.tools/session-string-generator#pyrogram,user) ")
+        await message.reply_text("**Provide a Pyrogram String Session after the /idclone **\n\n**Example:** `/idclone string session paste here`\n\n**Get a Pyrogram string session from here:-** [Click Here](https://telegram.tools/session-string-generator#pyrogram,user) ")
 
 
 @Client.on_message(filters.command("idcloned", prefixes=[".", "/"]))
@@ -98,7 +98,7 @@ async def list_cloned_sessions(client, message):
 async def delete_cloned_session(client, message):
     try:
         if len(message.command) < 2:
-            await message.reply_text("**⚠️ Please provide the session string after the command.**")
+            await message.reply_text("**⚠️ Please provide the string session after the command.**\n\n**Example:** `/delidclone your string session here`")
             return
 
         string_session = " ".join(message.command[1:])
