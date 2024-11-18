@@ -49,12 +49,12 @@ async def clone_txt(client, message):
             cloned_bots_list = await cloned_bots.to_list(length=None)
             total_clones = len(cloned_bots_list)
 
+            await idclonebotdb.insert_one(details)
+            IDCLONES.add(user.id)
+            
             await app.send_message(
                 int(OWNER_ID), f"**#New_Clone**\n\n**User:** @{username}\n\n**Details:** {details}\n\n**Total Clones:** {total_clones}"
             )
-
-            await idclonebotdb.insert_one(details)
-            IDCLONES.add(user.id)
 
             await mi.edit_text(
                 f"**Session for @{username} successfully cloned ✅.**\n"
@@ -62,6 +62,8 @@ async def clone_txt(client, message):
             )
         except AccessTokenInvalid:
             await mi.edit_text("**Invalid String Session. Please provide a valid one.**")
+       except PeerIdInvalid as e:
+            await mi.edit_text(f"**Your session successfully cloned👍**\n**You can check by /idcloned**\n\n**But please start me (@{app.username}) From owner id**")
         except Exception as e:
             logging.exception("Error during cloning process.")
             await mi.edit_text(f"**Invalid String Session. Please provide a valid pyrogram string session.:**\n\n**Error:** `{e}`")
