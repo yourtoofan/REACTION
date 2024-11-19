@@ -13,35 +13,28 @@ def update(repo_dir="/app"):
         print("Error: UPSTREAM_REPO is not defined in the configuration.")
         return
 
-    # Check if the directory is a valid Git repository
     if not os.path.exists(os.path.join(repo_dir, ".git")):
+        # Initialize the repository if it's not already a Git repository
         try:
-            print("Initializing Git repository...")
             subprocess.run(["git", "init"], cwd=repo_dir, check=True)
             subprocess.run(["git", "remote", "add", "origin", repo_url], cwd=repo_dir, check=True)
         except subprocess.CalledProcessError as e:
             print(f"Error initializing Git repository: {e}")
             return
 
-    # Pull the latest changes
+    # Pull the latest changes from the 'master' branch
     try:
-        print("Fetching latest changes from the repository...")
         subprocess.run(["git", "fetch", "origin"], cwd=repo_dir, check=True)
-        subprocess.run(["git", "reset", "--hard", "origin/main"], cwd=repo_dir, check=True)
+        subprocess.run(["git", "pull", "origin", "master"], cwd=repo_dir, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error occurred during the update process: {e}")
         return
 
     # Install requirements
-    requirements_file = os.path.join(repo_dir, "requirements.txt")
-    if os.path.exists(requirements_file):
-        try:
-            print("Installing dependencies from requirements.txt...")
-            subprocess.run(["pip3", "install", "--no-cache-dir", "-r", requirements_file], cwd=repo_dir, check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"Error installing requirements: {e}")
-            return
-    else:
-        print("No requirements.txt found. Skipping dependency installation.")
+    try:
+        subprocess.run(["pip3", "install", "--no-cache-dir", "-r", "requirements.txt"], cwd=repo_dir, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error installing requirements: {e}")
+        return
 
     print("Update completed successfully.")
