@@ -12,7 +12,7 @@ from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
 from config import MONGO_URL, OWNER_ID
 from nexichat import nexichat, mongo, LOGGER, db
-from nexichat.modules.helpers import chatai, abuse_words_db, CHATBOT_ON, languages
+from nexichat.modules.helpers import chatai, CHATBOT_ON, languages
 from nexichat.modules.helpers import (
     ABOUT_BTN,
     ABOUT_READ,
@@ -34,6 +34,7 @@ translator = GoogleTranslator()
 
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
+abuse_words_db = db.abuse_words_db.words
 
 replies_cache = []
 abuse_cache = []
