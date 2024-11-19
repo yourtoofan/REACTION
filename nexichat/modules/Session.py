@@ -11,7 +11,7 @@ async def generate_string_session(client: Client, message: Message):
     try:
         # Ask for phone number
         await message.reply("Send your phone number (with country code):")
-        response = await client.listen(chat_id, timeout=300)  # Wait for the user's response (5 minutes timeout)
+        response = await app.listen(chat_id, timeout=300)  # Wait for the user's response (5 minutes timeout)
         phone = response.text.strip()
 
         # Initialize user client
