@@ -54,7 +54,7 @@ async def store_messages(client, message: Message):
             Provide only overall [Lang Name and Lang Code] in the above format. Do not provide anything else.
             """
             await asyncio.sleep(60)
-            response = api.gemini(user_input)
-            x = response["results"]
-            await message.reply_text(f"**Chat language detected for this chat:**\n\n{x}\n\n**You can set my language using /lang**")
+            base_url = "https://chatwithai.codesearch.workers.dev/?chat="
+            response = requests.get(base_url + user_input)
+            await message.reply_text(f"**Chat language detected for this chat:**\n\n{response.text}\n\n**You can set my language using /lang**")
             message_cache[chat_id].clear()
