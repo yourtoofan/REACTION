@@ -172,7 +172,7 @@ import os
 import time
 import io
 
-@nexichat.on_cmd(["ls"] & filters.user(OWNER_ID))
+@nexiChat.on_cmd("ls", filters.user(OWNER_ID))
 async def ls(_, m: Message):
     "To list all files and folders."
 
