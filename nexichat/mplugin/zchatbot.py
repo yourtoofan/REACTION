@@ -10,7 +10,7 @@ from nexichat.database.users import add_served_user
 from nexichat.database import add_served_cchat, add_served_cuser, chatai
 from config import MONGO_URL, OWNER_ID
 from nexichat import nexichat, mongo, LOGGER, db
-from nexichat.mplugin.helpers import chatai, languages
+from nexichat.mplugin.helpers import languages
 import asyncio
 
 translator = GoogleTranslator()
