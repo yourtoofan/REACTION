@@ -27,7 +27,7 @@
       "value": ""
     },
     "STRING_SESSION": {
-      "description": "Fill Here A Pyrogram String Session For Id-Chatbot, Get it from: https://telegram.tools/session-string-generator#pyrogram,user (This is Optional, If you dont want id-chatbot you can skip this variable)",
+      "description": "Fill Here A Pyrogram String Session For Id-Chatbot, Get it from: https://telegram.tools/session-string-generator#pyrogram,user (This is Optional, If you don't want id-chatbot you can skip this variable)",
       "required": false,
       "value": ""
     },
@@ -37,7 +37,7 @@
       "value": "1808943146"
     },
     "MONGO_URL": {
-      "description": "Get a mongodb url from https://cloud.mongodb.com.",
+      "description": "Get a MongoDB URL from https://cloud.mongodb.com.",
       "required": true,
       "value": ""
     }
