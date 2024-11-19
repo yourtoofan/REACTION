@@ -5,7 +5,7 @@ from pyrogram.enums import ChatAction
 from nexichat import nexichat as app
 
 
-@Client.on_message(filters.command(["gemini", "ai", "ask", "chatgpt"]))
+@app.on_message(filters.command(["gemini", "ai", "ask", "chatgpt"]))
 async def gemini_handler(client, message):
     if (
         message.text.startswith(f"/gemini@{client.me.username}")
