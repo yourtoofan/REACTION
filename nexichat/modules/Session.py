@@ -5,7 +5,8 @@ from config import API_ID, API_HASH
 
 @app.on_message(filters.command("generate"))
 async def generate_string_session(client: Client, message: Message):
-    await client.ask("Send your phone number (with country code):")
+    chat_id = message.chat.id
+    await client.ask(chat_id, "Send your phone number (with country code):")
     phone = response.text
 
     user_client = Client("user_session", api_id=API_ID, api_hash=API_HASH)
@@ -13,13 +14,13 @@ async def generate_string_session(client: Client, message: Message):
     try:
         await user_client.connect()
         await user_client.send_code(phone_number=phone)
-        await client.ask("Please check your Telegram account for the login code and send it here:")
+        await client.ask(chat_id, "Please check your Telegram account for the login code and send it here:")
         code = response.text
 
         try:
             await user_client.sign_in(phone_number=phone, code=code)
         except Exception:
-            await client.ask("Enter your two-step verification password:")
+            await client.ask(chat_id, "Enter your two-step verification password:")
             password = response.text
             await user_client.check_password(password=password)
 
