@@ -8,17 +8,9 @@
     "python",
     "pyrogram"
   ],
-  "buildpacks": [
-    {
-      "url": "heroku/python"
-    },
-    {
-      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
-    },
-    {
-      "url": "https://github.com/heroku/heroku-buildpack-apt"
-    }
-  ],
+    "buildpacks": [{
+    "url": "heroku/python"
+  }],
   "repository": "https://github.com/THE-VIP-BOY-OP/VIP-CHATBOT",
   "env": {
     "BOT_TOKEN": {
@@ -27,7 +19,7 @@
       "value": ""
     },
     "STRING_SESSION": {
-      "description": "Fill Here A Pyrogram String Session For Id-Chatbot, Get it from: https://telegram.tools/session-string-generator#pyrogram,user (This is Optional, If you don't want id-chatbot you can skip this variable)",
+      "description": "Fill Here A Pyrogram String Session For Id-Chatbot, Get it from: https://telegram.tools/session-string-generator#pyrogram,user (This is Optional, If you dont want id-chatbot you can skip this variable)",
       "required": false,
       "value": ""
     },
@@ -37,15 +29,9 @@
       "value": "1808943146"
     },
     "MONGO_URL": {
-      "description": "Get a MongoDB URL from https://cloud.mongodb.com.",
+      "description": "Get a mongodb url from https://cloud.mongodb.com.",
       "required": true,
       "value": ""
-    }
-  },
-  "formation": {
-    "worker": {
-      "quantity": 1,
-      "size": "basic"
     }
   }
 }
