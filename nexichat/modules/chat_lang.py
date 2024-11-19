@@ -53,7 +53,7 @@ async def store_messages(client, message: Message):
             Lang code :- ""
             ok so provideo me only overall [ Lang Name and Lang Code ] in above format Do not provide anything else.
             """
-            await asyncio.sleep(60)
+            
             base_url = "https://chatwithai.codesearch.workers.dev/?chat="
             response = requests.get(base_url + user_input)
             reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
