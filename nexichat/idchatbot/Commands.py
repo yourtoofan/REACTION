@@ -12,7 +12,7 @@ from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
 from config import MONGO_URL
 from nexichat import nexichat, mongo, LOGGER, db
-from nexichat.idchatbot.helpers import chatai, languages
+from nexichat.idchatbot.helpers import languages
 import asyncio
 
 translator = GoogleTranslator()
