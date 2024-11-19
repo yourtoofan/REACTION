@@ -10,7 +10,8 @@ async def generate_string_session(client: Client, message: Message):
 
     try:
         # Ask for phone number
-        response = await client.ask(chat_id, "Send your phone number (with country code):")
+        await message.reply("Send your phone number (with country code):")
+        response = await client.listen(chat_id, timeout=300)  # Wait for the user's response (5 minutes timeout)
         phone = response.text.strip()
 
         # Initialize user client
@@ -20,16 +21,18 @@ async def generate_string_session(client: Client, message: Message):
 
         # Send the login code
         await user_client.send_code(phone_number=phone)
-        ok = await client.ask(chat_id, "Please check your Telegram account for the login code and send it here:")
-        code = ok.text.strip()
+        await message.reply("Please check your Telegram account for the login code and send it here:")
+        code_response = await client.listen(chat_id, timeout=300)  # Wait for code input
+        code = code_response.text.strip()
 
         # Try signing in with the code
         try:
             await user_client.sign_in(phone_number=phone, code=code)
         except Exception:
             # Ask for two-step password if required
-            oh = await client.ask(chat_id, "Enter your two-step verification password:")
-            password = oh.text.strip()
+            await message.reply("Enter your two-step verification password:")
+            password_response = await client.listen(chat_id, timeout=300)
+            password = password_response.text.strip()
             await user_client.check_password(password=password)
 
         # Generate string session
