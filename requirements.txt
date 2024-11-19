@@ -17,4 +17,3 @@ psutil
 langdetect
 MukeshAPI
 speedtest-cli
-gitpython
