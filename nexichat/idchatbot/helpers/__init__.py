@@ -20,6 +20,5 @@ def is_admins(func: Callable) -> Callable:
 
 from .inline import *
 from .read import *
-from .storage import *
 from .language import *
 from .cowner import *
