@@ -3,6 +3,7 @@ import time
 from pymongo import MongoClient
 from Abg import patch
 from nexichat.userbot.userbot import Userbot
+from nexichat.userbot.update import git
 from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
 from pyrogram import Client
 from pyrogram.enums import ParseMode
@@ -34,6 +35,8 @@ def dbb():
     global clonedb
     clonedb = {}
     db = {}
+
+git()
 
 cloneownerdb = db.clone_owners
 
