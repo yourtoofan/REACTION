@@ -7,8 +7,8 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, 
 from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
-from nexichat.database import add_served_cchat, add_served_cuser
-from config import MONGO_URL
+from nexichat.database import add_served_cchat, add_served_cuser, chatai
+from config import MONGO_URL, OWNER_ID
 from nexichat import nexichat, mongo, LOGGER, db
 from nexichat.mplugin.helpers import chatai, languages
 import asyncio
@@ -17,16 +17,80 @@ translator = GoogleTranslator()
 
 lang_db = db.ChatLangDb.LangCollection
 status_db = db.chatbot_status_db.status
+abuse_words_db = db.abuse_words_db.words
 
 replies_cache = []
+abuse_cache = []
+blocklist = {}
+message_counts = {}
 
-async def load_replies_cache():
-    global replies_cache
-    replies_cache = await chatai.find().to_list(length=None)
+
+async def load_abuse_cache():
+    global abuse_cache
+    abuse_cache = [entry['word'] for entry in await abuse_words_db.find().to_list(length=None)]
+
+async def add_abuse_word(word: str):
+    global abuse_cache
+    if word not in abuse_cache:
+        await abuse_words_db.insert_one({"word": word})
+        abuse_cache.append(word)
+
+async def is_abuse_present(text: str):
+    global abuse_cache
+    if not abuse_cache:
+        await load_abuse_cache()
+    return any(word in text.lower() for word in abuse_cache)
+
+@Client.on_message(filters.command("block") & filters.user(OWNER_ID))
+async def block_word(client: Client, message: Message):
+    try:
+        if len(message.command) < 2:
+            await message.reply_text("**Usage:** `/block <word>`\nAdd a word to the abuse list.")
+            return
+        new_word = message.command[1].lower()
+        await add_abuse_word(new_word)
+        await message.reply_text(f"**Word '{new_word}' added to abuse list!**")
+    except Exception as e:
+        await message.reply_text(f"Error: {e}")
+
+@Client.on_message(filters.command("unblock") & filters.user(OWNER_ID))
+async def unblock_word(client: Client, message: Message):
+    try:
+        if len(message.command) < 2:
+            await message.reply_text("**Usage:** `/unblock <word>`\nRemove a word from the abuse list.")
+            return
+        word_to_remove = message.command[1].lower()
+        global abuse_cache
+        if word_to_remove in abuse_cache:
+            await abuse_words_db.delete_one({"word": word_to_remove})
+            abuse_cache.remove(word_to_remove)
+            await message.reply_text(f"**Word '{word_to_remove}' removed from abuse list!**")
+        else:
+            await message.reply_text(f"**Word '{word_to_remove}' is not in the abuse list.**")
+    except Exception as e:
+        await message.reply_text(f"Error: {e}")
+
+@Client.on_message(filters.command("blocked") & filters.user(OWNER_ID))
+async def list_blocked_words(client: Client, message: Message):
+    try:
+        global abuse_cache
+        if not abuse_cache:
+            await load_abuse_cache()
+        if abuse_cache:
+            blocked_words = ", ".join(abuse_cache)
+            await message.reply_text(f"**Blocked Words:**\n{blocked_words}")
+        else:
+            await message.reply_text("**No blocked words found.**")
+    except Exception as e:
+        await message.reply_text(f"Error: {e}")
 
 async def save_reply(original_message: Message, reply_message: Message):
     global replies_cache
     try:
+        if (original_message.text and await is_abuse_present(original_message.text)) or \
+           (reply_message.text and await is_abuse_present(reply_message.text)):
+            return
+        
         reply_data = {
             "word": original_message.text,
             "text": None,
@@ -63,6 +127,11 @@ async def save_reply(original_message: Message, reply_message: Message):
 
     except Exception as e:
         print(f"Error in save_reply: {e}")
+
+async def load_replies_cache():
+    global replies_cache
+    replies_cache = await chatai.find().to_list(length=None)
+    await load_abuse_cache()
 
 async def get_reply(word: str):
     global replies_cache
