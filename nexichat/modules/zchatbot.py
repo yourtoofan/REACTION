@@ -10,9 +10,10 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, 
 from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
+from nexichat.database import chatai
 from config import MONGO_URL, OWNER_ID
 from nexichat import nexichat, mongo, LOGGER, db
-from nexichat.modules.helpers import chatai, CHATBOT_ON, languages
+from nexichat.modules.helpers import CHATBOT_ON, languages
 from nexichat.modules.helpers import (
     ABOUT_BTN,
     ABOUT_READ,
