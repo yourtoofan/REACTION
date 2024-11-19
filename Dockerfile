@@ -1,13 +1,13 @@
-FROM python:latest
+FROM nikolaik/python-nodejs:python3.10-nodejs19
 
-RUN apt-get update -y && apt-get upgrade -y
-
-RUN pip3 install -U pip
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg aria2 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY . /app/
 WORKDIR /app/
-RUN pip3 install --upgrade pip
-RUN pip3 install -U -r requirements.txt
+RUN python -m pip install --no-cache-dir --upgrade pip
+RUN pip3 install --no-cache-dir --upgrade --requirement requirements.txt
 
-CMD bash start
-
+CMD python3 -m nexichat
