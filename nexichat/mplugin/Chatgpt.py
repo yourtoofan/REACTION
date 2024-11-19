@@ -25,10 +25,10 @@ async def gemini_handler(client, message):
         response = api.gemini(user_input)
         await client.send_chat_action(message.chat.id, ChatAction.TYPING)
         x = response["results"]
-        if x:
-            await message.reply_text(x, quote=True)
+        if not x:
+            await message.reply_text("**Gemini is currently dead**")
         else:
-            await message.reply_text("sᴏʀʀʏ sɪʀ! ᴘʟᴇᴀsᴇ Tʀʏ ᴀɢᴀɪɴ")
+            await message.reply_text(x, quote=True)
     except requests.exceptions.RequestException as e:
         pass
 
