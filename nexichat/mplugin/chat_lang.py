@@ -1,5 +1,5 @@
 from pyrogram import Client, filters
-import request
+import requests
 from pyrogram.types import Message
 from nexichat import nexichat as app, mongo, db
 from MukeshAPI import api
