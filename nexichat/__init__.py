@@ -3,7 +3,6 @@ import time
 from pymongo import MongoClient
 from Abg import patch
 from nexichat.userbot.userbot import Userbot
-from nexichat.userbot.git import update
 from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
 from pyrogram import Client
 from pyrogram.enums import ParseMode
@@ -35,8 +34,6 @@ def dbb():
     global clonedb
     clonedb = {}
     db = {}
-
-
 
 cloneownerdb = db.clone_owners
 
@@ -120,7 +117,5 @@ def get_readable_time(seconds: int) -> str:
     ping_time += ":".join(time_list)
     return ping_time
 
-update()
 nexichat = nexichat()
 userbot = Userbot()
-
