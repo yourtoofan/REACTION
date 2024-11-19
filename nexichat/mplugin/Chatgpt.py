@@ -57,3 +57,5 @@ async def gemini_handler(client, message):
             await message.reply_text(response.text)
         else:
             await message.reply_text("**Chat with ai is dead**")
+    except:
+        return
