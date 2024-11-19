@@ -8,7 +8,7 @@ from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
 from nexichat.database import add_served_cchat, add_served_cuser, chatai
-from config import MONGO_URL
+from config import MONGO_URL, OWNER_ID
 from nexichat import nexichat, mongo, LOGGER, db
 from nexichat.idchatbot.helpers import languages
 import asyncio
