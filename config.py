@@ -16,3 +16,6 @@ UPSTREAM_REPO = getenv("UPSTREAM_REPO", "https://github.com/THE-VIP-BOY-OP/VIP-C
 SUPPORT_GRP = "TG_FRIENDSS"
 UPDATE_CHNL = "VIP_CREATORS"
 OWNER_USERNAME = "THE_VIP_BOY"
+# GIT TOKEN ( if your edited repo is private)
+GIT_TOKEN = getenv("GIT_TOKEN", "")
+    
