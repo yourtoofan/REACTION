@@ -4,7 +4,7 @@ from pyrogram.types import Message
 from nexichat import nexichat as app, mongo, db
 from MukeshAPI import api
 import asyncio
-from nexichat.modules.helpers import chatai, CHATBOT_ON, languages
+from nexichat.modules.helpers import CHATBOT_ON, languages
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 
 lang_db = db.ChatLangDb.LangCollection
