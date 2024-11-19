@@ -34,3 +34,26 @@ async def gemini_handler(client, message):
 
 
 
+@Client.on_message(filters.command(["chat", "ai", "ask", "chatgpt"]))
+async def gemini_handler(client, message):
+    if (
+        message.text.startswith(f"/gemini@{client.me.username}")
+        and len(message.text.split(" ", 1)) > 1
+    ):
+        user_input = message.text.split(" ", 1)[1]
+    elif message.reply_to_message and message.reply_to_message.text:
+        user_input = message.reply_to_message.text
+    else:
+        if len(message.command) > 1:
+            user_input = " ".join(message.command[1:])
+        else:
+            await message.reply_text("ᴇxᴀᴍᴘʟᴇ :- `/ask who is Narendra Modi")
+            return
+
+    try:
+        base_url = "https://chatwithai.codesearch.workers.dev/?chat="
+        response = requests.get(base_url + user_input)
+        if response:
+            await message.reply_text(response.text)
+        else:
+            await message.reply_text("**Chat with ai is dead**")
