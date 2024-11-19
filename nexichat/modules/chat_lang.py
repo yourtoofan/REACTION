@@ -1,4 +1,5 @@
 from pyrogram import Client, filters
+import request
 from pyrogram.types import Message
 from nexichat import nexichat as app, mongo, db
 from MukeshAPI import api
@@ -12,6 +13,13 @@ message_cache = {}
 async def get_chat_language(chat_id):
     chat_lang = await lang_db.find_one({"chat_id": chat_id})
     return chat_lang["language"] if chat_lang and "language" in chat_lang else None
+
+@app.on_message(filters.command("chatlang"))
+async def fetch_chat_lang(client, message):
+    chat_id = message.chat.id
+    chat_lang = await get_chat_language(chat_id)
+    await message.reply_text(f"The language code using for this chat is: {chat_lang}")
+
 
 @app.on_message(filters.text, group=2)
 async def store_messages(client, message: Message):
@@ -46,17 +54,12 @@ async def store_messages(client, message: Message):
             ok so provideo me only overall [ Lang Name and Lang Code ] in above format Do not provide anything else.
             """
             await asyncio.sleep(60)
-            response = api.gemini(user_input)
-            x = response["results"]
+            base_url = "https://chatwithai.codesearch.workers.dev/?chat="
+            response = requests.get(base_url + user_input)
             reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
-            await message.reply_text(f"**Chat language detected for this chat:**\n\n{x}\n\n**You can set my lang by /lang**", reply_markup=reply_markup)
+            await message.reply_text(f"**Chat language detected for this chat:**\n\n{response}\n\n**You can set my lang by /lang**", reply_markup=reply_markup)
             message_cache[chat_id].clear()
 
 
 
-@app.on_message(filters.command("chatlang"))
-async def fetch_chat_lang(client, message):
-    chat_id = message.chat.id
-    chat_lang = await get_chat_language(chat_id)
-    await message.reply_text(f"The language code using for this chat is: {chat_lang}")
 
