@@ -1,14 +1,11 @@
 import asyncio
 import shlex
 from typing import Tuple
-
 from git import Repo
 from git.exc import GitCommandError, InvalidGitRepositoryError
-
 import config
 
 loop = asyncio.get_event_loop_policy().get_event_loop()
-
 
 def install_req(cmd: str) -> Tuple[str, str, int, int]:
     async def install_requirements():
@@ -28,7 +25,6 @@ def install_req(cmd: str) -> Tuple[str, str, int, int]:
 
     return loop.run_until_complete(install_requirements())
 
-
 def git():
     REPO_LINK = config.UPSTREAM_REPO
     if config.GIT_TOKEN:
@@ -37,25 +33,21 @@ def git():
         UPSTREAM_REPO = f"https://{GIT_USERNAME}:{config.GIT_TOKEN}@{TEMP_REPO}"
     else:
         UPSTREAM_REPO = config.UPSTREAM_REPO
+    
     try:
-        repo = Repo()
+        repo = Repo("/app")
         print(f"Git Client Found [VPS DEPLOYER]")
     except GitCommandError:
         print(f"Invalid Git Command")
     except InvalidGitRepositoryError:
-        repo = Repo.init()
+        repo = Repo.init("/app")
         if "origin" in repo.remotes:
             origin = repo.remote("origin")
         else:
             origin = repo.create_remote("origin", UPSTREAM_REPO)
         origin.fetch()
-        repo.create_head(
-            config.UPSTREAM_BRANCH,
-            origin.refs[config.UPSTREAM_BRANCH],
-        )
-        repo.heads[config.UPSTREAM_BRANCH].set_tracking_branch(
-            origin.refs[config.UPSTREAM_BRANCH]
-        )
+        repo.create_head(config.UPSTREAM_BRANCH, origin.refs[config.UPSTREAM_BRANCH])
+        repo.heads[config.UPSTREAM_BRANCH].set_tracking_branch(origin.refs[config.UPSTREAM_BRANCH])
         repo.heads[config.UPSTREAM_BRANCH].checkout(True)
 
         try:
@@ -69,5 +61,6 @@ def git():
         nrs.pull(config.UPSTREAM_BRANCH)
     except GitCommandError:
         repo.git.reset("--hard", "FETCH_HEAD")
+
     install_req("pip3 install --no-cache-dir -r requirements.txt")
-    print(f"Fetched Updates from: UPSTREAM_REPO")
+    print(f"Fetched Updates from: {UPSTREAM_REPO}")
