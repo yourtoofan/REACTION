@@ -57,7 +57,7 @@ async def store_messages(client, message: Message):
             base_url = "https://chatwithai.codesearch.workers.dev/?chat="
             response = requests.get(base_url + user_input)
             reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
-            await message.reply_text(f"**Chat language detected for this chat:**\n\n{response}\n\n**You can set my lang by /lang**", reply_markup=reply_markup)
+            await message.reply_text(f"**Chat language detected for this chat:**\n\n{response.text}\n\n**You can set my lang by /lang**", reply_markup=reply_markup)
             message_cache[chat_id].clear()
 
 
