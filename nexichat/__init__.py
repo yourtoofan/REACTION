@@ -3,7 +3,7 @@ import time
 from pymongo import MongoClient
 from Abg import patch
 from nexichat.userbot.userbot import Userbot
-from nexichat.userbot.update import update
+from nexichat.userbot.git import update
 from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
 from pyrogram import Client
 from pyrogram.enums import ParseMode
