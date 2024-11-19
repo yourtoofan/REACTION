@@ -8,9 +8,17 @@
     "python",
     "pyrogram"
   ],
-    "buildpacks": [{
-    "url": "heroku/python"
-  }],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    },
+    {
+      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
+    },
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-apt"
+    }
+  ],
   "repository": "https://github.com/THE-VIP-BOY-OP/VIP-CHATBOT",
   "env": {
     "BOT_TOKEN": {
@@ -33,19 +41,11 @@
       "required": true,
       "value": ""
     }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "basic"
+    }
   }
-  "buildpacks": [
-          {
-              "url": "heroku/python"
-          },
-          {
-              "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
-          }
-      ],
-      "formation": {
-          "worker": {
-              "quantity": 1,
-              "size": "basic"
-          }
-      }
 }
