@@ -27,6 +27,7 @@ boot = time.time()
 mongodb = MongoCli(config.MONGO_URL)
 db = mongodb.Anonymous
 mongo = MongoClient(config.MONGO_URL)
+mongodb = mongo.VIP
 OWNER = config.OWNER_ID
 _boot_ = time.time()
 clonedb = None
@@ -43,7 +44,7 @@ def sudo():
         for user_id in OWNER:
             SUDOERS.add(user_id)
     else:
-        sudoersdb = db.sudoers
+        sudoersdb = mongodb.sudoers
         sudoers = sudoersdb.find_one({"sudo": "sudo"})
         sudoers = [] if not sudoers else sudoers["sudoers"]
         for user_id in OWNER:
