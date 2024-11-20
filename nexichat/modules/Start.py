@@ -7,7 +7,7 @@ import psutil
 import config
 from nexichat import _boot_
 from nexichat import get_readable_time
-from nexichat import nexichat, mongo
+from nexichat import nexichat, mongo, SUDOERS
 from datetime import datetime
 from pymongo import MongoClient
 from pyrogram.enums import ChatType
@@ -441,7 +441,7 @@ broadcast_lock = asyncio.Lock()
 
 
 @nexichat.on_message(
-    filters.command(["broadcast", "gcast"]) & filters.user(int(OWNER_ID))
+    filters.command(["broadcast", "gcast"]) & SUDOERS
 )
 async def broadcast_message(client, message):
     global IS_BROADCASTING
