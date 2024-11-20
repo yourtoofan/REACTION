@@ -7,8 +7,7 @@ import config
 import os
 from nexichat import _boot_
 from nexichat import get_readable_time
-from nexichat.mplugin.helpers import is_owner
-from nexichat import mongo, nexichat as app
+from nexichat import mongo, nexichat as app, SUDOERS
 from datetime import datetime
 from pymongo import MongoClient
 from pyrogram.enums import ChatType
@@ -29,14 +28,11 @@ IS_BROADCASTING = False
 broadcast_lock = asyncio.Lock()
 
 
-@app.on_message(filters.command(["broadcast", "gcast"]))
+@app.on_message(filters.command(["broadcast", "gcast"]) & SUDOERS)
 async def broadcast_message(client, message):
     global IS_BROADCASTING
     bot_id = (await client.get_me()).id
     user_id = message.from_user.id
-    if not await is_owner(bot_id, user_id):
-        await message.reply_text("You don't have permission to use this command on this bot.")
-        return
         
     async with broadcast_lock:
         if IS_BROADCASTING:
