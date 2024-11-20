@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from nexichat import nexichat
 
-@nexichat.on_message(filters.incoming, group=5)
+@nexichat.on_message(filters.incoming)
 async def react_to_messages(client: Client, message: Message):
     try:
         await message.react("👍")
