@@ -4,7 +4,7 @@ from typing import Dict, List, Union
 sudoersdb = mongodb.sudoers
 
 async def get_sudoers() -> list:
-    sudoers = await sudoersdb.find_one({"sudo": "sudo"})
+    sudoers = sudoersdb.find_one({"sudo": "sudo"})
     if not sudoers:
         return []
     return sudoers["sudoers"]
