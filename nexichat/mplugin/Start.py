@@ -219,7 +219,7 @@ async def start(client: Client, m: Message):
         chats = len(await get_served_cchats(bot_id))
         UP, CPU, RAM, DISK = await bot_sys_stats()
         await m.reply_photo(photo=chat_photo, caption=START.format(users, chats, UP), reply_markup=InlineKeyboardMarkup(START_BOT))
-        await message.reply_text(f"**{AUTO_MSG}**")
+        await m.reply_text(f"**{AUTO_MSG}**")
         await add_served_cuser(bot_id, m.chat.id) 
         await add_served_user(m.chat.id)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(f"{m.chat.first_name}", user_id=m.chat.id)]])
@@ -239,7 +239,7 @@ async def start(client: Client, m: Message):
             caption=GSTART.format(m.from_user.mention or "can't mention"),
             reply_markup=InlineKeyboardMarkup(HELP_START),
         )
-        await message.reply_text(f"**{AUTO_MSG}**")
+        await m.reply_text(f"**{AUTO_MSG}**")
         await add_served_cchat(bot_id, m.chat.id)
         await add_served_chat(m.chat.id)
 
