@@ -6,7 +6,7 @@ from nexichat import nexichat as app
 from nexichat import SUDOERS
 from nexichat.database import add_sudo, remove_sudo
 
-@app.on_message(filters.command("addsudo") & filters.user(OWNER_ID))
+@Client.on_message(filters.command("addsudo") & filters.user(OWNER_ID))
 async def useradd(client, message: Message):
     if MONGO_URL is None:
         return await message.reply_text(
