@@ -2,7 +2,6 @@ import logging
 import time
 from pymongo import MongoClient
 from Abg import patch
-from nexichat.userbot.userbot import Userbot
 from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
 from pyrogram import Client, filters
 from pyrogram.enums import ParseMode
@@ -143,4 +142,3 @@ def get_readable_time(seconds: int) -> str:
     
 sudo()
 nexichat = nexichat()
-userbot = Userbot()
