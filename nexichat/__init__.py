@@ -39,7 +39,7 @@ def dbb():
     
 def sudo():
     global SUDOERS
-    OWNER = list(map(int, (config.OWNER_ID).split()))
+    OWNER = config.OWNER_ID
     if config.MONGO_URL is None:
         for user_id in OWNER:
             SUDOERS.add(user_id)
@@ -47,7 +47,7 @@ def sudo():
         sudoersdb = mongodb.sudoers
         sudoers = sudoersdb.find_one({"sudo": "sudo"})
         sudoers = [] if not sudoers else sudoers["sudoers"]
-        for user_id in OWNER:
+        for user_id == OWNER:
             SUDOERS.add(user_id)
             if user_id not in sudoers:
                 sudoers.append(user_id)
