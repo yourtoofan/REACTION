@@ -1,7 +1,7 @@
 from nexichat import mongodb
 from typing import Dict, List, Union
 
-sudoersdb = db.sudoers
+sudoersdb = mongodb.sudoers
 
 async def get_sudoers() -> list:
     sudoers = await sudoersdb.find_one({"sudo": "sudo"})
