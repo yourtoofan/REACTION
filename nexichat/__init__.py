@@ -4,7 +4,7 @@ from pymongo import MongoClient
 from Abg import patch
 from nexichat.userbot.userbot import Userbot
 from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
-from pyrogram import Client
+from pyrogram import Client, filters
 from pyrogram.enums import ParseMode
 import config
 import uvloop
