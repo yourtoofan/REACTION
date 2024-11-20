@@ -7,13 +7,9 @@ dnspython
 tgcrypto==1.2.2
 asyncio
 python-dotenv
-lexica-api
-deep-translator
 pycgi
 apscheduler
 Flask
 uvloop
 psutil
-langdetect
-MukeshAPI
 speedtest-cli
