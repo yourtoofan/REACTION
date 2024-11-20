@@ -1,4 +1,4 @@
-from nexichat import db
+from nexichat import db, SUDOERS
 from config import OWNER_ID
 
 cloneownerdb = db.clone_owners
@@ -18,6 +18,6 @@ async def get_idclone_owner(clone_id):
     
 async def is_owner(clone_id, user_id):
     owner_id = await get_idclone_owner(clone_id)
-    if owner_id == user_id or user_id == OWNER_ID:
+    if owner_id == user_id or user_id == OWNER_ID or user_id in SUDOERS:
         return True
     return False
