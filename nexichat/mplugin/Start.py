@@ -4,6 +4,7 @@ import random
 import time
 import psutil
 import config
+import os
 from nexichat import _boot_
 from nexichat import get_readable_time
 from nexichat.mplugin.helpers import is_owner
@@ -31,6 +32,9 @@ from nexichat.mplugin.helpers import (
     SOURCE_READ,
 )
 
+OK = = "**ʜᴇʏ👀**" 
+
+AUTO_MSG = f"""{os.getenv("AUTO_MSG")}""" if AUTO_MSG else OK
 GSTART = """**ʜᴇʏ ᴅᴇᴀʀ {}**\n\n**ᴛʜᴀɴᴋs ғᴏʀ sᴛᴀʀᴛ ᴍᴇ ɪɴ ɢʀᴏᴜᴘ ʏᴏᴜ ᴄᴀɴ ᴄʜᴀɴɢᴇ ʟᴀɴɢᴜᴀɢᴇ ʙʏ ᴄʟɪᴄᴋ ᴏɴ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴs.**\n**ᴄʟɪᴄᴋ ᴀɴᴅ sᴇʟᴇᴄᴛ ʏᴏᴜʀ ғᴀᴠᴏᴜʀɪᴛᴇ ʟᴀɴɢᴜᴀɢᴇ ᴛᴏ sᴇᴛ ᴄʜᴀᴛ ʟᴀɴɢᴜᴀɢᴇ ғᴏʀ ʙᴏᴛ ʀᴇᴘʟʏ.**\n\n**ᴛʜᴀɴᴋ ʏᴏᴜ ᴘʟᴇᴀsᴇ ᴇɴɪᴏʏ.**"""
 STICKER = [
     "CAACAgUAAx0CYlaJawABBy4vZaieO6T-Ayg3mD-JP-f0yxJngIkAAv0JAALVS_FWQY7kbQSaI-geBA",
@@ -124,6 +128,7 @@ async def welcomejej(client, message: Message):
                 try:
                     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("sᴇʟᴇᴄᴛ ʟᴀɴɢᴜᴀɢᴇ", callback_data="choose_lang")]])    
                     await message.reply_text(text="**тнαикѕ ꜰᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ ɪɴ ᴛʜɪꜱ ɢʀᴏᴜᴩ.**\n\n**ᴋɪɴᴅʟʏ  ꜱᴇʟᴇᴄᴛ  ʙᴏᴛ  ʟᴀɴɢᴜᴀɢᴇ  ꜰᴏʀ  ᴛʜɪꜱ  ɢʀᴏᴜᴩ  ʙʏ  ᴛʏᴩᴇ  ☞  /lang**", reply_markup=reply_markup)
+                    await message.reply_text(f"**{AUTO_MSG}**")
                 except Exception as e:
                     print(f"{e}")
                     pass
@@ -215,7 +220,7 @@ async def start(client: Client, m: Message):
         chats = len(await get_served_cchats(bot_id))
         UP, CPU, RAM, DISK = await bot_sys_stats()
         await m.reply_photo(photo=chat_photo, caption=START.format(users, chats, UP), reply_markup=InlineKeyboardMarkup(START_BOT))
-        
+        await message.reply_text(f"**{AUTO_MSG}**")
         await add_served_cuser(bot_id, m.chat.id) 
         await add_served_user(m.chat.id)
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(f"{m.chat.first_name}", user_id=m.chat.id)]])
@@ -235,6 +240,7 @@ async def start(client: Client, m: Message):
             caption=GSTART.format(m.from_user.mention or "can't mention"),
             reply_markup=InlineKeyboardMarkup(HELP_START),
         )
+        await message.reply_text(f"**{AUTO_MSG}**")
         await add_served_cchat(bot_id, m.chat.id)
         await add_served_chat(m.chat.id)
 
