@@ -1,4 +1,4 @@
-from nexichat import db
+from nexichat import mongodb
 from typing import Dict, List, Union
 
 sudoersdb = db.sudoers
