@@ -18,7 +18,7 @@ async def useradd(client, message: Message):
         user = message.text.split(None, 1)[1]
         if "@" in user:
             user = user.replace("@", "")
-        user = await app.get_users(user)
+        user = await client.get_users(user)
         if user.id in SUDOERS:
             return await message.reply_text(f"{user.mention} ɪs ᴀʟʀᴇᴀᴅʏ ᴀ sᴜᴅᴏ ᴜsᴇʀ.")
         added = await add_sudo(user.id)
@@ -55,7 +55,7 @@ async def userdel(client, message: Message):
         user = message.text.split(None, 1)[1]
         if "@" in user:
             user = user.replace("@", "")
-        user = await app.get_users(user)
+        user = await client.get_users(user)
         if user.id not in SUDOERS:
             return await message.reply_text("ɴᴏᴛ ᴀ ᴘᴀʀᴛ ᴏꜰ ʙᴏᴛ's sᴜᴅᴏ.")
         removed = await remove_sudo(user.id)
@@ -81,7 +81,7 @@ async def sudoers_list(client, message: Message):
     text = "🔥<u> **ᴏᴡɴᴇʀ:**</u>\n"
     count = 0
     try:
-        user = await app.get_users(OWNER_ID)
+        user = await client.get_users(OWNER_ID)
         user_name = user.first_name if not user.mention else user.mention
         count += 1
         text += f"{count}➤ {user_name}\n"
@@ -92,7 +92,7 @@ async def sudoers_list(client, message: Message):
     for user_id in SUDOERS:
         if user_id != OWNER_ID:
             try:
-                user = await app.get_users(user_id)
+                user = await client.get_users(user_id)
                 user_name = user.first_name if not user.mention else user.mention
                 if smex == 0:
                     smex += 1
