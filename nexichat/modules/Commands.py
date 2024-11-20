@@ -11,7 +11,7 @@ from deep_translator import GoogleTranslator
 from nexichat.database.chats import add_served_chat
 from nexichat.database.users import add_served_user
 from config import MONGO_URL, OWNER_ID
-from nexichat import nexichat, mongo, LOGGER, db
+from nexichat import nexichat, mongo, LOGGER, db, SUDOERS
 from nexichat.modules.helpers import languages, CHATBOT_ON
 from nexichat.modules.helpers import (
     ABOUT_BTN,
@@ -37,7 +37,7 @@ status_db = db.chatbot_status_db.status
 
 
 @nexichat.on_message(
-    filters.command(["restart"]) & filters.user(int(OWNER_ID))
+    filters.command(["restart"]) & SUDOERS
 )
 async def restart(client: Client, message: Message):
     reply = await message.reply_text("**🔁 Rᴇsᴛᴀʀᴛɪɴɢ 🔥 ...**")
