@@ -59,7 +59,7 @@ def sudo():
         if sudoers:
             for x in sudoers:
                 SUDOERS.add(x)
-    LOGGER(__name__).info(f"Sudoers Loaded.")
+    print(f"Sudoers Loaded.")
 
 cloneownerdb = db.clone_owners
 
