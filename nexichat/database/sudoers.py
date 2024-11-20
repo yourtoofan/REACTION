@@ -22,7 +22,7 @@ async def add_sudo(user_id: int) -> bool:
 async def remove_sudo(user_id: int) -> bool:
     sudoers = await get_sudoers()
     sudoers.remove(user_id)
-    await sudoersdb.update_one(
+    sudoersdb.update_one(
         {"sudo": "sudo"}, {"$set": {"sudoers": sudoers}}, upsert=True
     )
     return True
