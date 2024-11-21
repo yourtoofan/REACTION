@@ -19,6 +19,26 @@ from nexichat.database.chats import get_served_chats, add_served_chat
 from nexichat.database.users import get_served_users, add_served_user
 from nexichat.database.clonestats import get_served_cchats, get_served_cusers, add_served_cuser, add_served_cchat
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
+from pyrogram.types import InlineKeyboardButton
+
+from config import SUPPORT_GRP, UPDATE_CHNL
+from nexichat import OWNER, nexichat
+
+
+
+PNG_BTN = [
+    [
+        InlineKeyboardButton(text="🛠️ σρεи ¢σммαиdꜱ ⚙️", callback_data="HELP"),
+    ],
+    [
+        InlineKeyboardButton(
+            text="⦿ ᴄʟᴏsᴇ ⦿",
+            callback_data="CLOSE",
+        ),
+    ],
+]
+
+
 
 
 IMG = [
