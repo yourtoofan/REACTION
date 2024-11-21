@@ -13,7 +13,7 @@ from datetime import datetime
 from pymongo import MongoClient
 from pyrogram.enums import ChatType
 from pyrogram import Client, filters
-from nexichat import CLONE_OWNERS, db
+from nexichat import db
 from config import OWNER_ID, MONGO_URL, OWNER_USERNAME
 from pyrogram.errors import FloodWait, ChatAdminRequired
 from nexichat.database.chats import get_served_chats, add_served_chat
