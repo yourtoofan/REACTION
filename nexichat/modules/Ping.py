@@ -7,7 +7,6 @@ import config
 import os
 from nexichat import _boot_
 from nexichat import get_readable_time
-from nexichat.mplugin.helpers import is_owner
 from nexichat import nexichat
 from datetime import datetime
 from pymongo import MongoClient
