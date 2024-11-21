@@ -33,8 +33,8 @@ from nexichat import OWNER, nexichat
 @nexichat.on_message(filters.command("stats"))
 async def stats(cli: Client, message: Message):
     bot_id = (await cli.get_me()).id
-    users = len(await get_served_users(bot_id))
-    chats = len(await get_served_chats(bot_id))
+    users = len(await get_served_users())
+    chats = len(await get_served_chats())
     
     await message.reply_text(
         f"""{(await cli.get_me()).mention} Reaction Bot Stats:
