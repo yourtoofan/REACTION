@@ -1,4 +1,28 @@
+import asyncio
+import logging
+import random
+import time
+import psutil
+import config
+import os
+from nexichat import _boot_
+from nexichat import get_readable_time
+from nexichat import nexichat
+from datetime import datetime
+from pymongo import MongoClient
+from pyrogram.enums import ChatType
+from pyrogram import Client, filters
+from nexichat import db
+from config import OWNER_ID, MONGO_URL, OWNER_USERNAME
+from pyrogram.errors import FloodWait, ChatAdminRequired
+from nexichat.database.chats import get_served_chats, add_served_chat
+from nexichat.database.users import get_served_users, add_served_user
+from nexichat.database.clonestats import get_served_cchats, get_served_cusers, add_served_cuser, add_served_cchat
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
+from pyrogram.types import InlineKeyboardButton
 
+from config import SUPPORT_GRP, UPDATE_CHNL
+from nexichat import OWNER, nexichat
 
 
 
