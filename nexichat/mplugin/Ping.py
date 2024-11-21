@@ -20,6 +20,17 @@ from nexichat.database.chats import get_served_chats, add_served_chat
 from nexichat.database.users import get_served_users, add_served_user
 from nexichat.database.clonestats import get_served_cchats, get_served_cusers, add_served_cuser, add_served_cchat
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
+from nexichat.mplugin.helpers import (
+    START,
+    START_BOT,
+    PNG_BTN,
+    CLOSE_BTN,
+    HELP_BTN,
+    HELP_BUTN,
+    HELP_READ,
+    HELP_START,
+    SOURCE_READ,
+)
 
 IMG = [
     "https://graph.org/file/210751796ff48991b86a3.jpg",
