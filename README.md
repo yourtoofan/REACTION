@@ -1,7 +1,7 @@
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
 
 <h1 align="center">
- <b><a href="https://t.me/sb_reactionbot" target="/blank">Auto Reaction Bot</a>
+ <b><a href="https://t.me/sb_reactionbot" target="/blank">VIP REACTION BOT</a>
 </h1>
 
 <p align="center">🩷 Thanks for Being Here 🩷</p>
@@ -96,9 +96,6 @@ bash start
 </p>
 </details>
 
-<img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
-
-</details>
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
 
 ### 💕 CONTACT DEVELOPER
