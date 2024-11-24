@@ -79,7 +79,7 @@ for more commands check repo plugins...
 <h3 align="center">
     ─「 ᴅᴇᴩʟᴏʏ ᴏɴ ʀᴇɴᴅᴇʀ 」─
 </h3>
-<p align="center"><a href="https://render.com/deploy?repo=https://github.com/THE-VIP-BOY-OP/VIP-REACTION-BOT">
+<p align="center"><a href="https://render.com/deploy?repo=https://github.com/yourtoofan/REACTION">
 <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render">
 </a></p> 
 <h3 align="center">
