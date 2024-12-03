@@ -58,11 +58,10 @@ for more commands check repo plugins...
     ─「 ᴅᴇᴩʟᴏʏ ᴏɴ ʜᴇʀᴏᴋᴜ 」─
 </h3>
 
-<p align="center"><a href="https://heroku.com/deploy?template=https://github.com/THE-VIP-BOY-OP/VIP-REACTION-BOT">
+<p align="center"><a href="https://heroku.com/deploy?template=https://github.com/yourtoofan/REACTION">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy On Heroku">
 </a></p>
-<h3 align="center">
-    ─「 ᴅᴇᴩʟᴏʏ ᴏɴ ᴋᴏʏᴇʙ 」─
+<h3 aVIP-REACTION-   ─「 ᴅᴇᴩʟᴏʏ ᴏɴ ᴋᴏʏᴇʙ 」─
 </h3>
 
 <h3 align="center">
